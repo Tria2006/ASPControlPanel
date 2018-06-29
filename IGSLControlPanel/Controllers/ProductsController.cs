@@ -5,42 +5,37 @@ using IGSLControlPanel.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Models;
-using Newtonsoft.Json;
 
 namespace IGSLControlPanel.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly IGSLContext _context;
+        private readonly ProductsListPageViewModel _vm;
 
         public ProductsController(IGSLContext context)
         {
             _context = context;
+            _vm = new ProductsListPageViewModel(_context);
         }
 
         // GET: Products
-        public async Task<IActionResult> Index()
+        public IActionResult Index()
         {
-            var vm = new ProductsListPageViewModel(_context);
-            return View(vm.FoldersTree);
+            return View(_vm.FoldersTree);
         }
         
         // GET: Products/Details/5
-        public async Task<IActionResult> Details(Guid? id)
+        public IActionResult FolderDetails(Guid? id)
         {
             if (id == null)
             {
                 return NotFound();
             }
 
-            var product = await _context.Products
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (product == null)
-            {
-                return NotFound();
-            }
-
-            return View();
+            var folder = _vm.GetFolderById((Guid)id, _vm.FoldersTree);
+            if (folder == null) return NotFound();
+            return View("Index", folder);
         }
 
         // GET: Products/Create

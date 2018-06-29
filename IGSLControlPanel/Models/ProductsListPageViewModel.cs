@@ -8,38 +8,39 @@ namespace IGSLControlPanel.Models
     public class ProductsListPageViewModel
     {
         private readonly IGSLContext _context;
-        public List<FolderTreeEntry> FoldersTree { get; set; } = new List<FolderTreeEntry>();
-        private List<Product> _products { get; set; } = new List<Product>();
-        private List<FolderTreeEntry> _folders { get; set; } = new List<FolderTreeEntry>();
-        public IEnumerable<Product> ProductsWOFolder { get; private set; }
+        public FolderTreeEntry FoldersTree { get; set; } = new FolderTreeEntry();
+        private List<Product> _products { get; set; }
+        private List<FolderTreeEntry> _folders { get; set; }
+        private IEnumerable<Product> _productsWOFolder { get; set; }
 
         public ProductsListPageViewModel(IGSLContext context)
         {
             _context = context;
             _folders = _context.FolderTreeEntries.ToList();
             _products = _context.Products.ToList();
-            ProductsWOFolder = _products.Where(x => x.FolderId == null);
+            _productsWOFolder = _products.Where(x => x.FolderId == null);
             BuildFolderTree();
         }
 
         public void RenewFolders()
         {
-            _folders = FoldersTree = new List<FolderTreeEntry>();
+            _folders = new List<FolderTreeEntry>();
             _products = new List<Product>();
             _folders = _context.FolderTreeEntries.ToList();
             _products = _context.Products.ToList();
-            ProductsWOFolder = _products.Where(x => x.FolderId == null);
+            _productsWOFolder = _products.Where(x => x.FolderId == null);
         }
 
-        public List<FolderTreeEntry> BuildFolderTree()
+        public FolderTreeEntry BuildFolderTree()
         {
             var firstLevelFolders = _folders.Where(s => s.ParentFolderId == null);
             foreach (var folder in firstLevelFolders)
             {
                 BuildChildFolders(folder);
                 BuildProducts(folder);
-                FoldersTree.Add(folder);
+                FoldersTree.ChildFolders.Add(folder);
             }
+            FoldersTree.Products.AddRange(_productsWOFolder);
             return FoldersTree;
         }
 
@@ -114,6 +115,21 @@ namespace IGSLControlPanel.Models
             if (product == null) return;
             _context.Products.Remove(product);
             _context.SaveChanges();
+        }
+
+        public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
+        {
+            if (folder.Id == id) return folder;
+            foreach (var f in folder.ChildFolders)
+            {
+                if (f.Id == id) return f;
+                foreach (var childFolder in f.ChildFolders)
+                {
+                    var result = GetFolderById(id, childFolder);
+                    if (result != null) return result;
+                }
+            }
+            return null;
         }
 
         private void CreateTestProducts()
