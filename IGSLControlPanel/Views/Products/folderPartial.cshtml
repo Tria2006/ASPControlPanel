@@ -1,0 +1,29 @@
+﻿@model IGSLControlPanel.Models.FolderTreeEntry
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+    <ul>
+        @foreach (var child in Model.ChildFolders)
+        {
+            <li>
+                @if (child.ChildFolders.Any() || child.Products.Any())
+                {
+                    <img src="images/Icons/folder.png" width="18" height="18" alt="Image"/>
+                }
+                else
+                {
+                    <img src="images/Icons/emptyfolder.png" width="18" height="18" alt="Image" />  
+                }
+                @Html.DisplayTextFor(c => child.Name)
+            </li>
+        }
+        @foreach (var p in Model.Products)
+        {
+            <li>@Html.DisplayTextFor(c => p.Name)</li>
+        }
+    </ul>
+</body>
+</html>
