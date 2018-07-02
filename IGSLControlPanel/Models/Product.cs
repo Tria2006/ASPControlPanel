@@ -18,5 +18,7 @@ namespace IGSLControlPanel.Models
         public Guid? FolderId { get; set; }
 
         public List<ProductParameter> ProductParameters { get; set; } = new List<ProductParameter>();
+
+        public bool IsDeleted { get; set; }
     }
 }

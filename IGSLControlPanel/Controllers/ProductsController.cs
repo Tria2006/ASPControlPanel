@@ -5,18 +5,19 @@ using IGSLControlPanel.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Models;
+using IGSLControlPanel.Helpers;
 
 namespace IGSLControlPanel.Controllers
 {
     public class ProductsController : Controller
     {
         private readonly IGSLContext _context;
-        private readonly ProductsListPageViewModel _vm;
+        private readonly FolderDataHelper _vm;
 
         public ProductsController(IGSLContext context)
         {
             _context = context;
-            _vm = new ProductsListPageViewModel(_context);
+            _vm = new FolderDataHelper(_context);
         }
 
         // GET: Products

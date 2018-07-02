@@ -2,10 +2,11 @@
 using System.Collections.Generic;
 using System.Linq;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Models;
 
-namespace IGSLControlPanel.Models
+namespace IGSLControlPanel.Helpers
 {
-    public class ProductsListPageViewModel
+    public class FolderDataHelper
     {
         private readonly IGSLContext _context;
         public FolderTreeEntry FoldersTree { get; set; } = new FolderTreeEntry();
@@ -13,7 +14,7 @@ namespace IGSLControlPanel.Models
         private List<FolderTreeEntry> _folders { get; set; }
         private IEnumerable<Product> _productsWOFolder { get; set; }
 
-        public ProductsListPageViewModel(IGSLContext context)
+        public FolderDataHelper(IGSLContext context)
         {
             _context = context;
             _folders = _context.FolderTreeEntries.ToList();
@@ -130,33 +131,6 @@ namespace IGSLControlPanel.Models
                 }
             }
             return null;
-        }
-
-        private void CreateTestProducts()
-        {
-            for (int i = 1; i < 30; i++)
-            {
-                _products.Add(new Product
-                {
-                    Name = $"Product {i}"
-                });
-            }
-            _context.Products.AddRange(_products);
-            _context.SaveChanges();
-        }
-
-        private void CreateFolderTestData()
-        {
-            for (int i = 1; i < 5; i++)
-            {
-                _folders.Add(new FolderTreeEntry
-                {
-                    Name = $"Folder {i}",
-                    ParentFolderId = Guid.Parse("A09FCCB3-2676-E811-ABDD-5404A6BFD6F2")
-                });
-            }
-            _context.FolderTreeEntries.AddRange(_folders);
-            _context.SaveChanges();
         }
     }
 }
