@@ -5,6 +5,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="Views\Products\Delete.cshtml" />
     <Content Remove="Views\Products\FolderDetails.cshtml" />
   </ItemGroup>
 

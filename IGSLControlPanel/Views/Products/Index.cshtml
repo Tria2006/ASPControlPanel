@@ -14,9 +14,8 @@
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
-    <p>
-        <button id="createFolderBtn">Создать новую папку</button>
-    </p>
+    <a id="createFolderBtn">Создать новую папку</a>
+    <a id="deleteFolderBtn" asp-controller="Products" asp-action="Delete" asp-route-id="@Model.Id" style="margin-left: 10px">Удалить папку</a>
 
     <div id="addFolderModal" class="modal fade">
         <div class="modal-dialog modal-lg">
@@ -45,47 +44,50 @@
         @if (Model.ChildFolders.Any() || Model.Products.Any())
         {
             foreach (var child in Model.ChildFolders)
-             {
-                 <a asp-controller="Products" asp-action="Index" asp-route-id="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
-                     <table id="folderItem" ondblclick="" style="height: 90px; width: 90px">
-                         <tr>
-                             <td>
-                                 @if (child.ChildFolders.Any() || child.Products.Any())
-                                 {
-                                     <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
-                                 }
-                                 else
-                                 {
-                                     <img src="~/images/Icons/emptyfolder.png" width="50" height="50" alt="Image" class="center-block" />
-                                 }
-                             </td>
-                         </tr>
-                         <tr>
-                             <td style="text-align: center; vertical-align: text-top">
-                                 @Html.DisplayTextFor(n => child.Name)
-                             </td>
-                         </tr>
-                     </table>
+            {
+                <a asp-controller="Products" asp-action="Index" asp-route-id="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
+                    <table id="folderItem" style="height: 90px; width: 90px">
+                        <tr>
+                            <td>
+                                <input id="cb" type="checkbox" onclick="Clc(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
 
-                 </a>
-             }
+                                @if (child.ChildFolders.Any() || child.Products.Any())
+                                {
+                                    <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
+                                }
+                                else
+                                {
+                                    <img src="~/images/Icons/emptyfolder.png" width="50" height="50" alt="Image" class="center-block" />
+                                }
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; vertical-align: text-top">
+                                @Html.DisplayTextFor(n => child.Name)
+                            </td>
+                        </tr>
+                    </table>
+
+                </a>
+            }
             foreach (var p in Model.Products)
-             {
-                 <a style="float: left; margin: 2px; border: 1px solid lightgrey">
-                     <table id="folderItem" ondblclick="" style="height: 90px; width: 90px">
-                         <tr>
-                             <td>
-                                 <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
-                             </td>
-                         </tr>
-                         <tr>
-                             <td style="text-align: center; vertical-align: text-top">
-                                 @Html.DisplayTextFor(n => p.Name)
-                             </td>
-                         </tr>
-                     </table>
-                 </a>
-             }
+            {
+                <a style="float: left; margin: 2px; border: 1px solid lightgrey">
+                    <table id="folderItem" style="height: 90px; width: 90px">
+                        <tr>
+                            <td>
+                                <input type="checkbox" style="margin: 2px; width: 16px; height: 16px" />
+                                <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; vertical-align: text-top">
+                                @Html.DisplayTextFor(n => p.Name)
+                            </td>
+                        </tr>
+                    </table>
+                </a>
+            }
         }
     </div>
 </body>
@@ -104,4 +106,10 @@
             $("#addFolderModal").modal('hide');
         });
     });
+
+    function Clc(id) {
+        $.get("/Products/CheckBoxClick/" + id,null, function (data) {  
+              
+        });
+    }
 </script>

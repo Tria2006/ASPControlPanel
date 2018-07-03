@@ -14,10 +14,11 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
 
-        public ProductsController(IGSLContext context)
+        public ProductsController(IGSLContext context, FolderDataHelper helper)
         {
             _context = context;
-            _folderDataHelper = new FolderDataHelper(_context);
+            _folderDataHelper = helper;
+            _folderDataHelper.Initialize(_context);
         }
 
         // GET: Products
@@ -37,7 +38,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (parentFolderId == null) return NoContent();
             var folder = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == parentFolderId);
-            var updatedFolder = _folderDataHelper.AddFolder(name, folder);
+            var updatedFolder = _folderDataHelper.AddFolder(name, _context, folder);
             return View("Index", updatedFolder);
         }
 
@@ -110,21 +111,18 @@ namespace IGSLControlPanel.Controllers
         }
 
         // GET: Products/Delete/5
-        public async Task<IActionResult> Delete(Guid? id)
+        public IActionResult Delete(Guid? id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
+            if (id == null) return NoContent();
+            _folderDataHelper.RemoveFolders(_context, id);
+            var updatedFolder = _folderDataHelper.GetFolderById((Guid)id, _folderDataHelper.FoldersTree);
+            return View("Index", updatedFolder);
+        }
 
-            var folderTreeEntry = await _context.FolderTreeEntries
-                .SingleOrDefaultAsync(m => m.Id == id);
-            if (folderTreeEntry == null)
-            {
-                return NotFound();
-            }
-
-            return View(folderTreeEntry);
+        public void CheckBoxClick(Guid? id)
+        {
+            if(id == null) return;
+            _folderDataHelper.CheckFolder((Guid)id, _context);
         }
 
         // POST: Products/Delete/5

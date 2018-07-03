@@ -1,4 +1,5 @@
 ﻿using IGSLControlPanel.Data;
+using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -23,7 +24,7 @@ namespace IGSLControlPanel
         {
             services.AddDbContext<IGSLContext>(options =>
                 options.UseSqlServer(Configuration.GetConnectionString("IGSLConnection")));
-
+            services.AddSingleton<FolderDataHelper>();
             services.AddMvc();
         }
 
