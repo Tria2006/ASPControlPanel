@@ -67,16 +67,20 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        public Guid AddFolder(string name, FolderTreeEntry parent = null)
+        public FolderTreeEntry AddFolder(string name, FolderTreeEntry parent = null)
         {
             var newFolder = new FolderTreeEntry
             {
                 Name = name
             };
-            if (parent != null) newFolder.ParentFolderId = parent.Id;
+            if (parent != null)
+            {
+                newFolder.ParentFolderId = parent.Id;
+                parent.ChildFolders.Add(newFolder);
+            }
             _context.FolderTreeEntries.Add(newFolder);
             _context.SaveChanges();
-            return newFolder.Id;
+            return parent;
         }
 
         public void RemoveFolder(FolderTreeEntry folder)

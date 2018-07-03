@@ -12,37 +12,33 @@ namespace IGSLControlPanel.Controllers
     public class ProductsController : Controller
     {
         private readonly IGSLContext _context;
-        private readonly FolderDataHelper _vm;
+        private readonly FolderDataHelper _folderDataHelper;
 
         public ProductsController(IGSLContext context)
         {
             _context = context;
-            _vm = new FolderDataHelper(_context);
+            _folderDataHelper = new FolderDataHelper(_context);
         }
 
         // GET: Products
-        public IActionResult Index()
+        public IActionResult Index(Guid? id)
         {
-            return View(_vm.FoldersTree);
-        }
-        
-        // GET: Products/Details/5
-        public IActionResult FolderDetails(Guid? id)
-        {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var folder = _vm.GetFolderById((Guid)id, _vm.FoldersTree);
-            if (folder == null) return NotFound();
-            return View("Index", folder);
+            var folder = id != null ? _folderDataHelper.GetFolderById((Guid) id, _folderDataHelper.FoldersTree) : _folderDataHelper.FoldersTree;
+            return View(folder);
         }
 
         // GET: Products/Create
         public IActionResult Create()
         {
             return View();
+        }
+
+        public async Task<IActionResult> CreateFolder(string name, Guid? parentFolderId)
+        {
+            if (parentFolderId == null) return NoContent();
+            var folder = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == parentFolderId);
+            var updatedFolder = _folderDataHelper.AddFolder(name, folder);
+            return View("Index", updatedFolder);
         }
 
         // POST: Products/Create

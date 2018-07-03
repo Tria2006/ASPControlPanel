@@ -10,18 +10,98 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
-    <link href="lib/bootstrap/dist/css/bootstrap.min.css.map" />
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css.map" />
+    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
     <p>
-        <a asp-action="Create">Новая папка</a>
+        <button id="createFolderBtn">Создать новую папку</button>
     </p>
+
+    <div id="addFolderModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Введите имя папки</h4>
+                </div>
+                <div class="modal-body">
+                    <form asp-controller="Products" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
+                        <div class="form-group">
+                            <input id="folderNameInput" asp-for="Name" />
+                            <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
+                            <button id="cancelBtn" type="button" class="btn btn-primary">
+                                Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
     <div style="width: 100%; border: 1px gray groove; min-height: 600px;">
         @if (Model.ChildFolders.Any() || Model.Products.Any())
         {
-            @await Html.PartialAsync("FolderDetails", Model)
+            foreach (var child in Model.ChildFolders)
+             {
+                 <a asp-controller="Products" asp-action="Index" asp-route-id="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
+                     <table id="folderItem" ondblclick="" style="height: 90px; width: 90px">
+                         <tr>
+                             <td>
+                                 @if (child.ChildFolders.Any() || child.Products.Any())
+                                 {
+                                     <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
+                                 }
+                                 else
+                                 {
+                                     <img src="~/images/Icons/emptyfolder.png" width="50" height="50" alt="Image" class="center-block" />
+                                 }
+                             </td>
+                         </tr>
+                         <tr>
+                             <td style="text-align: center; vertical-align: text-top">
+                                 @Html.DisplayTextFor(n => child.Name)
+                             </td>
+                         </tr>
+                     </table>
+
+                 </a>
+             }
+            foreach (var p in Model.Products)
+             {
+                 <a style="float: left; margin: 2px; border: 1px solid lightgrey">
+                     <table id="folderItem" ondblclick="" style="height: 90px; width: 90px">
+                         <tr>
+                             <td>
+                                 <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                             </td>
+                         </tr>
+                         <tr>
+                             <td style="text-align: center; vertical-align: text-top">
+                                 @Html.DisplayTextFor(n => p.Name)
+                             </td>
+                         </tr>
+                     </table>
+                 </a>
+             }
         }
     </div>
 </body>
 </html>
 
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#createFolderBtn").click(function () {
+            $("#addFolderModal").modal('show');
+            $("#folderNameInput").val("");
+        });
+        $("#okBtn").click(function () {
+            $("#addFolderModal").modal('hide');
+        });
+        $("#cancelBtn").click(function () {
+            $("#addFolderModal").modal('hide');
+        });
+    });
+</script>
