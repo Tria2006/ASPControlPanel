@@ -11,26 +11,19 @@ namespace IGSLControlPanel.Helpers
         public FolderTreeEntry FoldersTree { get; set; }
         private List<Product> _products { get; set; }
         private List<FolderTreeEntry> _folders { get; set; }
-        private IEnumerable<Product> _productsWOFolder { get; set; }
+        private List<Product> _productsWOFolder { get; set; }
         private List<FolderTreeEntry> _checkedFolders { get; set; } = new List<FolderTreeEntry>();
+        private List<Product> _checkedProducts { get; set; } = new List<Product>();
         
         public void Initialize(IGSLContext _context)
         {
             if(_checkedFolders == null) _checkedFolders = new List<FolderTreeEntry>();
+            if(_checkedProducts == null) _checkedProducts = new List<Product>();
             FoldersTree = new FolderTreeEntry();
             _folders = _context.FolderTreeEntries.ToList();
             _products = _context.Products.ToList();
-            _productsWOFolder = _products.Where(x => x.FolderId == null);
+            _productsWOFolder = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
             BuildFolderTree();
-        }
-
-        public void RenewFolders(IGSLContext _context)
-        {
-            _folders = new List<FolderTreeEntry>();
-            _products = new List<Product>();
-            _folders = _context.FolderTreeEntries.ToList();
-            _products = _context.Products.ToList();
-            _productsWOFolder = _products.Where(x => x.FolderId == null);
         }
 
         public FolderTreeEntry BuildFolderTree()
@@ -104,6 +97,26 @@ namespace IGSLControlPanel.Helpers
                 parentFolder?.ChildFolders.RemoveAll(x => x.IsDeleted);
             }
             _context.SaveChanges();
+            _checkedFolders = new List<FolderTreeEntry>();
+        }
+
+        public void RemoveProducts(IGSLContext _context, Guid? parentId = null)
+        {
+            foreach (var f in _checkedProducts)
+            {
+                var contextFolder = _context.Products.SingleOrDefault(x => x.Id == f.Id);
+                if (contextFolder == null) continue;
+                contextFolder.IsDeleted = true;
+            }
+
+            if (parentId != null)
+            {
+                var parentFolder = GetFolderById((Guid)parentId, FoldersTree);
+                parentFolder?.Products.RemoveAll(x => x.IsDeleted);
+            }
+            _productsWOFolder.RemoveAll(x => x.IsDeleted);
+            _context.SaveChanges();
+            _checkedProducts = new List<Product>();
         }
 
         public void CheckFolder(Guid id, IGSLContext _context)
@@ -116,6 +129,16 @@ namespace IGSLControlPanel.Helpers
                 _checkedFolders.Add(folder);
         }
 
+        public void CheckProduct(Guid id, IGSLContext _context)
+        {
+            var product = _context.Products.SingleOrDefault(x => x.Id == id);
+            if (product == null) return;
+            if (_checkedProducts.Contains(product))
+                _checkedProducts.Remove(product);
+            else
+                _checkedProducts.Add(product);
+        }
+
         public void RemoveFolderId(Product p, IGSLContext _context)
         {
             var product = _context.Products.FirstOrDefault(x => x.Id == p.Id);
@@ -124,27 +147,18 @@ namespace IGSLControlPanel.Helpers
             _context.SaveChanges();
         }
 
-        public Guid AddProduct(string name, FolderTreeEntry parent, IGSLContext _context)
+        public void AddProduct(string name, Guid parentId, IGSLContext _context)
         {
             var newProduct = new Product
             {
                 Name = name,
-                FolderId = parent.Id
+                FolderId = parentId
             };
-
+            //parentFolder.Products.Add(newProduct);
             _context.Products.Add(newProduct);
             _context.SaveChanges();
-            return newProduct.Id;
         }
-
-        public void RemoveProduct(Product p, IGSLContext _context)
-        {
-            var product = _context.Products.FirstOrDefault(x => x.Id == p.Id);
-            if (product == null) return;
-            _context.Products.Remove(product);
-            _context.SaveChanges();
-        }
-
+        
         public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
         {
             if (folder.Id == id) return folder;

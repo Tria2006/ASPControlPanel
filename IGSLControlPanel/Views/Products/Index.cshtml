@@ -15,7 +15,9 @@
 </head>
 <body>
     <a id="createFolderBtn">Создать новую папку</a>
-    <a id="deleteFolderBtn" asp-controller="Products" asp-action="Delete" asp-route-id="@Model.Id" style="margin-left: 10px">Удалить папку</a>
+    <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">Удалить папку</a>
+    <a asp-controller="Products" asp-action="CreateProduct">Новый продукт</a>
+    <a asp-controller="Products" asp-action="DeleteProduct" asp-route-id="@Model.Id">Удалить продукт</a>
 
     <div id="addFolderModal" class="modal fade">
         <div class="modal-dialog modal-lg">
@@ -49,7 +51,7 @@
                     <table id="folderItem" style="height: 90px; width: 90px">
                         <tr>
                             <td>
-                                <input id="cb" type="checkbox" onclick="Clc(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
+                                <input id="cb" type="checkbox" onclick="FolderCheckBoxClick(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
 
                                 @if (child.ChildFolders.Any() || child.Products.Any())
                                 {
@@ -76,7 +78,7 @@
                     <table id="folderItem" style="height: 90px; width: 90px">
                         <tr>
                             <td>
-                                <input type="checkbox" style="margin: 2px; width: 16px; height: 16px" />
+                                <input type="checkbox" onclick="ProductCheckBoxClick('@p.Id')" style="margin: 2px; width: 16px; height: 16px" />
                                 <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
                             </td>
                         </tr>
@@ -107,9 +109,11 @@
         });
     });
 
-    function Clc(id) {
-        $.get("/Products/CheckBoxClick/" + id,null, function (data) {  
-              
-        });
+    function FolderCheckBoxClick(id) {
+        $.get("/Products/FolderCheckBoxClick/" + id, null);
+    }
+
+    function ProductCheckBoxClick(id) {
+        $.get("/Products/ProductCheckBoxClick/" + id, null);
     }
 </script>

@@ -1,11 +1,10 @@
 ﻿using System;
-using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using IGSLControlPanel.Models;
 using IGSLControlPanel.Helpers;
+using IGSLControlPanel.Models;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -21,45 +20,30 @@ namespace IGSLControlPanel.Controllers
             _folderDataHelper.Initialize(_context);
         }
 
-        // GET: Products
-        public IActionResult Index(Guid? id)
+        public IActionResult Index(Guid id)
         {
-            var folder = id != null ? _folderDataHelper.GetFolderById((Guid) id, _folderDataHelper.FoldersTree) : _folderDataHelper.FoldersTree;
+            var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
             return View(folder);
         }
 
-        // GET: Products/Create
-        public IActionResult Create()
+        public IActionResult CreateProduct(Guid folderId)
         {
-            return View();
+            return View(new Product{FolderId = folderId});
         }
 
-        public async Task<IActionResult> CreateFolder(string name, Guid? parentFolderId)
+        public IActionResult CreateProductSubmit(string name, Guid folderId)
         {
-            if (parentFolderId == null) return NoContent();
+            _folderDataHelper.AddProduct(name, folderId, _context);
+            return RedirectToAction("Index", new { id = folderId });
+        }
+
+        public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId)
+        {
             var folder = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == parentFolderId);
-            var updatedFolder = _folderDataHelper.AddFolder(name, _context, folder);
-            return View("Index", updatedFolder);
+            _folderDataHelper.AddFolder(name, _context, folder);
+            return RedirectToAction("Index", new{ id = parentFolderId });
         }
 
-        // POST: Products/Create
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,ParentFolderId,Name")] FolderTreeEntry folderTreeEntry)
-        {
-            if (ModelState.IsValid)
-            {
-                folderTreeEntry.Id = Guid.NewGuid();
-                _context.Add(folderTreeEntry);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(folderTreeEntry);
-        }
-
-        // GET: Products/Edit/5
         public async Task<IActionResult> Edit(Guid? id)
         {
             if (id == null)
@@ -75,70 +59,29 @@ namespace IGSLControlPanel.Controllers
             return View(product);
         }
 
-        // POST: Products/Edit/5
-        // To protect from overposting attacks, please enable the specific properties you want to bind to, for 
-        // more details see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,ParentFolderId,Name")] Product folderTreeEntry)
+        public IActionResult DeleteFolder(Guid id)
         {
-            if (id != folderTreeEntry.Id)
-            {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                try
-                {
-                    _context.Update(folderTreeEntry);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FolderTreeEntryExists(folderTreeEntry.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction(nameof(Index));
-            }
-            return View(folderTreeEntry);
+            _folderDataHelper.RemoveFolders(_context, id);
+            return RedirectToAction("Index", new { id });
         }
 
-        // GET: Products/Delete/5
-        public IActionResult Delete(Guid? id)
+        public IActionResult DeleteProduct(Guid? id)
         {
             if (id == null) return NoContent();
-            _folderDataHelper.RemoveFolders(_context, id);
-            var updatedFolder = _folderDataHelper.GetFolderById((Guid)id, _folderDataHelper.FoldersTree);
-            return View("Index", updatedFolder);
+            _folderDataHelper.RemoveProducts(_context, id);
+            return RedirectToAction("Index", new { id });
         }
 
-        public void CheckBoxClick(Guid? id)
+        public void FolderCheckBoxClick(Guid? id)
         {
             if(id == null) return;
             _folderDataHelper.CheckFolder((Guid)id, _context);
         }
 
-        // POST: Products/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
+        public void ProductCheckBoxClick(Guid? id)
         {
-            var folderTreeEntry = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == id);
-            _context.FolderTreeEntries.Remove(folderTreeEntry);
-            await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
-        }
-
-        private bool FolderTreeEntryExists(Guid id)
-        {
-            return _context.FolderTreeEntries.Any(e => e.Id == id);
+            if(id == null) return;
+            _folderDataHelper.CheckProduct((Guid)id, _context);
         }
     }
 }

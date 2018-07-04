@@ -1,4 +1,4 @@
-﻿@model IGSLControlPanel.Models.FolderTreeEntry
+﻿@model IGSLControlPanel.Models.Product
 
 @{
     Layout = null;
@@ -9,35 +9,25 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
+    <title>Новый продукт</title>
 </head>
 <body>
 
-<h4>FolderTreeEntry</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-controller="Products" asp-action="CreateProductSubmit" asp-route-folderId="@Model.FolderId" asp-route-name="@Model.Name">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="ParentFolderId" class="control-label"></label>
-                <input asp-for="ParentFolderId" class="form-control" />
-                <span asp-validation-for="ParentFolderId" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <input type="submit" value="Создать" class="btn btn-default" />
             </div>
         </form>
     </div>
-</div>
-
-<div>
-    <a asp-action="Index">Back to List</a>
 </div>
 
 </body>
