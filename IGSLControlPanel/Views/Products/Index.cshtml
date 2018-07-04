@@ -72,7 +72,7 @@
             }
             foreach (var p in Model.Products)
             {
-                <a style="float: left; margin: 2px; border: 1px solid lightgrey">
+                <a asp-controller="Products" asp-action="Edit" asp-route-id="@p.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
                     <table id="folderItem" style="height: 90px; width: 90px">
                         <tr>
                             <td>
