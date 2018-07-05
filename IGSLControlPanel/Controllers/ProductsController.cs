@@ -26,6 +26,11 @@ namespace IGSLControlPanel.Controllers
             return View(folder);
         }
 
+        public IActionResult OneLevelUp(Guid destFolderId)
+        {
+            return RedirectToAction("Index", new { id = destFolderId });
+        }
+
         public IActionResult CreateProduct(Guid folderId)
         {
             return View(new Product{FolderId = folderId});
@@ -61,14 +66,15 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult DeleteFolder(Guid id)
         {
-            _folderDataHelper.RemoveFolders(_context, id);
+            if(_folderDataHelper.HasSelectedFolders)
+                _folderDataHelper.RemoveFolders(_context, id);
             return RedirectToAction("Index", new { id });
         }
 
-        public IActionResult DeleteProduct(Guid? id)
+        public IActionResult DeleteProduct(Guid id)
         {
-            if (id == null) return NoContent();
-            _folderDataHelper.RemoveProducts(_context, id);
+            if (_folderDataHelper.HasSelectedProducts)
+                _folderDataHelper.RemoveProducts(_context, id);
             return RedirectToAction("Index", new { id });
         }
 

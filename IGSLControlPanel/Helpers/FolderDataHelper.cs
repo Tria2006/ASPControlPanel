@@ -14,11 +14,14 @@ namespace IGSLControlPanel.Helpers
         private List<Product> _productsWOFolder { get; set; }
         private List<FolderTreeEntry> _checkedFolders { get; set; } = new List<FolderTreeEntry>();
         private List<Product> _checkedProducts { get; set; } = new List<Product>();
-        
+
+        public bool HasSelectedFolders => _checkedFolders.Any();
+        public bool HasSelectedProducts => _checkedProducts.Any();
+
         public void Initialize(IGSLContext _context)
         {
-            if(_checkedFolders == null) _checkedFolders = new List<FolderTreeEntry>();
-            if(_checkedProducts == null) _checkedProducts = new List<Product>();
+            if (_checkedFolders == null) _checkedFolders = new List<FolderTreeEntry>();
+            if (_checkedProducts == null) _checkedProducts = new List<Product>();
             FoldersTree = new FolderTreeEntry();
             _folders = _context.FolderTreeEntries.ToList();
             _products = _context.Products.ToList();
@@ -77,27 +80,29 @@ namespace IGSLControlPanel.Helpers
             return parent;
         }
 
-        public void RemoveFolders(IGSLContext _context, Guid? parentId = null)
+        public void RemoveFolders(IGSLContext _context, Guid parentId)
         {
             foreach (var f in _checkedFolders)
             {
                 var contextFolder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == f.Id);
-                if(contextFolder == null) continue;
-                contextFolder.Products.ForEach(x => RemoveFolderId(x, _context));
-                foreach (var childFolder in contextFolder.ChildFolders)
-                {
-                    RemoveFolders(_context, childFolder.Id);
-                }
-                contextFolder.IsDeleted = true;
+                if (contextFolder == null) continue;
+                RemoveChildFoldersAndProducts(contextFolder, _context);
+                f.IsDeleted = true;
             }
-
-            if (parentId != null)
-            {
-                var parentFolder = GetFolderById((Guid)parentId, FoldersTree);
-                parentFolder?.ChildFolders.RemoveAll(x => x.IsDeleted);
-            }
+            var parentFolder = GetFolderById(parentId, FoldersTree);
+            parentFolder?.ChildFolders.RemoveAll(x => x.IsDeleted);
             _context.SaveChanges();
             _checkedFolders = new List<FolderTreeEntry>();
+        }
+
+        private void RemoveChildFoldersAndProducts(FolderTreeEntry parent, IGSLContext _context)
+        {
+            parent.Products.ForEach(x => RemoveFolderId(x, _context));
+            foreach (var childFolder in parent.ChildFolders)
+            {
+                RemoveChildFoldersAndProducts(childFolder, _context);
+            }
+            parent.IsDeleted = true;
         }
 
         public void RemoveProducts(IGSLContext _context, Guid? parentId = null)
@@ -154,11 +159,10 @@ namespace IGSLControlPanel.Helpers
                 Name = name,
                 FolderId = parentId
             };
-            //parentFolder.Products.Add(newProduct);
             _context.Products.Add(newProduct);
             _context.SaveChanges();
         }
-        
+
         public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
         {
             if (folder.Id == id) return folder;

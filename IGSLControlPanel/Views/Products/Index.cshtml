@@ -14,10 +14,22 @@
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
-    <a id="createFolderBtn">Создать новую папку</a>
-    <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">Удалить папку</a>
-    <a asp-controller="Products" asp-action="CreateProduct">Новый продукт</a>
-    <a asp-controller="Products" asp-action="DeleteProduct" asp-route-id="@Model.Id">Удалить продукт</a>
+    <input id="modelIdValue" type="hidden" value="@Model.Id" />
+    <a id="backBtn" asp-controller="Products" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
+        <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
+    <a id="createFolderBtn">
+        <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
+    <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
+        <img src="~/images/Icons/folderdelete.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
+    <a asp-controller="Products" asp-action="CreateProduct">
+        <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
+    <a asp-controller="Products" asp-action="DeleteProduct" asp-route-id="@Model.Id">
+        <img src="~/images/Icons/documentRemove.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
     <div id="addFolderModal" class="modal fade">
         <div class="modal-dialog modal-lg">
@@ -106,6 +118,12 @@
         });
         $("#cancelBtn").click(function () {
             $("#addFolderModal").modal('hide');
+        });
+        $("#backBtn").click(function () {
+            var id = $("#modelIdValue").val();
+            if (id === "00000000-0000-0000-0000-000000000000") {
+                event.preventDefault();
+            }
         });
     });
 
