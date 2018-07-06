@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using IGSLControlPanel.Models.ManyToManyLinks;
 
 namespace IGSLControlPanel.Models
 {
@@ -19,7 +20,7 @@ namespace IGSLControlPanel.Models
 
         public Guid? FolderId { get; set; }
 
-        public List<ProductParameter> ProductParameters { get; set; } = new List<ProductParameter>();
+        public List<ProductLinkToProductParameter> LinkToProductParameters { get; set; }
 
         public bool IsDeleted { get; set; }
     }

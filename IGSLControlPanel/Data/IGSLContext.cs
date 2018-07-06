@@ -1,4 +1,5 @@
 ﻿using IGSLControlPanel.Models;
+using IGSLControlPanel.Models.ManyToManyLinks;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Data
@@ -12,5 +13,10 @@ namespace IGSLControlPanel.Data
 
         public DbSet<FolderTreeEntry> FolderTreeEntries { get; set; }
         public DbSet<Product> Products { get; set; }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            modelBuilder.Entity<ProductLinkToProductParameter>().HasKey(p => new {p.ProductId, p.ProductParameterId});
+        }
     }
 }

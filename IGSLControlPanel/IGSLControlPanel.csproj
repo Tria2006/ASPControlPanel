@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Migrations\20180706110923_123.cs" />
+    <Compile Remove="Migrations\20180706110923_123.Designer.cs" />
+    <Compile Remove="Migrations\20180706112115_Product to ProductParameter many-to-many relation.cs" />
+    <Compile Remove="Migrations\20180706112115_Product to ProductParameter many-to-many relation.Designer.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Content Remove="Views\Products\Delete.cshtml" />
     <Content Remove="Views\Products\FolderDetails.cshtml" />
   </ItemGroup>

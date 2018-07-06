@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using IGSLControlPanel.Models.ManyToManyLinks;
 
 namespace IGSLControlPanel.Models
 {
@@ -7,6 +9,8 @@ namespace IGSLControlPanel.Models
         public Guid Id { get; set; }
 
         public string Name { get; set; }
+
+        public List<ProductLinkToProductParameter> LinkToProduct { get; set; }
 
         public bool IsDeleted { get; set; }
     }

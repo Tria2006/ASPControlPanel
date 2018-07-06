@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Helpers
 {
@@ -24,7 +25,7 @@ namespace IGSLControlPanel.Helpers
             if (_checkedProducts == null) _checkedProducts = new List<Product>();
             FoldersTree = new FolderTreeEntry();
             _folders = _context.FolderTreeEntries.ToList();
-            _products = _context.Products.ToList();
+            _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).ToList();
             _productsWOFolder = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
             BuildFolderTree();
         }
