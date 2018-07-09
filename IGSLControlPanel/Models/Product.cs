@@ -22,7 +22,7 @@ namespace IGSLControlPanel.Models
 
         public Guid? FolderId { get; set; }
 
-        public List<ProductLinkToProductParameter> LinkToProductParameters { get; set; }
+        public List<ProductLinkToProductParameter> LinkToProductParameters { get; set; } = new List<ProductLinkToProductParameter>();
 
         public bool IsDeleted { get; set; }
     }
