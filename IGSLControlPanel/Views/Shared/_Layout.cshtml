@@ -16,8 +16,8 @@
         <link rel="stylesheet" href="~/css/site.min.css" asp-append-version="true" />
     </environment>
 </head>
-<body>
-<nav class="navbar navbar-inverse navbar-fixed-top">
+<body style="background: whitesmoke">
+<nav class="navbar navbar-inverse navbar-fixed-top" style="min-width: 700px">
     <div class="container">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -38,13 +38,13 @@
         </div>
     </div>
 </nav>
-<div class="container body-content">
+<div class="container body-content"  style="min-width: 700px">
     @RenderBody()
-    <footer style="position: fixed; bottom: 0; width: 70%">
-        <hr />
-        <p>&copy; 2018 - Ингосстрах жизнь - Панель управления</p>
-    </footer>
 </div>
+<footer style="position: fixed; bottom: 0; width: 100%; background: whitesmoke; padding-left: 50px; padding-right: 50px; padding-bottom: 10px; min-width: 700px">
+    <hr />
+    <p>&copy; 2018 - Ингосстрах жизнь - Панель управления</p>
+</footer>
 
 <environment include="Development">
     <script src="~/lib/jquery/dist/jquery.js"></script>
