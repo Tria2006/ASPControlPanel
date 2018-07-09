@@ -13,7 +13,7 @@ namespace IGSLControlPanel.Controllers
             return View();
         }
 
-        public IActionResult Products()
+        public IActionResult Error()
         {
             return View();
         }

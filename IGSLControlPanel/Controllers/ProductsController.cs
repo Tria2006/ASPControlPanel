@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
+using Microsoft.Extensions.Logging;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -12,10 +13,12 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
+        private readonly ILogger _logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper)
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ILogger<ProductsController> logger)
         {
             _context = context;
+            _logger = logger;
             _folderDataHelper = helper;
             _folderDataHelper.Initialize(_context);
         }
