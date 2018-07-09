@@ -23,20 +23,35 @@ namespace IGSLControlPanel.Helpers
         {
             if (_checkedFolders == null) _checkedFolders = new List<FolderTreeEntry>();
             if (_checkedProducts == null) _checkedProducts = new List<Product>();
+            
+            // создается root папка с Id = Guid.Empty
             FoldersTree = new FolderTreeEntry();
+            
+            // папки из БД
             _folders = _context.FolderTreeEntries.ToList();
+
+            // продукты получаем вместе со связанными параметрами 
             _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).ToList();
+            
+            // продукты, не привязанные ни к какой папке
             _productsWOFolder = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
+
+            // формирование дерева папок
             BuildFolderTree();
         }
 
         public FolderTreeEntry BuildFolderTree()
         {
-            var firstLevelFolders = _folders.Where(s => s.ParentFolderId == null && !s.IsDeleted);
+            // первый уровень папок
+            var firstLevelFolders = _folders.Where(s => (s.ParentFolderId == null || s.ParentFolderId == Guid.Empty) && !s.IsDeleted);
             foreach (var folder in firstLevelFolders)
             {
+                // заполняем ChildFolders
                 BuildChildFolders(folder);
+
+                // заполняем Products
                 BuildProducts(folder);
+
                 FoldersTree.ChildFolders.Add(folder);
             }
             FoldersTree.Products.AddRange(_productsWOFolder);
@@ -45,11 +60,16 @@ namespace IGSLControlPanel.Helpers
 
         private void BuildChildFolders(FolderTreeEntry parent)
         {
+            // получаем родительскую папку по ID
             var folders = _folders.Where(x => x.ParentFolderId != null && x.ParentFolderId == parent.Id && !x.IsDeleted);
             foreach (var folder in folders)
             {
+                // рекурсия для заполнения вложенных ChildFolders
                 BuildChildFolders(folder);
+
+                // заполняем продукты
                 BuildProducts(folder);
+
                 if (!parent.ChildFolders.Contains(folder))
                     parent.ChildFolders.Add(folder);
             }
@@ -67,10 +87,13 @@ namespace IGSLControlPanel.Helpers
 
         public FolderTreeEntry AddFolder(string name, IGSLContext _context, FolderTreeEntry parent = null)
         {
+            // новая папка с введенным именем
             var newFolder = new FolderTreeEntry
             {
                 Name = name
             };
+
+            // если parent не пустой, то помещаем новую папку в ChildFolders parent'a
             if (parent != null)
             {
                 newFolder.ParentFolderId = parent.Id;
@@ -83,8 +106,10 @@ namespace IGSLControlPanel.Helpers
 
         public void RemoveFolders(IGSLContext _context, Guid parentId)
         {
+            // идем по списку выбранных папок
             foreach (var f in _checkedFolders)
             {
+                // получаем папку из контекста и далее работаем с ней
                 var contextFolder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == f.Id);
                 if (contextFolder == null) continue;
                 RemoveChildFoldersAndProducts(contextFolder, _context);
@@ -98,9 +123,11 @@ namespace IGSLControlPanel.Helpers
 
         private void RemoveChildFoldersAndProducts(FolderTreeEntry parent, IGSLContext _context)
         {
+            // отвязывавем продукты от удаляемой папки
             parent.Products.ForEach(x => RemoveFolderId(x, _context));
             foreach (var childFolder in parent.ChildFolders)
             {
+                // рекурсивно удаляем ChildFolders
                 RemoveChildFoldersAndProducts(childFolder, _context);
             }
             parent.IsDeleted = true;
@@ -108,27 +135,37 @@ namespace IGSLControlPanel.Helpers
 
         public void RemoveProducts(IGSLContext _context, Guid? parentId = null)
         {
+            // двигаемся по списку выбранных продуктов
             foreach (var f in _checkedProducts)
             {
-                var contextFolder = _context.Products.SingleOrDefault(x => x.Id == f.Id);
-                if (contextFolder == null) continue;
-                contextFolder.IsDeleted = true;
+                // получаем продукт из контекста и далее работавем с ним
+                var contextProduct = _context.Products.SingleOrDefault(x => x.Id == f.Id);
+                if (contextProduct == null) continue;
+                contextProduct.IsDeleted = true;
             }
 
+            // если parentId не пустой, то нужно убрать продукты из FoldersTree чтобы они не отображались и не нужно было пересоздавать все дерево
             if (parentId != null)
             {
                 var parentFolder = GetFolderById((Guid)parentId, FoldersTree);
+                // удаляются продукты только из FoldersTree
+                // в контексте БД они остаются
                 parentFolder?.Products.RemoveAll(x => x.IsDeleted);
             }
+            // удалить продукты нужно и из _productsWOFolder
             _productsWOFolder.RemoveAll(x => x.IsDeleted);
             _context.SaveChanges();
+
+            // очищаем список выбранных продуктов
             _checkedProducts = new List<Product>();
         }
 
         public void CheckFolder(Guid id, IGSLContext _context)
         {
+            // получаем папку из контекста
             var folder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == id);
             if (folder == null) return;
+            // добавляем или удаляем папку из списка _checkedFolders
             if (_checkedFolders.Contains(folder))
                 _checkedFolders.Remove(folder);
             else
@@ -137,8 +174,10 @@ namespace IGSLControlPanel.Helpers
 
         public void CheckProduct(Guid id, IGSLContext _context)
         {
+            // получаем продукт из контекста
             var product = _context.Products.SingleOrDefault(x => x.Id == id);
             if (product == null) return;
+            // добавляем или удаляем продукт из списка _checkedFolders
             if (_checkedProducts.Contains(product))
                 _checkedProducts.Remove(product);
             else
@@ -147,6 +186,7 @@ namespace IGSLControlPanel.Helpers
 
         public void RemoveFolderId(Product p, IGSLContext _context)
         {
+            // отвязываем продукт от папки
             var product = _context.Products.FirstOrDefault(x => x.Id == p.Id);
             if (product == null) return;
             product.FolderId = Guid.Empty;
@@ -155,6 +195,7 @@ namespace IGSLControlPanel.Helpers
 
         public void AddProduct(string name, Guid parentId, IGSLContext _context)
         {
+            // новый продукт с введенным именем и родительским Id
             var newProduct = new Product
             {
                 Name = name,
@@ -166,6 +207,7 @@ namespace IGSLControlPanel.Helpers
 
         public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
         {
+            // рекурсивный поиск по Id папок по дереву
             if (folder.Id == id) return folder;
             var childs1 = folder.ChildFolders.Where(x => !x.IsDeleted);
             foreach (var f in childs1)

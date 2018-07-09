@@ -49,13 +49,8 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Index", new{ id = parentFolderId });
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var product = await _context.Products.SingleOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {

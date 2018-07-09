@@ -14,23 +14,36 @@
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
+
+    <!-- Id можели для использования в js функции $("#backBtn").click(function ()-->
     <input id="modelIdValue" type="hidden" value="@Model.Id" />
+
+    <!-- кнопка Назад-->
     <a id="backBtn" asp-controller="Products" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
         <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
     </a>
+
+    <!-- кнопка Создать папку-->
     <a id="createFolderBtn">
         <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
+
+    <!-- кнопка Удалить папку-->
     <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
         <img src="~/images/Icons/folderdelete.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
+
+    <!-- кнопка Создать продукт-->
     <a asp-controller="Products" asp-action="CreateProduct">
         <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
+
+    <!-- кнопка Удалить продукт-->
     <a asp-controller="Products" asp-action="DeleteProduct" asp-route-id="@Model.Id">
         <img src="~/images/Icons/documentRemove.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
+    <!-- диалог для ввода имени новой папки -->
     <div id="addFolderModal" class="modal fade">
         <div class="modal-dialog modal-lg">
             <div class="modal-content">
@@ -59,6 +72,7 @@
         {
             foreach (var child in Model.ChildFolders)
             {
+                // Папки
                 <a asp-controller="Products" asp-action="Index" asp-route-id="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
                     <table id="folderItem" style="height: 90px; width: 90px">
                         <tr>
@@ -86,6 +100,7 @@
             }
             foreach (var p in Model.Products)
             {
+                // Продукты
                 <a asp-controller="Products" asp-action="Edit" asp-route-id="@p.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
                     <table id="folderItem" style="height: 90px; width: 90px">
                         <tr>
