@@ -9,6 +9,12 @@
     <Compile Remove="Migrations\20180706110923_123.Designer.cs" />
     <Compile Remove="Migrations\20180706112115_Product to ProductParameter many-to-many relation.cs" />
     <Compile Remove="Migrations\20180706112115_Product to ProductParameter many-to-many relation.Designer.cs" />
+    <Compile Remove="Migrations\20180710120257_Nullable Datetime + Tariff.cs" />
+    <Compile Remove="Migrations\20180710120257_Nullable Datetime + Tariff.Designer.cs" />
+    <Compile Remove="Migrations\20180710120545_Nullable Datetime + Tariff.cs" />
+    <Compile Remove="Migrations\20180710120545_Nullable Datetime + Tariff.Designer.cs" />
+    <Compile Remove="Migrations\20180710120716_Nullable Datetime + Tariff.cs" />
+    <Compile Remove="Migrations\20180710120716_Nullable Datetime + Tariff.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

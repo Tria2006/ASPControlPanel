@@ -205,6 +205,17 @@ namespace IGSLControlPanel.Helpers
             _context.SaveChanges();
         }
 
+        public void UpdateProduct(Product product, IGSLContext _context)
+        {
+            var contextProduct = _context.Products.SingleOrDefault(x => x.Id == product.Id);
+            if(contextProduct == null) return;
+            contextProduct.ValidFrom = product.ValidFrom;
+            contextProduct.ValidTo = product.ValidTo;
+            _context.SaveChanges();
+            var parentFolder = GetFolderById(contextProduct.FolderId ?? Guid.Empty, FoldersTree);
+            BuildProducts(parentFolder);
+        }
+
         public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
         {
             // рекурсивный поиск по Id папок по дереву
@@ -221,6 +232,13 @@ namespace IGSLControlPanel.Helpers
                 }
             }
             return null;
+        }
+
+        public void UpdateProductFields(Product oldProduct, Product newProduct)
+        {
+            oldProduct.Name = newProduct.Name;
+            oldProduct.ValidFrom = newProduct.ValidFrom;
+            oldProduct.ValidTo = newProduct.ValidTo;
         }
     }
 }

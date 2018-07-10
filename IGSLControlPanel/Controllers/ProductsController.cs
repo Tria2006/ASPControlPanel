@@ -62,6 +62,13 @@ namespace IGSLControlPanel.Controllers
             return View(product);
         }
 
+        [HttpPost]
+        public IActionResult Edit(Product product)
+        {
+            _folderDataHelper.UpdateProduct(product, _context);
+            return View(product);
+        }
+
         public IActionResult DeleteFolder(Guid id)
         {
             if(_folderDataHelper.HasSelectedFolders)

@@ -15,10 +15,10 @@ namespace IGSLControlPanel.Models
         public string Name { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime ValidFrom { get; set; }
+        public DateTime? ValidFrom { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime ValidTo { get; set; }
+        public DateTime? ValidTo { get; set; }
 
         public Guid? FolderId { get; set; }
 

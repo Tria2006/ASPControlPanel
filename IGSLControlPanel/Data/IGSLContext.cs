@@ -13,6 +13,7 @@ namespace IGSLControlPanel.Data
 
         public DbSet<FolderTreeEntry> FolderTreeEntries { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<Tariff> Tariffs { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
