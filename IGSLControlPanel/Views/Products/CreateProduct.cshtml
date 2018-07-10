@@ -9,11 +9,12 @@
 </head>
 <body>
 <div class="row">
-    <form asp-action="Edit" style="min-width: 700px; margin-bottom: 70px; margin-top: 30px">
+    <form asp-action="CreateProductSubmit" style="min-width: 700px; margin-bottom: 70px; margin-top: 30px">
+        <input asp-for="FolderId" type="hidden" />
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group" style="width: 600px">
             <label class="control-label">Название продукта</label>
-            <input asp-for="Name" class="form-control" />
+            <input asp-for="Name" class="form-control"/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
@@ -23,19 +24,19 @@
         </div>
         <div class="form-group">
             <label class="control-label" style="width: 150px">Действителен по</label>
-            <input asp-for="ValidTo" type="date" id="validToDt" />
+            <input asp-for="ValidTo" type="date" id="validToDt"/>
             <span asp-validation-for="ValidTo" class="text-danger"></span>
         </div>
         <div>
             <label class="control-label">Параметры продукта</label>
         </div>
         <a>
-            <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
+            <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px"/>
         </a>
 
         <div class="form-group" style="height: 400px; border: 1px lightgrey solid; padding: 1px">
             @{
-                var counter = 1;   
+                var counter = 1;
             }
             @foreach (var link in Model.LinkToProductParameters)
             {
@@ -57,7 +58,7 @@
             }
         </div>
         <div class="form-group">
-            <input type="submit" value="Сохранить изменения" class="btn btn-default" />
+            <input type="submit" value="Сохранить изменения" class="btn btn-default"/>
         </div>
     </form>
 </div>

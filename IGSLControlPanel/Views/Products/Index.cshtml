@@ -34,7 +34,7 @@
     </a>
 
     <!-- кнопка Создать продукт-->
-    <a asp-controller="Products" asp-action="CreateProduct">
+    <a asp-controller="Products" asp-action="CreateProduct" asp-route-folderId="@Model.Id">
         <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 

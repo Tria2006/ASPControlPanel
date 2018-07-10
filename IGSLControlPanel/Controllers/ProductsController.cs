@@ -39,10 +39,11 @@ namespace IGSLControlPanel.Controllers
             return View(new Product{FolderId = folderId});
         }
 
-        public IActionResult CreateProductSubmit(string name, Guid folderId)
+        public IActionResult CreateProductSubmit(Product product)
         {
-            _folderDataHelper.AddProduct(name, folderId, _context);
-            return RedirectToAction("Index", new { id = folderId });
+            var helper = new ProductsHelper();
+            helper.AddProduct(product, _context);
+            return RedirectToAction("Index", new { id = product.FolderId });
         }
 
         public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId)
