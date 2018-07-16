@@ -29,8 +29,13 @@ namespace IGSLControlPanel.Controllers
             return View(folder);
         }
 
-        public IActionResult OneLevelUp(Guid destFolderId)
+        public IActionResult OneLevelUp(Guid destFolderId, bool returnPartial = false)
         {
+            if (returnPartial)
+            {
+                var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
+                return PartialView("FolderSelectView", folder);
+            }
             return RedirectToAction("Index", new { id = destFolderId });
         }
 
@@ -39,7 +44,8 @@ namespace IGSLControlPanel.Controllers
             return View(new Product{FolderId = folderId});
         }
 
-        public IActionResult CreateProductSubmit(Product product)
+        [HttpPost]
+        public IActionResult CreateProduct(Product product)
         {
             var helper = new ProductsHelper();
             helper.AddProduct(product, _context);
@@ -94,6 +100,12 @@ namespace IGSLControlPanel.Controllers
         {
             if(id == null) return;
             _folderDataHelper.CheckProduct((Guid)id, _context);
+        }
+
+        public IActionResult FolderClick(Guid id)
+        {
+            var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
+            return PartialView("FolderSelectView", folder);
         }
     }
 }
