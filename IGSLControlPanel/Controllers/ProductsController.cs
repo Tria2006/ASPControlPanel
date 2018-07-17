@@ -31,12 +31,9 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult OneLevelUp(Guid destFolderId, bool returnPartial = false)
         {
-            if (returnPartial)
-            {
-                var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
-                return PartialView("FolderSelectView", folder);
-            }
-            return RedirectToAction("Index", new { id = destFolderId });
+            if (!returnPartial) return RedirectToAction("Index", new {id = destFolderId});
+            var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
+            return PartialView("FolderSelectView", folder);
         }
 
         public IActionResult CreateProduct(Guid folderId)
@@ -90,16 +87,21 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Index", new { id });
         }
 
-        public void FolderCheckBoxClick(Guid? id)
+        public bool FolderCheckBoxClick(Guid id)
         {
-            if(id == null) return;
-            _folderDataHelper.CheckFolder((Guid)id, _context);
+            _folderDataHelper.CheckFolder(id, _context);
+            return _folderDataHelper.HasSelectedFolders;
         }
 
-        public void ProductCheckBoxClick(Guid? id)
+        public bool ProductCheckBoxClick(Guid id)
         {
-            if(id == null) return;
-            _folderDataHelper.CheckProduct((Guid)id, _context);
+            _folderDataHelper.CheckProduct(id, _context);
+            return _folderDataHelper.HasSelectedProducts;
+        }
+
+        public bool GetFolderOrProductSelected()
+        {
+            return _folderDataHelper.HasSelectedProducts || _folderDataHelper.HasSelectedFolders;
         }
 
         public IActionResult FolderClick(Guid id)

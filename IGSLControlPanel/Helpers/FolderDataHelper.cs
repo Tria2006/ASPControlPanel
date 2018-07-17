@@ -127,8 +127,8 @@ namespace IGSLControlPanel.Helpers
             var folder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == id);
             if (folder == null) return;
             // добавляем или удаляем папку из списка _checkedFolders
-            if (_checkedFolders.Contains(folder))
-                _checkedFolders.Remove(folder);
+            if (_checkedFolders.Any(f => f.Id == folder.Id))
+                _checkedFolders.RemoveAll(f => f.Id == folder.Id);
             else
                 _checkedFolders.Add(folder);
         }
@@ -139,8 +139,8 @@ namespace IGSLControlPanel.Helpers
             var product = _context.Products.SingleOrDefault(x => x.Id == id);
             if (product == null) return;
             // добавляем или удаляем продукт из списка _checkedFolders
-            if (_checkedProducts.Contains(product))
-                _checkedProducts.Remove(product);
+            if (_checkedProducts.Any(p => p.Id == product.Id))
+                _checkedProducts.RemoveAll(p => p.Id == product.Id);
             else
                 _checkedProducts.Add(product);
         }
