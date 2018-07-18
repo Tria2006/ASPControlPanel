@@ -10,6 +10,8 @@ namespace IGSLControlPanel.Models
 
         public string Name { get; set; }
 
+        public int DataType { get; set; }
+
         public List<ProductLinkToProductParameter> LinkToProduct { get; set; }
 
         public bool IsDeleted { get; set; }
