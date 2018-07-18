@@ -12,6 +12,7 @@ namespace IGSLControlPanel.Helpers
         private List<FolderTreeEntry> _folders { get; set; }
         private List<FolderTreeEntry> _checkedFolders { get; set; }
         private List<Product> _checkedProducts { get; }
+        public Guid SelectedDestFolderId { get; set; }
         private readonly ProductsHelper _productsHelper;
 
         public bool HasSelectedFolders => _checkedFolders.Any();
@@ -173,6 +174,28 @@ namespace IGSLControlPanel.Helpers
         {
             var parentFolder = GetFolderById(parentId ?? Guid.Empty, FoldersTree);
             _productsHelper.RemoveProducts(context, _checkedProducts, parentFolder);
+        }
+
+        public void MoveSelectedItems(IGSLContext context)
+        {
+            foreach (var folder in _checkedFolders)
+            {
+                var contextFolder = context.FolderTreeEntries.SingleOrDefault(f => f.Id == folder.Id);
+                if(contextFolder == null) continue;
+                contextFolder.ParentFolderId = SelectedDestFolderId;
+            }
+            _checkedFolders.Clear();
+
+            foreach (var product in _checkedProducts)
+            {
+                var contextProduct = context.Products.SingleOrDefault(p => p.Id == product.Id);
+                if(contextProduct == null) continue;
+                contextProduct.FolderId = SelectedDestFolderId;
+            }
+            _checkedProducts.Clear();
+            context.SaveChanges();
+
+            BuildFolderTree();
         }
     }
 }

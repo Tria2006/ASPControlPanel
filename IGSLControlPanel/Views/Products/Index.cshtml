@@ -41,27 +41,53 @@
         <img id="productDeleteImg" src="~/images/Icons/product_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
-<!-- кнопка Переместить в папку-->
-<a id="moveBtn">
-    <img id="moveImg" src="~/images/Icons/move_gray.png" alt="Переместить в папку" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Переместить в папку-->
+    <a id="moveBtn">
+        <img id="moveImg" src="~/images/Icons/move_gray.png" alt="Переместить в папку" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
     <!-- диалог для ввода имени новой папки -->
-<div id="addFolderModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 class="modal-title">Введите имя папки</h4>
+    <div id="addFolderModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Введите имя папки</h4>
+                </div>
+                <div class="modal-body">
+                    <form asp-controller="Products" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
+                        <div class="form-group">
+                            <input id="folderNameInput" asp-for="Name" />
+                            <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
+                            <button id="cancelBtn" type="button" class="btn btn-primary">
+                                Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="modal-body">
-                <form asp-controller="Products" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
-                    <div class="form-group">
-                        <input id="folderNameInput" asp-for="Name" />
-                        <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
-                        <button id="cancelBtn" type="button" class="btn btn-primary">
+        </div>
+    </div>
+
+    <div id="moveItemModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Выберите папку назначения</h4>
+                </div>
+                <form>
+                    <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
+                        @await Html.PartialAsync("FolderSelectView", Model)
+                    </div>
+
+                    <div class="form-group" style="margin-left: 18px;">
+                        <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Products" asp-action="MoveSelectedItems">Выбрать</button>
+                        <button id="moveCancelBtn" type="button" class="btn btn-primary">
                             Отмена
                         </button>
                     </div>
@@ -69,34 +95,8 @@
             </div>
         </div>
     </div>
-</div>
-    
-<div id="moveItemModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 class="modal-title">Выберите папку назначения</h4>
-            </div>
-            <form>
-                <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
-                    @await Html.PartialAsync("FolderSelectView", Model)
-                </div>
 
-                <div class="form-group" style="margin-left: 18px;">
-                    <button id="moveOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
-                    <button id="moveCancelBtn" type="button" class="btn btn-primary">
-                        Отмена
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
-
-<div style="width: 100%; height: 90%; float: left">
+    <div style="width: 100%; height: 90%; float: left">
         @if (Model.ChildFolders.Any() || Model.Products.Any())
         {
             foreach (var child in Model.ChildFolders)

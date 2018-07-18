@@ -33,6 +33,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (!returnPartial) return RedirectToAction("Index", new {id = destFolderId});
             var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
+            _folderDataHelper.SelectedDestFolderId = destFolderId;
             return PartialView("FolderSelectView", folder);
         }
 
@@ -107,7 +108,14 @@ namespace IGSLControlPanel.Controllers
         public IActionResult FolderClick(Guid id)
         {
             var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
+            _folderDataHelper.SelectedDestFolderId = id;
             return PartialView("FolderSelectView", folder);
+        }
+
+        public IActionResult MoveSelectedItems()
+        {
+            _folderDataHelper.MoveSelectedItems(_context);
+            return RedirectToAction("Index", new { id = _folderDataHelper.SelectedDestFolderId });
         }
     }
 }
