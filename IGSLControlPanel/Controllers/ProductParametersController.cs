@@ -108,7 +108,8 @@ namespace IGSLControlPanel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
-            var productParameter = await _context.ProductParameters.FindAsync(id);
+            var productParameter = _context.ProductParameters.Include(x => x.LinkToProduct).ThenInclude(p => p.Product).SingleOrDefault(x => x.Id == id);
+            if (productParameter == null) return RedirectToAction("Edit", "Products", _productsHelper.TempProduct);
             productParameter.IsDeleted = true;
             var link = productParameter.LinkToProduct.SingleOrDefault(
                 p => p.ProductParameterId == id && p.ProductId == _productsHelper.TempProduct.Id);
