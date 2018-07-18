@@ -19,5 +19,7 @@ namespace IGSLControlPanel.Data
         {
             modelBuilder.Entity<ProductLinkToProductParameter>().HasKey(p => new {p.ProductId, p.ProductParameterId});
         }
+
+        public DbSet<ProductParameter> ProductParameters { get; set; }
     }
 }

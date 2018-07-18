@@ -13,5 +13,9 @@ namespace IGSLControlPanel.Models
         public List<ProductLinkToProductParameter> LinkToProduct { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public bool IsRequiredForCalc { get; set; }
+
+        public bool IsRequiredForSave { get; set; }
     }
 }

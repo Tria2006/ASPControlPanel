@@ -13,13 +13,15 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
+        private readonly ProductsHelper _productsHelper;
         private readonly ILogger _logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ILogger<ProductsController> logger)
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, ILogger<ProductsController> logger)
         {
             _context = context;
             _logger = logger;
             _folderDataHelper = helper;
+            _productsHelper = productsHelper;
             _folderDataHelper.Initialize(_context);
         }
 
@@ -39,7 +41,10 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult CreateProduct(Guid folderId)
         {
-            return View(new Product{FolderId = folderId});
+            var tempProduct = new Product {FolderId = folderId};
+            _productsHelper.TempProduct = tempProduct;
+            _productsHelper.IsCreateInProgress = true;
+            return View(tempProduct);
         }
 
         [HttpPost]
@@ -47,6 +52,7 @@ namespace IGSLControlPanel.Controllers
         {
             var helper = new ProductsHelper();
             helper.AddProduct(product, _context);
+            _productsHelper.IsCreateInProgress = false;
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
@@ -60,6 +66,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var product = await _context.Products.SingleOrDefaultAsync(m => m.Id == id);
+            _productsHelper.TempProduct = product;
             if (product == null)
             {
                 return NotFound();

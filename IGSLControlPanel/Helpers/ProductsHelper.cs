@@ -11,6 +11,8 @@ namespace IGSLControlPanel.Helpers
     {
         private List<Product> _products { get; set; }
         public List<Product> RootProducts { get; set; }
+        public Product TempProduct { get; set; }
+        public bool IsCreateInProgress { get; set; }
 
         public void Initialize(IGSLContext _context)
         {

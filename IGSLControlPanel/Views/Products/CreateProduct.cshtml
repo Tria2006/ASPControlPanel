@@ -1,7 +1,5 @@
 ﻿@model IGSLControlPanel.Models.Product
 
-<!DOCTYPE html>
-
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
@@ -30,7 +28,7 @@
         <div>
             <label class="control-label">Параметры продукта</label>
         </div>
-        <a>
+        <a asp-controller="ProductParameters" asp-action="Create">
             <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px"/>
         </a>
 
@@ -46,10 +44,10 @@
                         <label>@link.Parameter.Name</label>
                     </div>
                     <div style="position: absolute; right: 10px; top: 5px">
-                        <a>
+                        <a asp-controller="ProductParameters" asp-action="Edit" asp-route-id="@link.ProductParameterId">
                             <img src="~/images/Icons/edit_param.png" alt="Создать папку" style="width: 30px; height: 30px"/>
                         </a>
-                        <a style="margin-left: 10px;">
+                        <a style="margin-left: 10px;" asp-controller="ProductParameters" asp-action="Delete" asp-route-id="@link.ProductParameterId">
                             <img src="~/images/Icons/del_param.png" alt="Создать папку" style="width: 30px; height: 30px"/>
                         </a>
                     </div>

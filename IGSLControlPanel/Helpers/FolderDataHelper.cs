@@ -18,11 +18,11 @@ namespace IGSLControlPanel.Helpers
         public bool HasSelectedFolders => _checkedFolders.Any();
         public bool HasSelectedProducts => _checkedProducts.Any();
 
-        public FolderDataHelper()
+        public FolderDataHelper(ProductsHelper productsHelper)
         {
             _checkedFolders = new List<FolderTreeEntry>();
             _checkedProducts = new List<Product>();
-            _productsHelper = new ProductsHelper();
+            _productsHelper = productsHelper;
         }
 
         public void Initialize(IGSLContext _context)
