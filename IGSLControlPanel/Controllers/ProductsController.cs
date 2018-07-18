@@ -42,7 +42,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult CreateProduct(Guid folderId)
         {
             var tempProduct = new Product {FolderId = folderId};
-            _productsHelper.TempProduct = tempProduct;
+            _productsHelper.CurrentProduct = tempProduct;
             _productsHelper.IsCreateInProgress = true;
             return View(tempProduct);
         }
@@ -66,7 +66,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Edit(Guid id)
         {
             var product = await _context.Products.SingleOrDefaultAsync(m => m.Id == id);
-            _productsHelper.TempProduct = product;
+            _productsHelper.CurrentProduct = product;
             if (product == null)
             {
                 return NotFound();
@@ -123,6 +123,11 @@ namespace IGSLControlPanel.Controllers
         {
             _folderDataHelper.MoveSelectedItems(_context);
             return RedirectToAction("Index", new { id = _folderDataHelper.SelectedDestFolderId });
+        }
+
+        public void ProductParameterClick(Guid id)
+        {
+            _productsHelper.SelectUnselectParameter(id);
         }
     }
 }

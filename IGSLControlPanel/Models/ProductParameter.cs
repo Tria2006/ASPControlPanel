@@ -19,5 +19,7 @@ namespace IGSLControlPanel.Models
         public bool IsRequiredForCalc { get; set; }
 
         public bool IsRequiredForSave { get; set; }
+
+        public int Order { get; set; }
     }
 }

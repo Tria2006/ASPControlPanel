@@ -11,7 +11,8 @@ namespace IGSLControlPanel.Helpers
     {
         private List<Product> _products { get; set; }
         public List<Product> RootProducts { get; set; }
-        public Product TempProduct { get; set; }
+        public Product CurrentProduct { get; set; }
+        public ProductParameter SelectedParameter { get; private set; }
         public bool IsCreateInProgress { get; set; }
 
         public void Initialize(IGSLContext _context)
@@ -28,8 +29,10 @@ namespace IGSLControlPanel.Helpers
             var products = _products.Where(x => (x.FolderId != null && x.FolderId == parent.Id) && !x.IsDeleted);
             foreach (var product in products)
             {
-                if (!parent.Products.Contains(product))
-                    parent.Products.Add(product);
+                if (parent.Products.Contains(product)) continue;
+                product.LinkToProductParameters = product.LinkToProductParameters.OrderBy(x => x.Parameter.Order)
+                    .ToList();
+                parent.Products.Add(product);
             }
         }
 
@@ -87,6 +90,13 @@ namespace IGSLControlPanel.Helpers
             contextProduct.ValidTo = product.ValidTo;
             _context.SaveChanges();
             BuildProducts(parentFolder);
+        }
+
+        public void SelectUnselectParameter(Guid parameterId)
+        {
+            SelectedParameter = CurrentProduct.LinkToProductParameters
+                .SingleOrDefault(s => s.ProductParameterId == parameterId)
+                ?.Parameter;
         }
     }
 }

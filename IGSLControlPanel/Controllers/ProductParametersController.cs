@@ -36,11 +36,11 @@ namespace IGSLControlPanel.Controllers
             _context.SaveChanges();
             productParameter.LinkToProduct = new List<ProductLinkToProductParameter>{ new ProductLinkToProductParameter
             {
-                ProductId = _productsHelper.TempProduct.Id,
+                ProductId = _productsHelper.CurrentProduct.Id,
                 ProductParameterId = productParameter.Id
             }};
             await _context.SaveChangesAsync();
-            return RedirectToAction(_productsHelper.IsCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.TempProduct);
+            return RedirectToAction(_productsHelper.IsCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         public async Task<IActionResult> Edit(Guid? id)
@@ -84,7 +84,7 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_productsHelper.IsCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.TempProduct);
+            return RedirectToAction(_productsHelper.IsCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         public async Task<IActionResult> Delete(Guid? id)
@@ -109,16 +109,16 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var productParameter = _context.ProductParameters.Include(x => x.LinkToProduct).ThenInclude(p => p.Product).SingleOrDefault(x => x.Id == id);
-            if (productParameter == null) return RedirectToAction("Edit", "Products", _productsHelper.TempProduct);
+            if (productParameter == null) return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
             productParameter.IsDeleted = true;
             var link = productParameter.LinkToProduct.SingleOrDefault(
-                p => p.ProductParameterId == id && p.ProductId == _productsHelper.TempProduct.Id);
+                p => p.ProductParameterId == id && p.ProductId == _productsHelper.CurrentProduct.Id);
             if (link != null)
             {
                 productParameter.LinkToProduct.Remove(link);
             }
             await _context.SaveChangesAsync();
-            return RedirectToAction("Edit", "Products", _productsHelper.TempProduct);
+            return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         private bool ProductParameterExists(Guid id)
@@ -128,7 +128,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult ReturnToEditProduct()
         {
-            return RedirectToAction("Edit", "Products", _productsHelper.TempProduct);
+            return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
         }
     }
 }
