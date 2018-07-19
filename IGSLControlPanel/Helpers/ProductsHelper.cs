@@ -18,7 +18,7 @@ namespace IGSLControlPanel.Helpers
         public void Initialize(IGSLContext _context)
         {
             // продукты получаем вместе со связанными параметрами 
-            _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).ToList();
+            _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).Where(s => !s.IsDeleted).ToList();
 
             // продукты, не привязанные ни к какой папке
             RootProducts = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
@@ -30,8 +30,6 @@ namespace IGSLControlPanel.Helpers
             foreach (var product in products)
             {
                 if (parent.Products.Contains(product)) continue;
-                product.LinkToProductParameters = product.LinkToProductParameters.OrderBy(x => x.Parameter.Order)
-                    .ToList();
                 parent.Products.Add(product);
             }
         }

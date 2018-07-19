@@ -1,0 +1,44 @@
+﻿@model IGSLControlPanel.Models.Product
+
+<div id="parametersList" class="form-group" style="min-height: 200px; max-height: 300px; border: 1px lightgrey solid; padding: 1px">
+    @{
+        var counter = 1;
+    }
+    @foreach (var link in Model.LinkToProductParameters.OrderBy(x => x.Parameter.Order))
+    {
+        <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative"
+             onclick="ParameterClick(this, '@link.ProductParameterId')">
+            <div style="float: left; position: absolute; top: 9px;">
+                <label style="margin-right: 10px">@counter.</label>
+                <label>@link.Parameter.Name</label>
+            </div>
+            <div style="position: absolute; right: 10px; top: 5px">
+                <a asp-controller="ProductParameters" asp-action="Edit" asp-route-id="@link.ProductParameterId">
+                    <img src="~/images/Icons/edit_param.png" alt="Создать папку" style="width: 30px; height: 30px" />
+                </a>
+                <a style="margin-left: 10px;" asp-controller="ProductParameters" asp-action="Delete" asp-route-id="@link.ProductParameterId">
+                    <img src="~/images/Icons/del_param.png" alt="Создать папку" style="width: 30px; height: 30px" />
+                </a>
+            </div>
+        </div>
+        counter++;
+    }
+</div>
+
+<script>
+    function ParameterClick(div, paramId) {
+        var elements = $("#parametersList").children();
+        $.each(elements, function () {
+            if (this !== div) {
+                this.style.backgroundColor = "lavender";
+            }
+        });
+        if (div.style.backgroundColor === "lavender") {
+            div.style.backgroundColor = "cornflowerblue";
+        } else {
+            div.style.backgroundColor = "lavender";
+        }
+
+        $.get("/Products/ProductParameterClick/" + paramId, null);
+    }
+</script>

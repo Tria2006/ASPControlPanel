@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -126,9 +127,72 @@ namespace IGSLControlPanel.Controllers
             return _context.ProductParameters.Any(e => e.Id == id);
         }
 
-        public IActionResult ReturnToEditProduct()
+        public IActionResult ParameterUp()
         {
-            return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+            MoveParam();
+            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct);
+        }
+
+        public IActionResult ParameterDown()
+        {
+            MoveParam(false);
+            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct);
+        }
+
+        private void MoveParam(bool up = true)
+        {
+            if(_productsHelper.SelectedParameter == null) return;
+            // выбранный параметр из контекста
+            var contextParameter = _context.ProductParameters.SingleOrDefault(x => x.Id == _productsHelper.SelectedParameter.Id);
+            if(contextParameter == null) return;
+
+            // нужно переместить параметр вверх
+            if (up)
+            {
+                // предыдущий параметр по Order(выбираем ближайший order, который меньше, чем в текущем параметре)
+                var prevParam =
+                    _productsHelper.CurrentProduct.LinkToProductParameters.Where(
+                        x => x.Parameter.Order < contextParameter.Order).OrderByDescending(x => x.Parameter.Order).FirstOrDefault();
+                if(prevParam == null) return;
+
+                // Order куда надо переместить
+                var destOrder = prevParam.Parameter.Order;
+
+                // получаем предыдущий параметр из контекста
+                var contextPrevParam =
+                    _context.ProductParameters.SingleOrDefault(s => s.Id == prevParam.ProductParameterId);
+
+                // перемещаем предыдущий параметр на место выбранного
+                prevParam.Parameter.Order = contextParameter.Order;
+                if (contextPrevParam != null) contextPrevParam.Order = contextParameter.Order;
+                
+                // перемещаем текущий переметр на место предыдущего
+                contextParameter.Order = _productsHelper.SelectedParameter.Order = destOrder;
+                _context.SaveChanges();
+            }
+            else
+            {
+                // следующий параметр по Order(выбираем ближайший order, который больше, чем в текущем параметре)
+                var nextParam =
+                    _productsHelper.CurrentProduct.LinkToProductParameters.Where(
+                        x => x.Parameter.Order > contextParameter.Order).OrderBy(x => x.Parameter.Order).FirstOrDefault();
+                if (nextParam == null) return;
+
+                // Order куда надо переместить
+                var destOrder = nextParam.Parameter.Order;
+
+                // получаем следующий параметр из контекста
+                var contextNextParam =
+                    _context.ProductParameters.SingleOrDefault(s => s.Id == nextParam.ProductParameterId);
+
+                // перемещаем следующий параметр на место выбранного
+                nextParam.Parameter.Order = contextParameter.Order;
+                if (contextNextParam != null) contextNextParam.Order = contextParameter.Order;
+
+                // перемещаем текущий переметр на место предыдущего
+                contextParameter.Order = _productsHelper.SelectedParameter.Order = destOrder;
+                _context.SaveChanges();
+            }
         }
     }
 }
