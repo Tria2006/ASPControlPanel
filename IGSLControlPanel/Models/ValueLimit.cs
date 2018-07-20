@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace IGSLControlPanel.Models
 {
@@ -14,8 +15,12 @@ namespace IGSLControlPanel.Models
 
         public int? IntValueTo { get; set; }
 
+        [DataType(DataType.Date)]
+        //[DisplayFormat(DataFormatString = "{0:dd.MMMM.yyyy}")]
         public DateTime? DateValueFrom { get; set; }
 
+        [DataType(DataType.Date)]
+        //[DisplayFormat(DataFormatString = "{0:dd.MMMM.yyyy}")]
         public DateTime? DateValueTo { get; set; }
 
         public bool IsDeleted { get; set; }

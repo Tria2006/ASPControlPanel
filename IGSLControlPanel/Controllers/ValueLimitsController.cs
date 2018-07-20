@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
 
 namespace IGSLControlPanel.Controllers
@@ -11,15 +12,23 @@ namespace IGSLControlPanel.Controllers
     public class ValueLimitsController : Controller
     {
         private readonly IGSLContext _context;
+        private readonly ProductsHelper _productsHelper;
 
-        public ValueLimitsController(IGSLContext context)
+        public ValueLimitsController(IGSLContext context, ProductsHelper productsHelper)
         {
             _context = context;
+            _productsHelper = productsHelper;
         }
 
         public IActionResult Create()
         {
-            return View();
+            var tempLimit = new ValueLimit
+            {
+                ProductId = _productsHelper.CurrentProduct.Id,
+                ParameterId = _productsHelper.CurrentParameter.Id,
+                ParameterDataType = _productsHelper.CurrentParameter.DataType
+            };
+            return View(tempLimit);
         }
 
         [HttpPost]
@@ -27,25 +36,16 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create([Bind("Id,Name,ParameterDataType,IntValueFrom,IntValueTo,DateValueFrom,DateValueTo,IsDeleted,ParameterId,ProductId")] ValueLimit valueLimit)
         {
             if (!ModelState.IsValid) return View(valueLimit);
-            valueLimit.Id = Guid.NewGuid();
+            valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
+            _productsHelper.CurrentParameter.Limit = valueLimit;
             _context.Add(valueLimit);
             await _context.SaveChangesAsync();
-            return RedirectToAction("Create");
+            return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var valueLimit = await _context.ValueLimits.FindAsync(id);
-            if (valueLimit == null)
-            {
-                return NotFound();
-            }
-            return View(valueLimit);
+            return View(_productsHelper.CurrentParameter.Limit);
         }
 
         [HttpPost]
@@ -57,44 +57,31 @@ namespace IGSLControlPanel.Controllers
                 return NotFound();
             }
 
-            if (ModelState.IsValid)
+            if (!ModelState.IsValid) return View(valueLimit);
+            try
             {
-                try
-                {
-                    _context.Update(valueLimit);
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!ValueLimitExists(valueLimit.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
-                }
-                return RedirectToAction("Edit");
+                valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
+                _context.Update(valueLimit);
+                _productsHelper.CurrentParameter.Limit = valueLimit;
+                await _context.SaveChangesAsync();
             }
-            return View(valueLimit);
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ValueLimitExists(valueLimit.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
+        public IActionResult Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var valueLimit = await _context.ValueLimits
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (valueLimit == null)
-            {
-                return NotFound();
-            }
-
-            return View(valueLimit);
+            return View(_productsHelper.CurrentParameter.Limit);
         }
 
         [HttpPost, ActionName("Delete")]
@@ -102,9 +89,10 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var valueLimit = await _context.ValueLimits.FindAsync(id);
-            _context.ValueLimits.Remove(valueLimit);
+            valueLimit.IsDeleted = true;
+            _productsHelper.CurrentParameter.Limit = null;
             await _context.SaveChangesAsync();
-            return RedirectToAction("Delete");
+            return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
         private bool ValueLimitExists(Guid id)

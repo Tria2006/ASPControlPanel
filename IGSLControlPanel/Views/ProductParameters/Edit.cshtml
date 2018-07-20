@@ -9,11 +9,11 @@
 
     <h4>Параметр продукта</h4>
     <div class="row">
-        <div class="col-md-4">
+        <div class="col-md-4" style="width: 100%">
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
-                <div class="form-group">
+                <div class="form-group" style="width: 400px">
                     <label class="control-label">Название</label>
                     <input asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
@@ -47,17 +47,65 @@
                 <div class="form-group">
                     <label>
                         Лимиты значений 
-                        <a asp-controller="ValueLimits" asp-action="Create">
-                            <img src="~/images/Icons/add_param.png" alt="Назад" style="margin: 2px; margin-left: 28px; width: 25px; height: 25px" />
+                        <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
+                            <img src="~/images/Icons/add_param.png" style="margin: 2px; margin-left: 28px; width: 25px; height: 25px" alt=""/>
                         </a>
-                        <a asp-controller="Products" asp-action="OneLevelUp">
-                            <img src="~/images/Icons/edit_param.png" alt="Назад" style="margin: 2px; width: 25px; height: 25px" />
+                        <a asp-controller="ValueLimits" asp-action="Edit">
+                            <img src="~/images/Icons/edit_param.png" style="margin: 2px; width: 25px; height: 25px" alt=""/>
                         </a>
-                        <a asp-controller="Products" asp-action="OneLevelUp">
-                            <img src="~/images/Icons/del_param.png" alt="Назад" style="margin: 2px; width: 25px; height: 25px" />
+                        <a asp-controller="ValueLimits" asp-action="Delete">
+                            <img src="~/images/Icons/del_param.png" style="margin: 2px; width: 25px; height: 25px" alt=""/>
                         </a>
                     </label>
-                    @await Html.PartialAsync("_ParamLimitBlock", Model)
+                    @if (Model.Limit == null)
+                    {
+                        <div>
+                            <label>Нет ограничений по значению</label>
+                        </div>
+                    }
+                    else
+                    {
+                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px;">
+                            <div>
+                                <label>
+                                    Название @Html.DisplayTextFor(x => x.Limit.Name)
+                                </label>
+                            </div>
+                            <div>
+                                <label style="font-weight: normal">
+                                    Тип данных <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px"></select>
+                                </label>
+                            </div>
+                            <div>
+                                @if (Model.Limit.ParameterDataType == (int)DataTypes.Дата)
+                                {
+                                    <div>
+                                        <label>
+                                            Дата с @Html.DisplayFor(x => x.Limit.DateValueFrom)
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            Дата по @Html.DisplayFor(x => x.Limit.DateValueTo)
+                                        </label>
+                                    </div>
+                                }
+                                else if (Model.Limit.ParameterDataType == (int)DataTypes.Число)
+                                {
+                                    <div>
+                                        <label>
+                                            Начальное значение @Html.DisplayFor(x => x.Limit.IntValueFrom)
+                                        </label>
+                                    </div>
+                                    <div>
+                                        <label>
+                                            Конечное значение @Html.DisplayFor(x => x.Limit.IntValueTo)
+                                        </label>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Сохранить" class="btn btn-default" />

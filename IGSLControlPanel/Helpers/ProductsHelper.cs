@@ -12,7 +12,8 @@ namespace IGSLControlPanel.Helpers
         private List<Product> _products { get; set; }
         public List<Product> RootProducts { get; set; }
         public Product CurrentProduct { get; set; }
-        public ProductParameter CurrentParameter { get; private set; }
+        public ProductParameter CurrentParameter { get;
+            set; }
         public bool IsProductCreateInProgress { get; set; }
         public bool IsParameterCreateInProgress { get; set; }
 
@@ -103,11 +104,6 @@ namespace IGSLControlPanel.Helpers
 
         public void SelectUnselectParameter(Guid parameterId)
         {
-            if (CurrentParameter?.Id == parameterId)
-            {
-                CurrentParameter = null;
-                return;
-            }
             CurrentParameter = CurrentProduct.LinkToProductParameters
                 .SingleOrDefault(s => s.ProductParameterId == parameterId)
                 ?.Parameter;

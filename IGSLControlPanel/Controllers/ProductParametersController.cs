@@ -25,7 +25,19 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create()
         {
             _productsHelper.IsParameterCreateInProgress = true;
-            return View();
+            var tempParam = new ProductParameter
+            {
+                LinkToProduct = new List<ProductLinkToProductParameter>
+                {
+                    new ProductLinkToProductParameter
+                    {
+                        Product = _productsHelper.CurrentProduct,
+                        ProductId = _productsHelper.CurrentProduct.Id
+                    }
+                }
+            };
+            _productsHelper.CurrentParameter = tempParam;
+            return View(tempParam);
         }
 
         [HttpPost]
@@ -43,27 +55,25 @@ namespace IGSLControlPanel.Controllers
             await _context.SaveChangesAsync();
             _productsHelper.IsParameterCreateInProgress = false;
             await CheckParameterOrders(productParameter);
+            _productsHelper.CurrentParameter = null;
             return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var productParameter = await _context.ProductParameters.FindAsync(id);
+            var productParameter =
+                _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(x => x.ProductParameterId == id);
             if (productParameter == null)
             {
                 return NotFound();
             }
-            return View(productParameter);
+            _productsHelper.CurrentParameter = productParameter.Parameter;
+            return View(productParameter.Parameter);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType,Order,Limit")] ProductParameter productParameter)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType,Order,Limit,LinkToProduct")] ProductParameter productParameter)
         {
             if (id != productParameter.Id)
             {
@@ -88,6 +98,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             await CheckParameterOrders(productParameter);
+            _productsHelper.CurrentParameter = null;
             return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
