@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -25,12 +24,13 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create()
         {
+            _productsHelper.IsParameterCreateInProgress = true;
             return View();
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType")] ProductParameter productParameter)
+        public async Task<IActionResult> Create([Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType,Order,Limit")] ProductParameter productParameter)
         {
             if (!ModelState.IsValid) return View(productParameter);
             _context.Add(productParameter);
@@ -41,7 +41,9 @@ namespace IGSLControlPanel.Controllers
                 ProductParameterId = productParameter.Id
             }};
             await _context.SaveChangesAsync();
-            return RedirectToAction(_productsHelper.IsCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            _productsHelper.IsParameterCreateInProgress = false;
+            await CheckParameterOrders(productParameter);
+            return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         public async Task<IActionResult> Edit(Guid? id)
@@ -61,7 +63,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType")] ProductParameter productParameter)
+        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType,Order,Limit")] ProductParameter productParameter)
         {
             if (id != productParameter.Id)
             {
@@ -85,7 +87,8 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_productsHelper.IsCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            await CheckParameterOrders(productParameter);
+            return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         public async Task<IActionResult> Delete(Guid? id)
@@ -141,9 +144,9 @@ namespace IGSLControlPanel.Controllers
 
         private void MoveParam(bool up = true)
         {
-            if(_productsHelper.SelectedParameter == null) return;
+            if(_productsHelper.CurrentParameter == null) return;
             // выбранный параметр из контекста
-            var contextParameter = _context.ProductParameters.SingleOrDefault(x => x.Id == _productsHelper.SelectedParameter.Id);
+            var contextParameter = _context.ProductParameters.SingleOrDefault(x => x.Id == _productsHelper.CurrentParameter.Id);
             if(contextParameter == null) return;
 
             // нужно переместить параметр вверх
@@ -167,7 +170,7 @@ namespace IGSLControlPanel.Controllers
                 if (contextPrevParam != null) contextPrevParam.Order = contextParameter.Order;
                 
                 // перемещаем текущий переметр на место предыдущего
-                contextParameter.Order = _productsHelper.SelectedParameter.Order = destOrder;
+                contextParameter.Order = _productsHelper.CurrentParameter.Order = destOrder;
                 _context.SaveChanges();
             }
             else
@@ -190,9 +193,40 @@ namespace IGSLControlPanel.Controllers
                 if (contextNextParam != null) contextNextParam.Order = contextParameter.Order;
 
                 // перемещаем текущий переметр на место предыдущего
-                contextParameter.Order = _productsHelper.SelectedParameter.Order = destOrder;
+                contextParameter.Order = _productsHelper.CurrentParameter.Order = destOrder;
                 _context.SaveChanges();
             }
+        }
+
+        private async Task CheckParameterOrders(ProductParameter parameter)
+        {
+            // получаем запись LinkToProductParameters с нужным параметром
+            var currentLink =
+                _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(
+                    x => x.ProductParameterId == parameter.Id);
+
+            // удаляем ее из списка чтобы вставить по нужному индексу
+            _productsHelper.CurrentProduct.LinkToProductParameters.Remove(currentLink);
+
+            // получаем индекс, на который надо поставить параметр
+            var toIndex = parameter.Order > _productsHelper.CurrentProduct.LinkToProductParameters.Count
+                ? _productsHelper.CurrentProduct.LinkToProductParameters.Count
+                : parameter.Order;
+
+            _productsHelper.CurrentProduct.LinkToProductParameters.Insert(toIndex, currentLink);
+
+            // перестраиваем значение поля Order у параметров в соответствие с индексами
+            _productsHelper.CurrentProduct.LinkToProductParameters.ForEach(l =>
+            {
+                // это влияет на текущее отображение
+                l.Parameter.Order = _productsHelper.CurrentProduct.LinkToProductParameters.IndexOf(l);
+
+                // это нужно, чтоб в БД сохранилось значение
+                var contextParam = _context.ProductParameters.SingleOrDefault(x => x.Id == l.ProductParameterId);
+                if(contextParam != null)
+                    contextParam.Order = l.Parameter.Order;
+            });
+            await _context.SaveChangesAsync();
         }
     }
 }

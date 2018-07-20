@@ -21,5 +21,7 @@ namespace IGSLControlPanel.Data
         }
 
         public DbSet<ProductParameter> ProductParameters { get; set; }
+
+        public DbSet<ValueLimit> ValueLimits { get; set; }
     }
 }

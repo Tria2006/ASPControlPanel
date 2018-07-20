@@ -39,10 +39,25 @@
                 </div>
                 <div class="form-group">
                     <div>
-                        <label>
-                            Порядковый номер в списке <input asp-for="Order" type="number" />
+                        <label style="font-weight: normal">
+                            Порядковый номер в списке <input asp-for="Order" min="0" type="number" style="width: 60px; text-align: right" />
                         </label>
                     </div>
+                </div>
+                <div class="form-group">
+                    <label>
+                        Лимиты значений 
+                        <a asp-controller="ValueLimits" asp-action="Create">
+                            <img src="~/images/Icons/add_param.png" alt="Назад" style="margin: 2px; margin-left: 28px; width: 25px; height: 25px" />
+                        </a>
+                        <a asp-controller="Products" asp-action="OneLevelUp">
+                            <img src="~/images/Icons/edit_param.png" alt="Назад" style="margin: 2px; width: 25px; height: 25px" />
+                        </a>
+                        <a asp-controller="Products" asp-action="OneLevelUp">
+                            <img src="~/images/Icons/del_param.png" alt="Назад" style="margin: 2px; width: 25px; height: 25px" />
+                        </a>
+                    </label>
+                    @await Html.PartialAsync("_ParamLimitBlock", Model)
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Сохранить" class="btn btn-default" />

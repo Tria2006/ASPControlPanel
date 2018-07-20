@@ -43,7 +43,7 @@ namespace IGSLControlPanel.Controllers
         {
             var tempProduct = new Product {FolderId = folderId};
             _productsHelper.CurrentProduct = tempProduct;
-            _productsHelper.IsCreateInProgress = true;
+            _productsHelper.IsProductCreateInProgress = true;
             return View(tempProduct);
         }
 
@@ -52,7 +52,7 @@ namespace IGSLControlPanel.Controllers
         {
             var helper = new ProductsHelper();
             helper.AddProduct(product, _context);
-            _productsHelper.IsCreateInProgress = false;
+            _productsHelper.IsProductCreateInProgress = false;
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 

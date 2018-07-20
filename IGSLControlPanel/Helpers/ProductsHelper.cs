@@ -12,14 +12,25 @@ namespace IGSLControlPanel.Helpers
         private List<Product> _products { get; set; }
         public List<Product> RootProducts { get; set; }
         public Product CurrentProduct { get; set; }
-        public ProductParameter SelectedParameter { get; private set; }
-        public bool IsCreateInProgress { get; set; }
+        public ProductParameter CurrentParameter { get; private set; }
+        public bool IsProductCreateInProgress { get; set; }
+        public bool IsParameterCreateInProgress { get; set; }
 
         public void Initialize(IGSLContext _context)
         {
             // продукты получаем вместе со связанными параметрами 
             _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).Where(s => !s.IsDeleted).ToList();
 
+            // загружаем лимиты для параметров
+            _products.ForEach(p =>
+            {
+                foreach (var link in p.LinkToProductParameters)
+                {
+                    link.Parameter.Limit =
+                        _context.ValueLimits.FirstOrDefault(
+                            x => x.ProductId == p.Id && x.ParameterId == link.ProductParameterId && !x.IsDeleted);
+                }
+            });
             // продукты, не привязанные ни к какой папке
             RootProducts = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
         }
@@ -92,7 +103,12 @@ namespace IGSLControlPanel.Helpers
 
         public void SelectUnselectParameter(Guid parameterId)
         {
-            SelectedParameter = CurrentProduct.LinkToProductParameters
+            if (CurrentParameter?.Id == parameterId)
+            {
+                CurrentParameter = null;
+                return;
+            }
+            CurrentParameter = CurrentProduct.LinkToProductParameters
                 .SingleOrDefault(s => s.ProductParameterId == parameterId)
                 ?.Parameter;
         }

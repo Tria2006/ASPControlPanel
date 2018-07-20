@@ -21,5 +21,7 @@ namespace IGSLControlPanel.Models
         public bool IsRequiredForSave { get; set; }
 
         public int Order { get; set; }
+
+        public ValueLimit Limit { get; set; }
     }
 }
