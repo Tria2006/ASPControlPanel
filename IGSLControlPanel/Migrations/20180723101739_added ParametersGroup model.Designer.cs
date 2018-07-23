@@ -4,14 +4,16 @@ using IGSLControlPanel.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    partial class IGSLContextModelSnapshot : ModelSnapshot
+    [Migration("20180723101739_added ParametersGroup model")]
+    partial class addedParametersGroupmodel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -105,6 +107,8 @@ namespace IGSLControlPanel.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("GroupId");
+
                     b.HasIndex("LimitId");
 
                     b.ToTable("ProductParameters");
@@ -169,6 +173,10 @@ namespace IGSLControlPanel.Migrations
 
             modelBuilder.Entity("IGSLControlPanel.Models.ProductParameter", b =>
                 {
+                    b.HasOne("IGSLControlPanel.Models.ParameterGroup", "Group")
+                        .WithMany()
+                        .HasForeignKey("GroupId");
+
                     b.HasOne("IGSLControlPanel.Models.ValueLimit", "Limit")
                         .WithMany()
                         .HasForeignKey("LimitId");

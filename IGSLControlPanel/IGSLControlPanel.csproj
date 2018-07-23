@@ -15,6 +15,8 @@
     <Compile Remove="Migrations\20180710120545_Nullable Datetime + Tariff.Designer.cs" />
     <Compile Remove="Migrations\20180710120716_Nullable Datetime + Tariff.cs" />
     <Compile Remove="Migrations\20180710120716_Nullable Datetime + Tariff.Designer.cs" />
+    <Compile Remove="Migrations\20180723101111_added ParametersGroup model.cs" />
+    <Compile Remove="Migrations\20180723101629_added ParametersGroup model.cs" />
   </ItemGroup>
 
   <ItemGroup>

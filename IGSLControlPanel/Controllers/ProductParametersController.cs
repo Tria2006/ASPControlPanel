@@ -8,6 +8,7 @@ using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
 using IGSLControlPanel.Models.ManyToManyLinks;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -24,6 +25,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create()
         {
+            ViewData["ParamGroups"] = new SelectList(_context.ParameterGroups, "Id", "Name");
             _productsHelper.IsParameterCreateInProgress = true;
             var tempParam = new ProductParameter
             {
@@ -61,6 +63,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Edit(Guid id)
         {
+            ViewData["ParamGroups"] = new SelectList(_context.ParameterGroups, "Id", "Name");
             var productParameter =
                 _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(x => x.ProductParameterId == id);
             if (productParameter == null)
@@ -73,7 +76,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType,Order,Limit,LinkToProduct")] ProductParameter productParameter)
+        public async Task<IActionResult> Edit(Guid id, ProductParameter productParameter)
         {
             if (id != productParameter.Id)
             {

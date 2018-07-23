@@ -23,5 +23,7 @@ namespace IGSLControlPanel.Models
         public int Order { get; set; }
 
         public ValueLimit Limit { get; set; }
+
+        public Guid? GroupId { get; set; }
     }
 }
