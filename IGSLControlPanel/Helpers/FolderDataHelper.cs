@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Models;
 
@@ -74,7 +75,7 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        public FolderTreeEntry AddFolder(string name, IGSLContext _context, FolderTreeEntry parent = null)
+        public async Task<FolderTreeEntry> AddFolder(string name, IGSLContext _context, FolderTreeEntry parent = null)
         {
             // новая папка с введенным именем
             var newFolder = new FolderTreeEntry
@@ -89,11 +90,11 @@ namespace IGSLControlPanel.Helpers
                 parent.ChildFolders.Add(newFolder);
             }
             _context.FolderTreeEntries.Add(newFolder);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             return parent;
         }
 
-        public void RemoveFolders(IGSLContext _context, Guid parentId)
+        public async Task RemoveFolders(IGSLContext _context, Guid parentId)
         {
             // идем по списку выбранных папок
             foreach (var f in _checkedFolders)
@@ -106,14 +107,14 @@ namespace IGSLControlPanel.Helpers
             }
             var parentFolder = GetFolderById(parentId, FoldersTree);
             parentFolder?.ChildFolders.RemoveAll(x => x.IsDeleted);
-            _context.SaveChanges();
+            await _context.SaveChangesAsync();
             _checkedFolders = new List<FolderTreeEntry>();
         }
 
         private void RemoveChildFoldersAndProducts(FolderTreeEntry parent, IGSLContext _context)
         {
             // отвязывавем продукты от удаляемой папки
-            parent.Products.ForEach(x => _productsHelper.RemoveFolderId(x, _context));
+            parent.Products.ForEach(async x => await _productsHelper.RemoveFolderId(x, _context));
             foreach (var childFolder in parent.ChildFolders)
             {
                 // рекурсивно удаляем ChildFolders
@@ -164,16 +165,16 @@ namespace IGSLControlPanel.Helpers
             return null;
         }
 
-        public void UpdateProduct(Product product, IGSLContext context)
+        public async Task UpdateProduct(Product product, IGSLContext context)
         {
             var parentFolder = GetFolderById(product.FolderId ?? Guid.Empty, FoldersTree);
-            _productsHelper.UpdateProduct(product, parentFolder, context);
+            await _productsHelper.UpdateProduct(product, parentFolder, context);
         }
 
-        public void RemoveProducts(IGSLContext context, Guid? parentId)
+        public async Task RemoveProducts(IGSLContext context, Guid? parentId)
         {
             var parentFolder = GetFolderById(parentId ?? Guid.Empty, FoldersTree);
-            _productsHelper.RemoveProducts(context, _checkedProducts, parentFolder);
+            await _productsHelper.RemoveProducts(context, _checkedProducts, parentFolder);
         }
 
         public void MoveSelectedItems(IGSLContext context)

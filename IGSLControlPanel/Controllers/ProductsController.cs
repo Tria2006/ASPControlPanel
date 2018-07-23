@@ -48,10 +48,11 @@ namespace IGSLControlPanel.Controllers
         }
 
         [HttpPost]
-        public IActionResult CreateProduct(Product product)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateProduct(Product product)
         {
             var helper = new ProductsHelper();
-            helper.AddProduct(product, _context);
+            await helper.AddProduct(product, _context);
             _productsHelper.IsProductCreateInProgress = false;
             return RedirectToAction("Index", new { id = product.FolderId });
         }
@@ -59,7 +60,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId)
         {
             var folder = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == parentFolderId);
-            _folderDataHelper.AddFolder(name, _context, folder);
+            await _folderDataHelper.AddFolder(name, _context, folder);
             return RedirectToAction("Index", new{ id = parentFolderId });
         }
 
@@ -75,23 +76,24 @@ namespace IGSLControlPanel.Controllers
         }
 
         [HttpPost]
-        public IActionResult Edit(Product product)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Product product)
         {
-            _folderDataHelper.UpdateProduct(product, _context);
+            await _folderDataHelper.UpdateProduct(product, _context);
             return View(product);
         }
 
-        public IActionResult DeleteFolder(Guid id)
+        public async Task<IActionResult> DeleteFolder(Guid id)
         {
             if(_folderDataHelper.HasSelectedFolders)
-                _folderDataHelper.RemoveFolders(_context, id);
+                await _folderDataHelper.RemoveFolders(_context, id);
             return RedirectToAction("Index", new { id });
         }
 
-        public IActionResult DeleteProduct(Guid id)
+        public async Task<IActionResult> DeleteProduct(Guid id)
         {
             if (_folderDataHelper.HasSelectedProducts)
-                _folderDataHelper.RemoveProducts(_context, id);
+                await _folderDataHelper.RemoveProducts(_context, id);
             return RedirectToAction("Index", new { id });
         }
 
