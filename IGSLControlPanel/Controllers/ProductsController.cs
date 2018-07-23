@@ -80,7 +80,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Edit(Product product)
         {
             await _folderDataHelper.UpdateProduct(product, _context);
-            return View(product);
+            return RedirectToAction("Index", new { id = product.FolderId });
         }
 
         public async Task<IActionResult> DeleteFolder(Guid id)
