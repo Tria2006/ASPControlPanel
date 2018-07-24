@@ -29,7 +29,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,IsDeleted,CanBeDeleted")] ParameterGroup parameterGroup)
+        public async Task<IActionResult> Create(ParameterGroup parameterGroup)
         {
             if (!ModelState.IsValid) return View(parameterGroup);
             parameterGroup.Id = Guid.NewGuid();
@@ -55,7 +55,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,IsDeleted,CanBeDeleted")] ParameterGroup parameterGroup)
+        public async Task<IActionResult> Edit(Guid id, ParameterGroup parameterGroup)
         {
             if (id != parameterGroup.Id)
             {
@@ -105,6 +105,11 @@ namespace IGSLControlPanel.Controllers
         {
             var parameterGroup = await _context.ParameterGroups.FindAsync(id);
             parameterGroup.IsDeleted = true;
+            var parameters = _context.ProductParameters.Where(x => x.GroupId == id);
+            foreach (var parameter in parameters)
+            {
+                parameter.GroupId = null;
+            }
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }

@@ -47,11 +47,8 @@
                 <div class="form-group">
                     <div>
                         <label style="font-weight: normal; margin-left: 1px">
-                            Группа параметров
+                            Группа параметров <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
                         </label>
-                    </div>
-                    <div style="width: 400px">
-                        @Html.DropDownListFor(x => x.GroupId, ViewData["ParamGroups"] as SelectList, new { @class = "form-control" })
                     </div>
                 </div>
                 <div class="form-group">

@@ -33,7 +33,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,ParameterDataType,IntValueFrom,IntValueTo,DateValueFrom,DateValueTo,IsDeleted,ParameterId,ProductId")] ValueLimit valueLimit)
+        public async Task<IActionResult> Create(ValueLimit valueLimit)
         {
             if (!ModelState.IsValid) return View(valueLimit);
             valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
@@ -50,7 +50,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, [Bind("Id,Name,ParameterDataType,IntValueFrom,IntValueTo,DateValueFrom,DateValueTo,IsDeleted,ParameterId,ProductId")] ValueLimit valueLimit)
+        public async Task<IActionResult> Edit(Guid id, ValueLimit valueLimit)
         {
             if (id != valueLimit.Id)
             {

@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace IGSLControlPanel.Controllers
@@ -44,6 +46,9 @@ namespace IGSLControlPanel.Controllers
             var tempProduct = new Product {FolderId = folderId};
             _productsHelper.CurrentProduct = tempProduct;
             _productsHelper.IsProductCreateInProgress = true;
+            var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
+            ViewData["ParentFolderId"] = folderId;
             return View(tempProduct);
         }
 
@@ -66,6 +71,8 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
+            var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
             var product = await _context.Products.SingleOrDefaultAsync(m => m.Id == id);
             _productsHelper.CurrentProduct = product;
             if (product == null)

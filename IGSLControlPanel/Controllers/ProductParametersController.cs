@@ -23,18 +23,24 @@ namespace IGSLControlPanel.Controllers
             _productsHelper = productsHelper;
         }
 
-        public IActionResult Create()
+        public IActionResult Create(Guid? groupId)
         {
-            ViewData["ParamGroups"] = new SelectList(_context.ParameterGroups, "Id", "Name");
+            var groups = new List<ParameterGroup>
+            {
+                new ParameterGroup{Id = Guid.Empty, Name = "Не выбрано"}
+            };
+            groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groupId ?? groups.First().Id);
             _productsHelper.IsParameterCreateInProgress = true;
             var tempParam = new ProductParameter
             {
+                GroupId = groupId,
                 LinkToProduct = new List<ProductLinkToProductParameter>
                 {
                     new ProductLinkToProductParameter
                     {
                         Product = _productsHelper.CurrentProduct,
-                        ProductId = _productsHelper.CurrentProduct.Id
+                        ProductId = _productsHelper.CurrentProduct.Id,
                     }
                 }
             };
@@ -44,9 +50,10 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Name,IsDeleted,IsRequiredForCalc,IsRequiredForSave,DataType,Order,Limit")] ProductParameter productParameter)
+        public async Task<IActionResult> Create(ProductParameter productParameter)
         {
             if (!ModelState.IsValid) return View(productParameter);
+            if (productParameter.GroupId == Guid.Empty) productParameter.GroupId = null;
             _context.Add(productParameter);
             _context.SaveChanges();
             productParameter.LinkToProduct = new List<ProductLinkToProductParameter>{ new ProductLinkToProductParameter
@@ -55,6 +62,8 @@ namespace IGSLControlPanel.Controllers
                 ProductParameterId = productParameter.Id
             }};
             await _context.SaveChangesAsync();
+            var productId = _productsHelper.CurrentProduct.Id;
+            _productsHelper.CurrentProduct = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).SingleOrDefault(x => x.Id == productId);
             _productsHelper.IsParameterCreateInProgress = false;
             await CheckParameterOrders(productParameter);
             _productsHelper.CurrentParameter = null;
@@ -63,13 +72,18 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Edit(Guid id)
         {
-            ViewData["ParamGroups"] = new SelectList(_context.ParameterGroups, "Id", "Name");
             var productParameter =
                 _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(x => x.ProductParameterId == id);
             if (productParameter == null)
             {
                 return NotFound();
             }
+            var groups = new List<ParameterGroup>
+            {
+                new ParameterGroup{Id = Guid.Empty, Name = "Не выбрано"}
+            };
+            groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groups.SingleOrDefault(x => x.Id == productParameter.Parameter.GroupId));
             _productsHelper.CurrentParameter = productParameter.Parameter;
             return View(productParameter.Parameter);
         }
@@ -87,6 +101,7 @@ namespace IGSLControlPanel.Controllers
             try
             {
                 _context.Update(productParameter);
+                _productsHelper.CurrentParameter = productParameter;
                 await _context.SaveChangesAsync();
             }
             catch (DbUpdateConcurrencyException)
@@ -144,19 +159,19 @@ namespace IGSLControlPanel.Controllers
             return _context.ProductParameters.Any(e => e.Id == id);
         }
 
-        public IActionResult ParameterUp()
+        public IActionResult ParameterUp(Guid? groupId)
         {
-            MoveParam();
-            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct);
+            MoveParam(groupId);
+            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => x.Parameter.GroupId == groupId).Select(s => s.Parameter).ToList());
         }
 
-        public IActionResult ParameterDown()
+        public IActionResult ParameterDown(Guid? groupId)
         {
-            MoveParam(false);
-            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct);
+            MoveParam(groupId, false);
+            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => x.Parameter.GroupId == groupId).Select(s => s.Parameter).ToList());
         }
 
-        private void MoveParam(bool up = true)
+        private void MoveParam(Guid? groupId, bool up = true)
         {
             if(_productsHelper.CurrentParameter == null) return;
             // выбранный параметр из контекста
@@ -169,7 +184,7 @@ namespace IGSLControlPanel.Controllers
                 // предыдущий параметр по Order(выбираем ближайший order, который меньше, чем в текущем параметре)
                 var prevParam =
                     _productsHelper.CurrentProduct.LinkToProductParameters.Where(
-                        x => x.Parameter.Order < contextParameter.Order).OrderByDescending(x => x.Parameter.Order).FirstOrDefault();
+                        x => x.Parameter.GroupId == groupId && x.Parameter.Order < contextParameter.Order).OrderByDescending(x => x.Parameter.Order).FirstOrDefault();
                 if(prevParam == null) return;
 
                 // Order куда надо переместить
@@ -192,7 +207,7 @@ namespace IGSLControlPanel.Controllers
                 // следующий параметр по Order(выбираем ближайший order, который больше, чем в текущем параметре)
                 var nextParam =
                     _productsHelper.CurrentProduct.LinkToProductParameters.Where(
-                        x => x.Parameter.Order > contextParameter.Order).OrderBy(x => x.Parameter.Order).FirstOrDefault();
+                        x => x.Parameter.GroupId == groupId && x.Parameter.Order > contextParameter.Order).OrderBy(x => x.Parameter.Order).FirstOrDefault();
                 if (nextParam == null) return;
 
                 // Order куда надо переместить
@@ -214,32 +229,58 @@ namespace IGSLControlPanel.Controllers
 
         private async Task CheckParameterOrders(ProductParameter parameter)
         {
+            List<ProductLinkToProductParameter> resultList;
+            var paramsList =
+                _productsHelper.CurrentProduct.LinkToProductParameters.Where(
+                    x => x.Parameter.GroupId == parameter.GroupId).OrderBy(x => x.Parameter.Order).ToList();
+
             // получаем запись LinkToProductParameters с нужным параметром
             var currentLink =
                 _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(
                     x => x.ProductParameterId == parameter.Id);
 
-            // удаляем ее из списка чтобы вставить по нужному индексу
-            _productsHelper.CurrentProduct.LinkToProductParameters.Remove(currentLink);
+            if(currentLink == null) return;
 
-            // получаем индекс, на который надо поставить параметр
-            var toIndex = parameter.Order > _productsHelper.CurrentProduct.LinkToProductParameters.Count
-                ? _productsHelper.CurrentProduct.LinkToProductParameters.Count
-                : parameter.Order;
-
-            _productsHelper.CurrentProduct.LinkToProductParameters.Insert(toIndex, currentLink);
-
-            // перестраиваем значение поля Order у параметров в соответствие с индексами
-            _productsHelper.CurrentProduct.LinkToProductParameters.ForEach(l =>
+            // если добавляем в начало
+            if (parameter.Order == 0)
             {
-                // это влияет на текущее отображение
-                l.Parameter.Order = _productsHelper.CurrentProduct.LinkToProductParameters.IndexOf(l);
+                paramsList.Remove(currentLink);
+                resultList = new List<ProductLinkToProductParameter>{currentLink};
+                resultList.AddRange(paramsList);
 
-                // это нужно, чтоб в БД сохранилось значение
-                var contextParam = _context.ProductParameters.SingleOrDefault(x => x.Id == l.ProductParameterId);
-                if(contextParam != null)
-                    contextParam.Order = l.Parameter.Order;
-            });
+            } // если Order больше, чем максимальный, то добавляем в конец
+            else if (parameter.Order >= paramsList.Max(x => x.Parameter.Order))
+            {
+                paramsList.Remove(currentLink);
+                resultList = new List<ProductLinkToProductParameter>(paramsList) {currentLink};
+            }
+            else
+            {
+                var lower = paramsList.Where(x => x.Parameter.Order < parameter.Order); // Order меньше нужного
+                var upper = paramsList.Where(x => x.Parameter.Order >= parameter.Order); // Order больше нужного
+
+                // собираем результат: 1. все, кто с меньшим Order; 2. текущий параметр; 3. все, кто с бОльшим Order
+                resultList = new List<ProductLinkToProductParameter>(lower) {currentLink};
+                resultList.AddRange(upper);
+
+            }
+
+            // задаем Order каждому в списке
+            var i = 0;
+            foreach (var link in resultList)
+            {
+                var contextParam = _context.ProductParameters.SingleOrDefault(x => x.Id == link.ProductParameterId);
+                link.Parameter.Order = i;
+                if (contextParam != null) contextParam.Order = i;
+                i++;
+            }
+
+            // удаляем все записи параметров для текущей группы
+            _productsHelper.CurrentProduct.LinkToProductParameters.RemoveAll(
+                x => x.Parameter.GroupId == parameter.GroupId);
+
+            // добавляем resultList
+            _productsHelper.CurrentProduct.LinkToProductParameters.AddRange(resultList);
             await _context.SaveChangesAsync();
         }
     }
