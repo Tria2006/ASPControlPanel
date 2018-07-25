@@ -13,41 +13,36 @@
             <form asp-action="Create">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
-                    <label class="control-label">Название</label>
+                    <label asp-for="Name" class="control-label" style="width: 150px"></label>
                     <input asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label style="font-weight: normal">
-                        Тип данных <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px"></select>
-                    </label>
+                    <label asp-for="DataType" class="control-label"></label>
+                    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px"></select>
                 </div>
                 <div class="form-group">
                     <div class="checkbox">
-                        <label>
-                            <input asp-for="IsRequiredForCalc" /> Обязателен для расчета
-                        </label>
+                        <label asp-for="IsRequiredForCalc" class="control-label"></label>
+                            <input asp-for="IsRequiredForCalc" />
                     </div>
                 </div>
                 <div class="form-group">
                     <div class="checkbox">
-                        <label>
-                            <input asp-for="IsRequiredForSave" /> Обязателен для сохранения
-                        </label>
+                        <label asp-for="IsRequiredForSave" class="control-label"></label>
+                            <input asp-for="IsRequiredForSave" />
                     </div>
                 </div>
                 <div class="form-group">
                     <div>
-                        <label>
-                            Порядковый номер в списке <input asp-for="Order" min="0" type="number" style="width: 60px; text-align: right" />
-                        </label>
+                        <label asp-for="Order" class="control-label"></label>
+                        <input asp-for="Order" min="0" type="number" style="width: 60px; text-align: right" />
                     </div>
                 </div>
                 <div class="form-group">
                     <div>
-                        <label style="font-weight: normal; margin-left: 1px">
-                            Группа параметров <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
-                        </label>
+                        <label asp-for="GroupId" class="control-label"></label>
+                        <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
                     </div>
                 </div>
                 <div class="form-group">

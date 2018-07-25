@@ -13,43 +13,30 @@
             <form asp-action="Edit">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
-                <div class="form-group" style="width: 400px">
-                    <label class="control-label">Название</label>
-                    <input asp-for="Name" class="form-control" />
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" style="width: 500px" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
-                    <label style="font-weight: normal">
-                        Тип данных <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px"></select>
-                    </label>
+                    <label asp-for="DataType" class="control-label" style="width: 220px"></label>
+                    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" style="width: 150px"></select>
                 </div>
                 <div class="form-group">
-                    <div class="checkbox">
-                        <label>
-                            <input asp-for="IsRequiredForCalc" /> Обязателен для расчета
-                        </label>
-                    </div>
+                    <label asp-for="IsRequiredForCalc" class="control-label" style="width: 220px"></label>
+                    <input asp-for="IsRequiredForCalc" style="vertical-align: top" />
                 </div>
                 <div class="form-group">
-                    <div class="checkbox">
-                        <label>
-                            <input asp-for="IsRequiredForSave" /> Обязателен для сохранения
-                        </label>
-                    </div>
+                    <label asp-for="IsRequiredForSave" class="control-label" style="width: 220px"></label>
+                    <input asp-for="IsRequiredForSave" style="vertical-align: top" />
                 </div>
                 <div class="form-group">
-                    <div>
-                        <label style="font-weight: normal">
-                            Порядковый номер в списке <input asp-for="Order" min="0" type="number" style="width: 60px; text-align: right" />
-                        </label>
-                    </div>
+                    <label asp-for="Order" class="control-label" style="width: 220px"></label>
+                    <input asp-for="Order" min="0" type="number" style="width: 60px; text-align: right" />
                 </div>
                 <div class="form-group">
-                    <div>
-                        <label style="font-weight: normal; margin-left: 1px">
-                            Группа параметров <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
-                        </label>
-                    </div>
+                    <label asp-for="GroupId" class="control-label" style="width: 220px"></label>
+                    <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList" style="width: 150px"></select>
                 </div>
                 <div class="form-group">
                     <label>
@@ -66,48 +53,42 @@
                     </label>
                     @if (Model.Limit == null)
                     {
-                        <div>
-                            <label>Нет ограничений по значению</label>
-                        </div>
+                    <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
+                        <label>Нет ограничений по значению</label>
+                    </div>
                     }
                     else
                     {
-                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px;">
+                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
                             <div>
-                                <label>
-                                    Название @Html.DisplayTextFor(x => x.Limit.Name)
-                                </label>
+                                <label asp-for="Limit.Name" class="control-label" style="width: 180px"></label>
+                                <label>@Model.Limit.Name</label>
                             </div>
                             <div>
-                                <label style="font-weight: normal">
-                                    Тип данных <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px"></select>
-                                </label>
+                                <label asp-for="DataType" class="control-label" style="width: 180px"></label>
+                                <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()"  style="width: 150px"></select>
                             </div>
                             <div>
                                 @if (Model.Limit.ParameterDataType == (int)DataTypes.Дата)
                                 {
+                                <div>
+                                    <label asp-for="Limit.DateValueFrom" class="control-label" style="width: 180px"></label>
+                                    <label>@Model.Limit.DateValueFrom</label>
+                                </div>
                                     <div>
-                                        <label>
-                                            Дата с @Html.DisplayFor(x => x.Limit.DateValueFrom)
-                                        </label>
-                                    </div>
-                                    <div>
-                                        <label>
-                                            Дата по @Html.DisplayFor(x => x.Limit.DateValueTo)
-                                        </label>
+                                        <label asp-for="Limit.DateValueTo" class="control-label" style="width: 180px"></label>
+                                        <label>@Model.Limit.DateValueTo</label>
                                     </div>
                                 }
                                 else if (Model.Limit.ParameterDataType == (int)DataTypes.Число)
                                 {
                                     <div>
-                                        <label>
-                                            Начальное значение @Html.DisplayFor(x => x.Limit.IntValueFrom)
-                                        </label>
+                                        <label asp-for="Limit.IntValueFrom" class="control-label" style="width: 180px"></label>
+                                        <label>@Model.Limit.IntValueFrom</label>
                                     </div>
                                     <div>
-                                        <label>
-                                            Конечное значение @Html.DisplayFor(x => x.Limit.IntValueTo)
-                                        </label>
+                                        <label asp-for="Limit.IntValueTo" class="control-label" style="width: 180px"></label>
+                                        <label>@Model.Limit.IntValueTo</label>
                                     </div>
                                 }
                             </div>

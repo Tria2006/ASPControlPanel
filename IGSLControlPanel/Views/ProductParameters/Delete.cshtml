@@ -13,7 +13,7 @@
     <div style="margin-top: 20px; margin-bottom: 20px">
         <div style="margin-top: 5px; margin-bottom: 5px">
             <div style="float: left; width: 250px">
-                Название
+                <label asp-for="Name" style="font-weight: normal"></label>
             </div>
             <div>
                 @Html.DisplayFor(model => model.Name)
@@ -21,7 +21,15 @@
         </div>
         <div style="margin-top: 5px; margin-bottom: 5px">
             <div style="float: left; width: 250px">
-                Обязателен для расчета
+                <label asp-for="DataType" style="font-weight: normal"></label>
+            </div>
+            <div>
+                <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px" disabled="disabled"></select>
+            </div>
+        </div>
+        <div style="margin-top: 5px; margin-bottom: 5px">
+            <div style="float: left; width: 250px">
+                <label asp-for="IsRequiredForCalc" style="font-weight: normal"></label>
             </div>
             <div>
                 @Html.DisplayFor(model => model.IsRequiredForCalc)
@@ -29,10 +37,26 @@
         </div>
         <div style="margin-top: 5px; margin-bottom: 5px">
             <div style="float: left; width: 250px">
-                Обязателен для сохранения
+                <label asp-for="IsRequiredForSave" style="font-weight: normal"></label>
             </div>
             <div>
                 @Html.DisplayFor(model => model.IsRequiredForSave)
+            </div>
+        </div>
+        <div style="margin-top: 5px; margin-bottom: 5px">
+            <div style="float: left; width: 250px">
+                <label asp-for="Order" style="font-weight: normal"></label>
+            </div>
+            <div>
+                @Html.DisplayFor(model => model.Order)
+            </div>
+        </div>
+        <div style="margin-top: 5px; margin-bottom: 5px">
+            <div style="float: left; width: 250px">
+                <label asp-for="GroupId" style="font-weight: normal"></label>
+            </div>
+            <div>
+                <select asp-for="GroupId" disabled="disabled" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
             </div>
         </div>
     </div>

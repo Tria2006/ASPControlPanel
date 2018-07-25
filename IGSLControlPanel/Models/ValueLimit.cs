@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
 namespace IGSLControlPanel.Models
@@ -7,20 +8,24 @@ namespace IGSLControlPanel.Models
     {
         public Guid Id { get; set; }
 
+        [DisplayName("Название")]
         public string Name { get; set; }
 
+        [DisplayName("Тип данных")]
         public int ParameterDataType { get; set; }
 
+        [DisplayName("Начальное значение")]
         public int? IntValueFrom { get; set; }
 
+        [DisplayName("Конечное значение")]
         public int? IntValueTo { get; set; }
 
+        [DisplayName("Начальная дата")]
         [DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:dd.MMMM.yyyy}")]
         public DateTime? DateValueFrom { get; set; }
 
+        [DisplayName("Конечная дата")]
         [DataType(DataType.Date)]
-        //[DisplayFormat(DataFormatString = "{0:dd.MMMM.yyyy}")]
         public DateTime? DateValueTo { get; set; }
 
         public bool IsDeleted { get; set; }

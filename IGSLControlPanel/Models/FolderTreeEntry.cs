@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -19,6 +20,7 @@ namespace IGSLControlPanel.Models
         [NotMapped]
         public List<Product> Products { get; set; } = new List<Product>();
 
+        [DisplayName("Название")]
         public string Name { get; set; }
 
         public bool IsDeleted { get; set; }

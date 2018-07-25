@@ -47,7 +47,7 @@
 <script>
     function folderClick(child) {
         $.ajax({
-            url: "/Products/FolderClick",
+            url: "/Folders/FolderClick",
             type: "post",
             data: { id : child.id},
             success: function (result) {
@@ -57,7 +57,7 @@
     };
     function folderBackClick() {
         $.ajax({
-            url: "/Products/OneLevelUp",
+            url: "/Folders/OneLevelUp",
             type: "post",
             data: { destFolderId: $("#parentId").val(), returnPartial: true },
             success: function (result) {

@@ -10,6 +10,7 @@ namespace IGSLControlPanel.Helpers
     public class FolderDataHelper
     {
         public FolderTreeEntry FoldersTree { get; set; }
+        public bool IsInitialized { get; private set; }
         private List<FolderTreeEntry> _folders { get; set; }
         private List<FolderTreeEntry> _checkedFolders { get; set; }
         private List<Product> _checkedProducts { get; }
@@ -38,6 +39,8 @@ namespace IGSLControlPanel.Helpers
 
             // формирование дерева папок
             BuildFolderTree();
+
+            IsInitialized = true;
         }
 
         public FolderTreeEntry BuildFolderTree()

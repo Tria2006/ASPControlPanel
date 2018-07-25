@@ -17,7 +17,7 @@
     <input id="modelIdValue" type="hidden" value="@Model.Id" />
 
     <!-- кнопка Назад-->
-    <a id="backBtn" asp-controller="Products" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
+    <a id="backBtn" asp-controller="Folders" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
         <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
@@ -27,7 +27,7 @@
     </a>
 
     <!-- кнопка Удалить папку-->
-    <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
+    <a id="deleteFolderBtn" asp-controller="Folders" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
         <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
@@ -57,7 +57,7 @@
                     <h4 class="modal-title">Введите имя папки</h4>
                 </div>
                 <div class="modal-body">
-                    <form asp-controller="Products" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
+                    <form asp-controller="Folders" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
                         <div class="form-group">
                             <input id="folderNameInput" asp-for="Name" />
                             <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
@@ -190,7 +190,7 @@
     });
 
     function FolderCheckBoxClick(id) {
-        $.get("/Products/FolderCheckBoxClick/" + id, function (data) {
+        $.get("/Folders/FolderCheckBoxClick/" + id, function (data) {
             if (data === true) {
                 $("#deleteFolderImg").attr("src", "/images/Icons/folderdelete.png");
             } else {

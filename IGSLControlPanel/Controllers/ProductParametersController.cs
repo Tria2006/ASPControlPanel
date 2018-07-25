@@ -120,21 +120,29 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var productParameter = await _context.ProductParameters
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var productParameter =
+                _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(x => x.ProductParameterId == id);
             if (productParameter == null)
             {
                 return NotFound();
             }
+            var groups = new List<ParameterGroup>
+            {
+                new ParameterGroup{Id = Guid.Empty, Name = "Не выбрано"}
+            };
+            groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groups.SingleOrDefault(x => x.Id == productParameter.Parameter.GroupId));
+            _productsHelper.CurrentParameter = productParameter.Parameter;
+            var contextParameter = await _context.ProductParameters
+                .FirstOrDefaultAsync(m => m.Id == id);
+            if (contextParameter == null)
+            {
+                return NotFound();
+            }
 
-            return View(productParameter);
+            return View(productParameter.Parameter);
         }
 
         [HttpPost, ActionName("Delete")]

@@ -33,14 +33,6 @@ namespace IGSLControlPanel.Controllers
             return View(folder);
         }
 
-        public IActionResult OneLevelUp(Guid destFolderId, bool returnPartial = false)
-        {
-            if (!returnPartial) return RedirectToAction("Index", new {id = destFolderId});
-            var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
-            _folderDataHelper.SelectedDestFolderId = destFolderId;
-            return PartialView("FolderSelectView", folder);
-        }
-
         public IActionResult CreateProduct(Guid folderId)
         {
             var tempProduct = new Product {FolderId = folderId};
@@ -60,13 +52,6 @@ namespace IGSLControlPanel.Controllers
             await helper.AddProduct(product, _context);
             _productsHelper.IsProductCreateInProgress = false;
             return RedirectToAction("Index", new { id = product.FolderId });
-        }
-
-        public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId)
-        {
-            var folder = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == parentFolderId);
-            await _folderDataHelper.AddFolder(name, _context, folder);
-            return RedirectToAction("Index", new{ id = parentFolderId });
         }
 
         public async Task<IActionResult> Edit(Guid id)
@@ -90,24 +75,11 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
-        public async Task<IActionResult> DeleteFolder(Guid id)
-        {
-            if(_folderDataHelper.HasSelectedFolders)
-                await _folderDataHelper.RemoveFolders(_context, id);
-            return RedirectToAction("Index", new { id });
-        }
-
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
             if (_folderDataHelper.HasSelectedProducts)
                 await _folderDataHelper.RemoveProducts(_context, id);
             return RedirectToAction("Index", new { id });
-        }
-
-        public bool FolderCheckBoxClick(Guid id)
-        {
-            _folderDataHelper.CheckFolder(id, _context);
-            return _folderDataHelper.HasSelectedFolders;
         }
 
         public bool ProductCheckBoxClick(Guid id)
@@ -119,13 +91,6 @@ namespace IGSLControlPanel.Controllers
         public bool GetFolderOrProductSelected()
         {
             return _folderDataHelper.HasSelectedProducts || _folderDataHelper.HasSelectedFolders;
-        }
-
-        public IActionResult FolderClick(Guid id)
-        {
-            var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
-            _folderDataHelper.SelectedDestFolderId = id;
-            return PartialView("FolderSelectView", folder);
         }
 
         public IActionResult MoveSelectedItems()
