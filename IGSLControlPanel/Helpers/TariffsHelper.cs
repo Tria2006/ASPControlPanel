@@ -10,12 +10,64 @@ namespace IGSLControlPanel.Helpers
     public class TariffsHelper
     {
         public Tariff CurrentTariff { get; set; }
-
         public bool IsCreateInProgress { get; set; }
+        private List<Tariff> _tariffs { get; set; }
+        public List<Tariff> RootTariffs { get; set; }
+        private List<Tariff> _checkedTariffs { get; } = new List<Tariff>();
+        public bool HasSelectedTariffs => _checkedTariffs.Any();
 
-        public void Initialize(IGSLContext _context)
+        public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)
         {
-            
+            // продукты получаем вместе со связанными параметрами 
+            _tariffs = _context.Tariffs.Where(s => !s.IsDeleted).ToList();
+
+            // продукты, не привязанные ни к какой папке
+            RootTariffs = _tariffs.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
+
+            BuildTariffs(rootFolder);
+        }
+
+        public void BuildTariffs(FolderTreeEntry parent)
+        {
+            var tariffs = _tariffs.Where(x => (x.FolderId != null && x.FolderId == parent.Id) && !x.IsDeleted);
+            foreach (var tariff in tariffs)
+            {
+                if (parent.Tariffs.Contains(tariff)) continue;
+                parent.Tariffs.Add(tariff);
+            }
+        }
+
+        public async Task RemoveFolderId(Tariff tariff, IGSLContext _context)
+        {
+            // отвязываем продукт от папки
+            var contextTariff = _context.Tariffs.FirstOrDefault(x => x.Id == tariff.Id);
+            if (contextTariff == null) return;
+            contextTariff.FolderId = Guid.Empty;
+            await _context.SaveChangesAsync();
+        }
+
+        public void CheckTariff(Guid id, IGSLContext _context)
+        {
+            // получаем продукт из контекста
+            var tariff = _context.Tariffs.SingleOrDefault(x => x.Id == id);
+            if (tariff == null) return;
+            // добавляем или удаляем продукт из списка _checkedFolders
+            if (_checkedTariffs.Any(p => p.Id == tariff.Id))
+                _checkedTariffs.RemoveAll(p => p.Id == tariff.Id);
+            else
+                _checkedTariffs.Add(tariff);
+        }
+
+        public void MoveSelectedTariffs(IGSLContext context, Guid selectedDestFolderId)
+        {
+            foreach (var tariff in _checkedTariffs)
+            {
+                var contextTariff = context.Tariffs.SingleOrDefault(p => p.Id == tariff.Id);
+                if (contextTariff == null) continue;
+                contextTariff.FolderId = selectedDestFolderId;
+            }
+            _checkedTariffs.Clear();
+            context.SaveChanges();
         }
     }
 }

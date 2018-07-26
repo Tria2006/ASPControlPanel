@@ -4,43 +4,39 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.Extensions.Logging;
 
 namespace IGSLControlPanel.Controllers
 {
-    public class TariffsController : Controller
+    public class TariffsController : FoldersBaseController
     {
         private readonly IGSLContext _context;
-        private readonly FolderDataHelper _folderDataHelper;
         private readonly TariffsHelper _tariffsHelper;
         private readonly ILogger _logger;
 
         public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, ILogger<ProductsController> logger)
+            : base(context, helper)
         {
             _context = context;
             _logger = logger;
+            BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
-            _folderDataHelper = helper;
-            _folderDataHelper.Initialize(_context);
+            _tariffsHelper.Initialize(_context, GetRootFolder());
         }
 
         public IActionResult Index(Guid id)
         {
-            var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
-            return View(folder);
+            return View(GetFolderById(id));
         }
-
 
         public IActionResult Create(Guid folderId)
         {
             var tempTariff = new Tariff { FolderId = folderId };
             _tariffsHelper.CurrentTariff = tempTariff;
             _tariffsHelper.IsCreateInProgress = true;
-            var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
-            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
             ViewData["ParentFolderId"] = folderId;
             return View(tempTariff);
         }
@@ -130,6 +126,20 @@ namespace IGSLControlPanel.Controllers
         private bool TariffExists(Guid id)
         {
             return _context.Tariffs.Any(e => e.Id == id);
+        }
+
+        public bool ProductCheckBoxClick(Guid id)
+        {
+            _tariffsHelper.CheckTariff(id, _context);
+            return _tariffsHelper.HasSelectedTariffs;
+        }
+
+        public IActionResult MoveSelectedItems()
+        {
+            MoveSelectedFolders();
+            _tariffsHelper.MoveSelectedTariffs(_context, GetSelectedDestFolderId());
+            BuildFolderTree(ModelTypes.Products);
+            return RedirectToAction("Index", new { id = GetSelectedDestFolderId() });
         }
     }
 }

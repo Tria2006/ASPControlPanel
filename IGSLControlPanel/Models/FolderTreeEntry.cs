@@ -27,5 +27,7 @@ namespace IGSLControlPanel.Models
         public string Name { get; set; }
 
         public bool IsDeleted { get; set; }
+
+        public int ModelTypeId { get; set; }
     }
 }

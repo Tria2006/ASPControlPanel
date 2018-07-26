@@ -11,7 +11,7 @@ namespace IGSLControlPanel.Helpers
     public class ProductsHelper
     {
         private List<Product> _products { get; set; }
-        public List<Product> RootProducts { get; set; }
+        //public List<Product> RootProducts { get; set; }
         public Product CurrentProduct { get; set; }
         public ProductParameter CurrentParameter { get; set; }
         public bool IsProductCreateInProgress { get; set; }
@@ -19,7 +19,7 @@ namespace IGSLControlPanel.Helpers
         private List<Product> _checkedProducts { get; } = new List<Product>();
         public bool HasSelectedProducts => _checkedProducts.Any();
 
-        public void Initialize(IGSLContext _context)
+        public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)
         {
             // продукты получаем вместе со связанными параметрами 
             _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).Where(s => !s.IsDeleted).ToList();
@@ -35,16 +35,23 @@ namespace IGSLControlPanel.Helpers
                 }
             });
             // продукты, не привязанные ни к какой папке
-            RootProducts = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
+            //RootProducts = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
+
+            BuildProducts(rootFolder);
         }
 
-        public void BuildProducts(FolderTreeEntry parent)
+        private void BuildProducts(FolderTreeEntry parent)
         {
-            var products = _products.Where(x => (x.FolderId != null && x.FolderId == parent.Id) && !x.IsDeleted);
+            var products = _products.Where(x => x.FolderId == parent.Id && !x.IsDeleted);
             foreach (var product in products)
             {
                 if (parent.Products.Contains(product)) continue;
                 parent.Products.Add(product);
+            }
+
+            foreach (var childFolder in parent.ChildFolders)
+            {
+                BuildProducts(childFolder);
             }
         }
 
@@ -64,7 +71,7 @@ namespace IGSLControlPanel.Helpers
             parentFolder?.Products.RemoveAll(x => x.IsDeleted);
 
             // удалить продукты нужно и из _productsWOFolder
-            RootProducts.RemoveAll(x => x.IsDeleted);
+            //RootProducts.RemoveAll(x => x.IsDeleted);
             await _context.SaveChangesAsync();
 
             // очищаем список выбранных продуктов
@@ -79,13 +86,6 @@ namespace IGSLControlPanel.Helpers
             if (product == null) return;
             product.FolderId = Guid.Empty;
             await _context.SaveChangesAsync();
-        }
-
-        public void UpdateProductFields(Product oldProduct, Product newProduct)
-        {
-            oldProduct.Name = newProduct.Name;
-            oldProduct.ValidFrom = newProduct.ValidFrom;
-            oldProduct.ValidTo = newProduct.ValidTo;
         }
 
         public async Task AddProduct(Product product,IGSLContext _context)

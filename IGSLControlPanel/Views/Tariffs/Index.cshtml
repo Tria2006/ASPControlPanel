@@ -18,7 +18,7 @@
 <input id="modelIdValue" type="hidden" value="@Model.Id" />
 
 <!-- кнопка Назад-->
-<a id="backBtn" asp-controller="Folders" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
+<a id="backBtn" asp-controller="Tariffs" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId" asp-route-controllerName="Tariffs">
     <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
 </a>
 
@@ -28,7 +28,7 @@
 </a>
 
 <!-- кнопка Удалить папку-->
-<a id="deleteFolderBtn" asp-controller="Folders" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
+<a id="deleteFolderBtn" asp-controller="Tariffs" asp-action="DeleteFolder" asp-route-id="@Model.Id" asp-route-controllerName="Tariffs" style="margin-left: 10px">
     <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
 </a>
 
@@ -58,7 +58,7 @@
                 <h4 class="modal-title">Введите имя папки</h4>
             </div>
             <div class="modal-body">
-                <form asp-controller="Folders" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
+                <form asp-controller="Tariffs" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id" asp-route-modelType="@ModelTypes.Tariffs">
                     <div class="form-group">
                         <input id="folderNameInput" asp-for="Name" />
                         <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
@@ -87,7 +87,7 @@
                 </div>
 
                 <div class="form-group" style="margin-left: 18px;">
-                    <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Folders" asp-action="MoveSelectedItems" asp-route-controllerName="Tariffs">Выбрать</button>
+                    <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Tariffs" asp-action="MoveSelectedItems">Выбрать</button>
                     <button id="moveCancelBtn" type="button" class="btn btn-primary">
                         Отмена
                     </button>
@@ -130,7 +130,7 @@
         }
         foreach (var p in Model.Tariffs)
         {
-            // Продукты
+            // Тарифы
             <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
                 <table id="folderItem" style="height: 90px; width: 90px">
                     <tr>
@@ -191,7 +191,7 @@
     });
 
     function FolderCheckBoxClick(id) {
-        $.get("/Folders/FolderCheckBoxClick/" + id, function (data) {
+        $.get("/Tariffs/FolderCheckBoxClick/" + id, function (data) {
             if (data === true) {
                 $("#deleteFolderImg").attr("src", "/images/Icons/folderdelete.png");
             } else {
@@ -202,7 +202,7 @@
     }
 
     function TariffCheckBoxClick(id) {
-        $.get("/Tariffs/ProductCheckBoxClick/" + id, function (data) {
+        $.get("/Tariffs/TariffCheckBoxClick/" + id, function (data) {
             if (data === true) {
                 $("#productDeleteImg").attr("src", "/images/Icons/documentRemove.png");
             } else {

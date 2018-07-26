@@ -24,7 +24,7 @@ namespace IGSLControlPanel.Models
         [DisplayName("Действителен по")]
         public DateTime? ValidTo { get; set; }
 
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
 
         public List<ProductLinkToProductParameter> LinkToProductParameters { get; set; } = new List<ProductLinkToProductParameter>();
 

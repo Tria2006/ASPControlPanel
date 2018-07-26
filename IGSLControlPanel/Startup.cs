@@ -23,6 +23,7 @@ namespace IGSLControlPanel
                 options.UseSqlServer(Configuration.GetConnectionString("IGSLConnection")));
             services.AddSingleton<FolderDataHelper>();
             services.AddSingleton<ProductsHelper>();
+            services.AddSingleton<TariffsHelper>();
             services.AddMvc();
         }
 

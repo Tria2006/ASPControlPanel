@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Helpers;
@@ -22,7 +23,9 @@ namespace IGSLControlPanel.Controllers
         {
             _context = context;
             _logger = logger;
+            BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
+            _productsHelper.Initialize(_context, GetRootFolder());
         }
 
         public IActionResult Index(Guid id)
@@ -68,7 +71,7 @@ namespace IGSLControlPanel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Product product)
         {
-            await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId ?? Guid.Empty), _context);
+            await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
@@ -96,7 +99,7 @@ namespace IGSLControlPanel.Controllers
         {
             MoveSelectedFolders();
             _productsHelper.MoveSelectedProducts(_context, GetSelectedDestFolderId());
-            RebuildFolderTree();
+            BuildFolderTree(ModelTypes.Products);
             return RedirectToAction("Index", new { id = GetSelectedDestFolderId() });
         }
 

@@ -18,7 +18,7 @@
     <input id="modelIdValue" type="hidden" value="@Model.Id" />
 
     <!-- кнопка Назад-->
-    <a id="backBtn" asp-controller="Products" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
+    <a id="backBtn" asp-controller="Products" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId" asp-route-controllerName="Products">
         <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
@@ -28,7 +28,7 @@
     </a>
 
     <!-- кнопка Удалить папку-->
-    <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
+    <a id="deleteFolderBtn" asp-controller="Products" asp-action="DeleteFolder" asp-route-id="@Model.Id" asp-route-controllerName="Products" style="margin-left: 10px">
         <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
@@ -58,7 +58,7 @@
                     <h4 class="modal-title">Введите имя папки</h4>
                 </div>
                 <div class="modal-body">
-                    <form asp-controller="Products" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
+                    <form asp-controller="Products" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id" asp-route-modelType="@ModelTypes.Products">
                         <div class="form-group">
                             <input id="folderNameInput" asp-for="Name" />
                             <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
@@ -87,7 +87,7 @@
                     </div>
 
                     <div class="form-group" style="margin-left: 18px;">
-                        <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Products" asp-action="MoveSelectedItems" asp-route-controllerName="Products">Выбрать</button>
+                        <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Products" asp-action="MoveSelectedItems">Выбрать</button>
                         <button id="moveCancelBtn" type="button" class="btn btn-primary">
                             Отмена
                         </button>

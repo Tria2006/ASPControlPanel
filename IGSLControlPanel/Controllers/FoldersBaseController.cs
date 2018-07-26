@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
 using Microsoft.AspNetCore.Mvc;
@@ -22,18 +23,18 @@ namespace IGSLControlPanel.Controllers
             _folderDataHelper.Initialize(_context);
         }
 
-        public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId)
+        public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId, ModelTypes modelType)
         {
             var folder = await _context.FolderTreeEntries.SingleOrDefaultAsync(m => m.Id == parentFolderId);
-            await _folderDataHelper.AddFolder(name, _context, folder);
-            return RedirectToAction("Index", "Products", new { id = parentFolderId });
+            await _folderDataHelper.AddFolder(name, (int)modelType, _context, folder);
+            return RedirectToAction("Index", modelType.ToString(), new { id = parentFolderId });
         }
 
-        public async Task<IActionResult> DeleteFolder(Guid id)
+        public async Task<IActionResult> DeleteFolder(Guid id, string controllerName)
         {
             if (HasSelectedFolders)
                 await _folderDataHelper.RemoveFolders(_context, id);
-            return RedirectToAction("Index", "Products", new { id });
+            return RedirectToAction("Index", controllerName, new { id });
         }
 
         public bool FolderCheckBoxClick(Guid id)
@@ -49,9 +50,9 @@ namespace IGSLControlPanel.Controllers
             return PartialView("FolderSelectView", folder);
         }
 
-        public IActionResult OneLevelUp(Guid destFolderId, bool returnPartial = false)
+        public IActionResult OneLevelUp(Guid destFolderId, string controllerName, bool returnPartial = false)
         {
-            if (!returnPartial) return RedirectToAction("Index", "Products", new { id = destFolderId });
+            if (!returnPartial) return RedirectToAction("Index", controllerName, new { id = destFolderId });
             var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
             _folderDataHelper.SelectedDestFolderId = destFolderId;
             return PartialView("FolderSelectView", folder);
@@ -72,9 +73,14 @@ namespace IGSLControlPanel.Controllers
             return _folderDataHelper.SelectedDestFolderId;
         }
 
-        public void RebuildFolderTree()
+        public void BuildFolderTree(ModelTypes modelType)
         {
-            _folderDataHelper.BuildFolderTree();
+            _folderDataHelper.BuildFolderTree(modelType);
+        }
+
+        public FolderTreeEntry GetRootFolder()
+        {
+            return _folderDataHelper.FoldersTree;
         }
     }
 }
