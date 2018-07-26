@@ -1,4 +1,223 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@model IGSLControlPanel.Models.FolderTreeEntry
+
+@{
+    ViewData["Title"] = "Тарифы";
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css.map" />
+    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
+</head>
+<body style="background: whitesmoke">
+
+<!-- Id можели для использования в js функции $("#backBtn").click(function ()-->
+<input id="modelIdValue" type="hidden" value="@Model.Id" />
+
+<!-- кнопка Назад-->
+<a id="backBtn" asp-controller="Folders" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId">
+    <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
+</a>
+
+<!-- кнопка Создать папку-->
+<a id="createFolderBtn">
+    <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
+</a>
+
+<!-- кнопка Удалить папку-->
+<a id="deleteFolderBtn" asp-controller="Folders" asp-action="DeleteFolder" asp-route-id="@Model.Id" style="margin-left: 10px">
+    <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
+</a>
+
+<!-- кнопка Создать тариф-->
+<a asp-controller="Tariffs" asp-action="Create" asp-route-folderId="@Model.Id">
+    <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
+</a>
+
+<!-- кнопка Удалить тариф-->
+<a asp-controller="Tariffs" asp-action="Delete" asp-route-id="@Model.Id">
+    <img id="productDeleteImg" src="~/images/Icons/product_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
+</a>
+
+<!-- кнопка Переместить в папку-->
+<a id="moveBtn">
+    <img id="moveImg" src="~/images/Icons/move_gray.png" alt="Переместить в папку" style="margin: 10px; width: 40px; height: 40px" />
+</a>
+
+<!-- диалог для ввода имени новой папки -->
+<div id="addFolderModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    ×
+                </button>
+                <h4 class="modal-title">Введите имя папки</h4>
+            </div>
+            <div class="modal-body">
+                <form asp-controller="Folders" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id">
+                    <div class="form-group">
+                        <input id="folderNameInput" asp-for="Name" />
+                        <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
+                        <button id="cancelBtn" type="button" class="btn btn-primary">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="moveItemModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    ×
+                </button>
+                <h4 class="modal-title">Выберите папку назначения</h4>
+            </div>
+            <form>
+                <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
+                    @await Html.PartialAsync("FolderSelectView", Model)
+                </div>
+
+                <div class="form-group" style="margin-left: 18px;">
+                    <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Folders" asp-action="MoveSelectedItems" asp-route-controllerName="Tariffs">Выбрать</button>
+                    <button id="moveCancelBtn" type="button" class="btn btn-primary">
+                        Отмена
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div style="width: 100%; height: 90%; float: left">
+    @if (Model.ChildFolders.Any() || Model.Tariffs.Any())
+    {
+        foreach (var child in Model.ChildFolders)
+        {
+            // Папки
+            <a asp-controller="Tariffs" asp-action="Index" asp-route-id="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
+                <table id="folderItem" style="height: 90px; width: 90px">
+                    <tr>
+                        <td>
+                            <input id="cb" type="checkbox" onclick="FolderCheckBoxClick(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
+
+                            @if (child.ChildFolders.Any() || child.Tariffs.Any())
+                            {
+                                <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
+                            }
+                            else
+                            {
+                                <img src="~/images/Icons/emptyfolder.png" width="50" height="50" alt="Image" class="center-block" />
+                            }
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; vertical-align: text-top">
+                            @Html.DisplayTextFor(n => child.Name)
+                        </td>
+                    </tr>
+                </table>
+
+            </a>
+        }
+        foreach (var p in Model.Tariffs)
+        {
+            // Продукты
+            <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
+                <table id="folderItem" style="height: 90px; width: 90px">
+                    <tr>
+                        <td>
+                            <input type="checkbox" onclick="TariffCheckBoxClick('@p.Id')" style="margin: 2px; width: 16px; height: 16px" />
+                            <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                        </td>
+                    </tr>
+                    <tr>
+                        <td style="text-align: center; vertical-align: text-top">
+                            @Html.DisplayTextFor(n => p.Name)
+                        </td>
+                    </tr>
+                </table>
+            </a>
+        }
+    }
+</div>
+</body>
+</html>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        $("#createFolderBtn").click(function () {
+            $("#addFolderModal").modal('show');
+            $("#folderNameInput").val("");
+        });
+        $("#okBtn").click(function () {
+            $("#addFolderModal").modal('hide');
+        });
+        $("#cancelBtn").click(function () {
+            $("#addFolderModal").modal('hide');
+        });
+
+        $("#moveBtn").click(function () {
+            $("#moveItemModal").modal('show');
+        });
+        $("#moveOkBtn").click(function () {
+            $("#moveItemModal").modal('hide');
+        });
+        $("#moveCancelBtn").click(function () {
+            $("#moveItemModal").modal('hide');
+        });
+
+        $("#backBtn").click(function () {
+            var id = $("#modelIdValue").val();
+            if (id === "00000000-0000-0000-0000-000000000000") {
+                event.preventDefault();
+            }
+        });
+
+        $("#modalBackBtn").click(function () {
+            var id = $("#modelIdValue").val();
+            if (id === "00000000-0000-0000-0000-000000000000") {
+                event.preventDefault();
+            }
+        });
+    });
+
+    function FolderCheckBoxClick(id) {
+        $.get("/Folders/FolderCheckBoxClick/" + id, function (data) {
+            if (data === true) {
+                $("#deleteFolderImg").attr("src", "/images/Icons/folderdelete.png");
+            } else {
+                $("#deleteFolderImg").attr("src", "/images/Icons/folder_delete_gray.png");
+            }
+            ActivateMoveButton();
+        });
+    }
+
+    function TariffCheckBoxClick(id) {
+        $.get("/Tariffs/ProductCheckBoxClick/" + id, function (data) {
+            if (data === true) {
+                $("#productDeleteImg").attr("src", "/images/Icons/documentRemove.png");
+            } else {
+                $("#productDeleteImg").attr("src", "/images/Icons/product_remove_gray.png");
+            }
+            ActivateMoveButton();
+        });
+    }
+
+    function ActivateMoveButton() {
+        $.get("/Tariffs/GetFolderOrTariffselected", function (data) {
+            if (data === true) {
+                $("#moveImg").attr("src", "/images/Icons/move_icon.png");
+            } else {
+                $("#moveImg").attr("src", "/images/Icons/move_gray.png");
+            }
+        });
+    }
+</script>

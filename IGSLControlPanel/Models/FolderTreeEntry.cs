@@ -20,6 +20,9 @@ namespace IGSLControlPanel.Models
         [NotMapped]
         public List<Product> Products { get; set; } = new List<Product>();
 
+        [NotMapped]
+        public List<Tariff> Tariffs { get; set; } = new List<Tariff>();
+
         [DisplayName("Название")]
         public string Name { get; set; }
 

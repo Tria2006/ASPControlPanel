@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -10,7 +11,16 @@ namespace IGSLControlPanel.Models
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
         public Guid Id { get; set; }
 
+        [DisplayName("Название")]
         public string Name { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayName("Действителен с")]
+        public DateTime? ValidFrom { get; set; }
+
+        [DataType(DataType.Date)]
+        [DisplayName("Действителен по")]
+        public DateTime? ValidTo { get; set; }
 
         public bool IsDeleted { get; set; }
 
