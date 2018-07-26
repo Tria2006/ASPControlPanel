@@ -1,22 +1,25 @@
 ﻿using System;
+using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
+using IGSLControlPanel.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Controllers
 {
-    public class FoldersController : Controller
+    public class FoldersBaseController : Controller
     {
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
+        public bool HasSelectedFolders => _folderDataHelper._checkedFolders.Any();
 
-        public FoldersController(IGSLContext context, FolderDataHelper helper)
+        protected FoldersBaseController(IGSLContext context, FolderDataHelper helper)
         {
             _context = context;
             _folderDataHelper = helper;
-            if(!_folderDataHelper.IsInitialized)_folderDataHelper.Initialize(_context);
+            _folderDataHelper.Initialize(_context);
         }
 
         public async Task<IActionResult> CreateFolder(string name, Guid parentFolderId)
@@ -28,7 +31,7 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> DeleteFolder(Guid id)
         {
-            if (_folderDataHelper.HasSelectedFolders)
+            if (HasSelectedFolders)
                 await _folderDataHelper.RemoveFolders(_context, id);
             return RedirectToAction("Index", "Products", new { id });
         }
@@ -36,7 +39,7 @@ namespace IGSLControlPanel.Controllers
         public bool FolderCheckBoxClick(Guid id)
         {
             _folderDataHelper.CheckFolder(id, _context);
-            return _folderDataHelper.HasSelectedFolders;
+            return HasSelectedFolders;
         }
 
         public IActionResult FolderClick(Guid id)
@@ -52,6 +55,26 @@ namespace IGSLControlPanel.Controllers
             var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
             _folderDataHelper.SelectedDestFolderId = destFolderId;
             return PartialView("FolderSelectView", folder);
+        }
+
+        public FolderTreeEntry GetFolderById(Guid id)
+        {
+            return _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
+        }
+
+        public void MoveSelectedFolders()
+        {
+            _folderDataHelper.MoveSelectedFolders(_context);
+        }
+
+        public Guid GetSelectedDestFolderId()
+        {
+            return _folderDataHelper.SelectedDestFolderId;
+        }
+
+        public void RebuildFolderTree()
+        {
+            _folderDataHelper.BuildFolderTree();
         }
     }
 }

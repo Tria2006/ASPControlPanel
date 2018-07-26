@@ -11,26 +11,23 @@ using Microsoft.Extensions.Logging;
 
 namespace IGSLControlPanel.Controllers
 {
-    public class ProductsController : Controller
+    public class ProductsController : FoldersBaseController
     {
         private readonly IGSLContext _context;
-        private readonly FolderDataHelper _folderDataHelper;
         private readonly ProductsHelper _productsHelper;
         private readonly ILogger _logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, ILogger<ProductsController> logger)
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, ILogger<ProductsController> logger) 
+            : base(context, helper)
         {
             _context = context;
             _logger = logger;
-            _folderDataHelper = helper;
             _productsHelper = productsHelper;
-            _folderDataHelper.Initialize(_context);
         }
 
         public IActionResult Index(Guid id)
         {
-            var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
-            return View(folder);
+            return View(GetFolderById(id));
         }
 
         public IActionResult CreateProduct(Guid folderId)
@@ -71,32 +68,36 @@ namespace IGSLControlPanel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Product product)
         {
-            await _folderDataHelper.UpdateProduct(product, _context);
+            await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId ?? Guid.Empty), _context);
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
         public async Task<IActionResult> DeleteProduct(Guid id)
         {
-            if (_folderDataHelper.HasSelectedProducts)
-                await _folderDataHelper.RemoveProducts(_context, id);
+            if (_productsHelper.HasSelectedProducts)
+            {
+                await _productsHelper.RemoveProducts(_context, GetFolderById(id));
+            }
             return RedirectToAction("Index", new { id });
         }
 
         public bool ProductCheckBoxClick(Guid id)
         {
-            _folderDataHelper.CheckProduct(id, _context);
-            return _folderDataHelper.HasSelectedProducts;
+            _productsHelper.CheckProduct(id, _context);
+            return _productsHelper.HasSelectedProducts;
         }
 
         public bool GetFolderOrProductSelected()
         {
-            return _folderDataHelper.HasSelectedProducts || _folderDataHelper.HasSelectedFolders;
+            return _productsHelper.HasSelectedProducts || HasSelectedFolders;
         }
 
         public IActionResult MoveSelectedItems()
         {
-            _folderDataHelper.MoveSelectedItems(_context);
-            return RedirectToAction("Index", new { id = _folderDataHelper.SelectedDestFolderId });
+            MoveSelectedFolders();
+            _productsHelper.MoveSelectedProducts(_context, GetSelectedDestFolderId());
+            RebuildFolderTree();
+            return RedirectToAction("Index", new { id = GetSelectedDestFolderId() });
         }
 
         public void ProductParameterClick(Guid id)

@@ -7,6 +7,7 @@
 <body>
     <div id="partial">
         <input id="parentId" type="hidden" value="@Model.ParentFolderId" />
+        <input id="controllerName" type="hidden" value="@ViewData["ControllerName"]" />
         <div style="float: left">
             <!-- кнопка Назад-->
             <a id="modalBackBtn" onclick="folderBackClick()">
@@ -47,7 +48,7 @@
 <script>
     function folderClick(child) {
         $.ajax({
-            url: "/Folders/FolderClick",
+            url: "/" + $("#controllerName").val() + "/FolderClick",
             type: "post",
             data: { id : child.id},
             success: function (result) {
@@ -57,7 +58,7 @@
     };
     function folderBackClick() {
         $.ajax({
-            url: "/Folders/OneLevelUp",
+            url: "/" + $("#controllerName").val() + "/OneLevelUp",
             type: "post",
             data: { destFolderId: $("#parentId").val(), returnPartial: true },
             success: function (result) {

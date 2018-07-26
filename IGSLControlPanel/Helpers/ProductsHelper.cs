@@ -16,6 +16,8 @@ namespace IGSLControlPanel.Helpers
         public ProductParameter CurrentParameter { get; set; }
         public bool IsProductCreateInProgress { get; set; }
         public bool IsParameterCreateInProgress { get; set; }
+        private List<Product> _checkedProducts { get; } = new List<Product>();
+        public bool HasSelectedProducts => _checkedProducts.Any();
 
         public void Initialize(IGSLContext _context)
         {
@@ -46,7 +48,7 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        public async Task RemoveProducts(IGSLContext _context, List<Product> _checkedProducts, FolderTreeEntry parentFolder)
+        public async Task RemoveProducts(IGSLContext _context, FolderTreeEntry parentFolder)
         {
             // двигаемся по списку выбранных продуктов
             foreach (var f in _checkedProducts)
@@ -107,6 +109,30 @@ namespace IGSLControlPanel.Helpers
             CurrentParameter = CurrentProduct.LinkToProductParameters
                 .SingleOrDefault(s => s.ProductParameterId == parameterId)
                 ?.Parameter;
+        }
+
+        public void CheckProduct(Guid id, IGSLContext _context)
+        {
+            // получаем продукт из контекста
+            var product = _context.Products.SingleOrDefault(x => x.Id == id);
+            if (product == null) return;
+            // добавляем или удаляем продукт из списка _checkedFolders
+            if (_checkedProducts.Any(p => p.Id == product.Id))
+                _checkedProducts.RemoveAll(p => p.Id == product.Id);
+            else
+                _checkedProducts.Add(product);
+        }
+
+        public void MoveSelectedProducts(IGSLContext context, Guid selectedDestFolderId)
+        {
+            foreach (var product in _checkedProducts)
+            {
+                var contextProduct = context.Products.SingleOrDefault(p => p.Id == product.Id);
+                if (contextProduct == null) continue;
+                contextProduct.FolderId = selectedDestFolderId;
+            }
+            _checkedProducts.Clear();
+            context.SaveChanges();
         }
     }
 }

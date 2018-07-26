@@ -12,18 +12,13 @@ namespace IGSLControlPanel.Helpers
         public FolderTreeEntry FoldersTree { get; set; }
         public bool IsInitialized { get; private set; }
         private List<FolderTreeEntry> _folders { get; set; }
-        private List<FolderTreeEntry> _checkedFolders { get; set; }
-        private List<Product> _checkedProducts { get; }
+        public List<FolderTreeEntry> _checkedFolders { get; set; }
         public Guid SelectedDestFolderId { get; set; }
         private readonly ProductsHelper _productsHelper;
-
-        public bool HasSelectedFolders => _checkedFolders.Any();
-        public bool HasSelectedProducts => _checkedProducts.Any();
 
         public FolderDataHelper(ProductsHelper productsHelper)
         {
             _checkedFolders = new List<FolderTreeEntry>();
-            _checkedProducts = new List<Product>();
             _productsHelper = productsHelper;
         }
 
@@ -138,18 +133,6 @@ namespace IGSLControlPanel.Helpers
                 _checkedFolders.Add(folder);
         }
 
-        public void CheckProduct(Guid id, IGSLContext _context)
-        {
-            // получаем продукт из контекста
-            var product = _context.Products.SingleOrDefault(x => x.Id == id);
-            if (product == null) return;
-            // добавляем или удаляем продукт из списка _checkedFolders
-            if (_checkedProducts.Any(p => p.Id == product.Id))
-                _checkedProducts.RemoveAll(p => p.Id == product.Id);
-            else
-                _checkedProducts.Add(product);
-        }
-
         public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
         {
             // рекурсивный поиск по Id папок по дереву
@@ -168,19 +151,7 @@ namespace IGSLControlPanel.Helpers
             return null;
         }
 
-        public async Task UpdateProduct(Product product, IGSLContext context)
-        {
-            var parentFolder = GetFolderById(product.FolderId ?? Guid.Empty, FoldersTree);
-            await _productsHelper.UpdateProduct(product, parentFolder, context);
-        }
-
-        public async Task RemoveProducts(IGSLContext context, Guid? parentId)
-        {
-            var parentFolder = GetFolderById(parentId ?? Guid.Empty, FoldersTree);
-            await _productsHelper.RemoveProducts(context, _checkedProducts, parentFolder);
-        }
-
-        public void MoveSelectedItems(IGSLContext context)
+        public void MoveSelectedFolders(IGSLContext context)
         {
             foreach (var folder in _checkedFolders)
             {
@@ -189,17 +160,6 @@ namespace IGSLControlPanel.Helpers
                 contextFolder.ParentFolderId = SelectedDestFolderId;
             }
             _checkedFolders.Clear();
-
-            foreach (var product in _checkedProducts)
-            {
-                var contextProduct = context.Products.SingleOrDefault(p => p.Id == product.Id);
-                if(contextProduct == null) continue;
-                contextProduct.FolderId = SelectedDestFolderId;
-            }
-            _checkedProducts.Clear();
-            context.SaveChanges();
-
-            BuildFolderTree();
         }
     }
 }
