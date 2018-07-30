@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
@@ -10,7 +11,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Controllers
 {
-    public class FoldersBaseController : Controller
+    public abstract class FoldersBaseController : Controller
     {
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
@@ -33,9 +34,15 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteFolder(Guid id, string controllerName)
         {
             if (HasSelectedFolders)
+            {
+                await ClearFolderItems(_folderDataHelper._checkedFolders);
                 await _folderDataHelper.RemoveFolders(_context, id);
-            return RedirectToAction("Index", controllerName, new { id });
+            }
+            return RedirectToAction("Index", controllerName, id);
         }
+
+        // must be overrided in controller
+        public abstract Task ClearFolderItems(List<FolderTreeEntry> foldersToClear);
 
         public bool FolderCheckBoxClick(Guid id)
         {

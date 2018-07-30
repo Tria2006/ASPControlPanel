@@ -11,7 +11,6 @@ namespace IGSLControlPanel.Helpers
     public class FolderDataHelper
     {
         public FolderTreeEntry FoldersTree { get; set; }
-        public bool IsInitialized { get; private set; }
         private List<FolderTreeEntry> _folders { get; set; }
         public List<FolderTreeEntry> _checkedFolders { get; set; } = new List<FolderTreeEntry>();
         public Guid SelectedDestFolderId { get; set; }
@@ -33,12 +32,8 @@ namespace IGSLControlPanel.Helpers
                 // заполняем ChildFolders
                 BuildChildFolders(folder);
 
-                // заполняем Products
-                //_productsHelper.BuildProducts(folder);
-
                 FoldersTree.ChildFolders.Add(folder);
             }
-            //FoldersTree.Products.AddRange(_productsHelper.RootProducts);
             return FoldersTree;
         }
 
@@ -50,9 +45,6 @@ namespace IGSLControlPanel.Helpers
             {
                 // рекурсия для заполнения вложенных ChildFolders
                 BuildChildFolders(folder);
-
-                // заполняем продукты
-                //_productsHelper.BuildProducts(folder);
 
                 if (!parent.ChildFolders.Contains(folder))
                     parent.ChildFolders.Add(folder);
@@ -87,23 +79,23 @@ namespace IGSLControlPanel.Helpers
                 // получаем папку из контекста и далее работаем с ней
                 var contextFolder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == f.Id);
                 if (contextFolder == null) continue;
-                RemoveChildFoldersAndProducts(contextFolder, _context);
+                RemoveChildFoldersAndProducts(contextFolder);
                 f.IsDeleted = true;
             }
             var parentFolder = GetFolderById(parentId, FoldersTree);
             parentFolder?.ChildFolders.RemoveAll(x => x.IsDeleted);
             await _context.SaveChangesAsync();
-            _checkedFolders = new List<FolderTreeEntry>();
         }
 
-        private void RemoveChildFoldersAndProducts(FolderTreeEntry parent, IGSLContext _context)
+        private void RemoveChildFoldersAndProducts(FolderTreeEntry parent)
         {
             // отвязывавем продукты от удаляемой папки
-            //parent.Products.ForEach(async x => await _productsHelper.RemoveFolderId(x, _context));
+            parent.Products.ForEach(x => {x.FolderId = Guid.Empty;});
+            parent.Tariffs.ForEach(x => {x.FolderId = Guid.Empty;});
             foreach (var childFolder in parent.ChildFolders)
             {
                 // рекурсивно удаляем ChildFolders
-                RemoveChildFoldersAndProducts(childFolder, _context);
+                RemoveChildFoldersAndProducts(childFolder);
             }
             parent.IsDeleted = true;
         }

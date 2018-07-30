@@ -24,6 +24,6 @@ namespace IGSLControlPanel.Models
 
         public bool IsDeleted { get; set; }
 
-        public Guid? FolderId { get; set; }
+        public Guid FolderId { get; set; }
     }
 }

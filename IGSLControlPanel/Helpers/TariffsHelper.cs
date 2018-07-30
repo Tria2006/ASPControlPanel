@@ -22,14 +22,14 @@ namespace IGSLControlPanel.Helpers
             _tariffs = _context.Tariffs.Where(s => !s.IsDeleted).ToList();
 
             // продукты, не привязанные ни к какой папке
-            RootTariffs = _tariffs.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
+            RootTariffs = _tariffs.Where(x => x.FolderId == Guid.Empty && !x.IsDeleted).ToList();
 
             BuildTariffs(rootFolder);
         }
 
         public void BuildTariffs(FolderTreeEntry parent)
         {
-            var tariffs = _tariffs.Where(x => (x.FolderId != null && x.FolderId == parent.Id) && !x.IsDeleted);
+            var tariffs = _tariffs.Where(x => x.FolderId == parent.Id && !x.IsDeleted);
             foreach (var tariff in tariffs)
             {
                 if (parent.Tariffs.Contains(tariff)) continue;
@@ -68,6 +68,29 @@ namespace IGSLControlPanel.Helpers
             }
             _checkedTariffs.Clear();
             context.SaveChanges();
+        }
+
+        public async Task RemoveTariffs(IGSLContext _context, FolderTreeEntry parentFolder)
+        {
+            // двигаемся по списку выбранных тарифов
+            foreach (var f in _checkedTariffs)
+            {
+                // получаем тариф из контекста и далее работавем с ним
+                var contextTariff = _context.Tariffs.SingleOrDefault(x => x.Id == f.Id);
+                if (contextTariff == null) continue;
+                contextTariff.IsDeleted = true;
+            }
+
+            // удаляются тарифы только из FoldersTree
+            // в контексте БД они остаются
+            parentFolder?.Tariffs.RemoveAll(x => x.IsDeleted);
+
+            // удалить тарифы нужно и из _productsWOFolder
+            await _context.SaveChangesAsync();
+
+            // очищаем список выбранных тарифов
+            _checkedTariffs.Clear();
+            BuildTariffs(parentFolder);
         }
     }
 }

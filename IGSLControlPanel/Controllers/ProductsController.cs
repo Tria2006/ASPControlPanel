@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using IGSLControlPanel.Data;
@@ -8,7 +9,6 @@ using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.Extensions.Logging;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -16,20 +16,18 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
-        private readonly ILogger _logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, ILogger<ProductsController> logger) 
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper) 
             : base(context, helper)
         {
             _context = context;
-            _logger = logger;
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
-            _productsHelper.Initialize(_context, GetRootFolder());
         }
 
         public IActionResult Index(Guid id)
         {
+            _productsHelper.Initialize(_context, GetFolderById(id));
             return View(GetFolderById(id));
         }
 
@@ -106,6 +104,17 @@ namespace IGSLControlPanel.Controllers
         public void ProductParameterClick(Guid id)
         {
             _productsHelper.SelectUnselectParameter(id);
+        }
+
+        public override async Task ClearFolderItems(List<FolderTreeEntry> foldersToClear)
+        {
+            foreach (var folder in foldersToClear)
+            {
+                var products = _context.Products.Where(x => x.FolderId == folder.Id);
+                if (!products.Any()) continue;
+                await products.ForEachAsync(x => x.FolderId = Guid.Empty);
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }

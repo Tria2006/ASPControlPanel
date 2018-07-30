@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +8,6 @@ using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using IGSLControlPanel.Models;
-using Microsoft.Extensions.Logging;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -15,20 +15,18 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
-        private readonly ILogger _logger;
 
-        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, ILogger<ProductsController> logger)
+        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper)
             : base(context, helper)
         {
             _context = context;
-            _logger = logger;
             BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
-            _tariffsHelper.Initialize(_context, GetRootFolder());
         }
 
         public IActionResult Index(Guid id)
         {
+            _tariffsHelper.Initialize(_context, GetFolderById(id));
             return View(GetFolderById(id));
         }
 
@@ -46,10 +44,9 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(Tariff tariff)
         {
             if (!ModelState.IsValid) return View(tariff);
-            tariff.Id = Guid.NewGuid();
             _context.Add(tariff);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
         }
 
         public async Task<IActionResult> Edit(Guid? id)
@@ -93,24 +90,16 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
+            if (_tariffsHelper.HasSelectedTariffs)
             {
-                return NotFound();
+                await _tariffsHelper.RemoveTariffs(_context, GetFolderById(id));
             }
-
-            var tariff = await _context.Tariffs
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (tariff == null)
-            {
-                return NotFound();
-            }
-
-            return View(tariff);
+            return RedirectToAction("Index", new { id });
         }
 
         [HttpPost, ActionName("Delete")]
@@ -118,9 +107,11 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var tariff = await _context.Tariffs.FindAsync(id);
-            _context.Tariffs.Remove(tariff);
+            tariff.IsDeleted = true;
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            var parentFolder = GetFolderById(tariff.FolderId);
+            _tariffsHelper.BuildTariffs(parentFolder);
+            return RedirectToAction(nameof(Index), parentFolder);
         }
 
         private bool TariffExists(Guid id)
@@ -128,7 +119,7 @@ namespace IGSLControlPanel.Controllers
             return _context.Tariffs.Any(e => e.Id == id);
         }
 
-        public bool ProductCheckBoxClick(Guid id)
+        public bool TariffCheckBoxClick(Guid id)
         {
             _tariffsHelper.CheckTariff(id, _context);
             return _tariffsHelper.HasSelectedTariffs;
@@ -140,6 +131,17 @@ namespace IGSLControlPanel.Controllers
             _tariffsHelper.MoveSelectedTariffs(_context, GetSelectedDestFolderId());
             BuildFolderTree(ModelTypes.Products);
             return RedirectToAction("Index", new { id = GetSelectedDestFolderId() });
+        }
+
+        public override async Task ClearFolderItems(List<FolderTreeEntry> foldersToClear)
+        {
+            foreach (var folder in foldersToClear)
+            {
+                var tariffs = _context.Tariffs.Where(x => x.FolderId == folder.Id);
+                if(!tariffs.Any()) continue;
+                await tariffs.ForEachAsync(x => x.FolderId = Guid.Empty);
+            }
+            await _context.SaveChangesAsync();
         }
     }
 }
