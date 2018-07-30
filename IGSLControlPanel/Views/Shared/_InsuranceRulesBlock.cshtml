@@ -1,0 +1,11 @@
+﻿@using IGSLControlPanel.Models.ManyToManyLinks
+@model List<InsRuleTariffLink>
+
+<div class="form-group" style="min-height: 200px; max-height: 300px; border: 1px lightgrey solid; padding: 1px">
+    @foreach (var link in Model)
+    {
+        <div>
+            <label asp-for="@link.InsRule.Name"></label>
+        </div>
+    }
+</div>

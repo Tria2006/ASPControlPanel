@@ -35,14 +35,14 @@ namespace IGSLControlPanel.Controllers
             var tempParam = new ProductParameter
             {
                 GroupId = groupId,
-                LinkToProduct = new List<ProductLinkToProductParameter>
-                {
-                    new ProductLinkToProductParameter
-                    {
-                        Product = _productsHelper.CurrentProduct,
-                        ProductId = _productsHelper.CurrentProduct.Id,
-                    }
-                }
+                //LinkToProduct = new List<ProductLinkToProductParameter>
+                //{
+                //    new ProductLinkToProductParameter
+                //    {
+                //        Product = _productsHelper.CurrentProduct,
+                //        ProductId = _productsHelper.CurrentProduct.Id,
+                //    }
+                //}
             };
             _productsHelper.CurrentParameter = tempParam;
             return View(tempParam);
@@ -61,12 +61,15 @@ namespace IGSLControlPanel.Controllers
                 ProductId = _productsHelper.CurrentProduct.Id,
                 ProductParameterId = productParameter.Id
             }};
-            await _context.SaveChangesAsync();
-            var productId = _productsHelper.CurrentProduct.Id;
-            _productsHelper.CurrentProduct = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).SingleOrDefault(x => x.Id == productId);
-            _productsHelper.IsParameterCreateInProgress = false;
-            await CheckParameterOrders(productParameter);
-            _productsHelper.CurrentParameter = null;
+            if (!_productsHelper.IsProductCreateInProgress)
+            {
+                await _context.SaveChangesAsync();
+                var productId = _productsHelper.CurrentProduct.Id;
+                _productsHelper.CurrentProduct = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).SingleOrDefault(x => x.Id == productId);
+                await CheckParameterOrders(productParameter);
+                _productsHelper.CurrentParameter = null;
+                _productsHelper.IsParameterCreateInProgress = false;
+            }
             return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 

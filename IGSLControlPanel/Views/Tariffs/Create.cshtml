@@ -24,6 +24,13 @@
                 <input asp-for="ValidTo" class="form-control" />
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
+            
+            <h5>Правила страхования</h5>
+            <a asp-controller="InsuranceRules" asp-action="Create">
+                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
+            </a>
+            @await Html.PartialAsync("_InsuranceRulesBlock", Model.InsRuleTariffLink)
+
             <div class="form-group" style="margin-top: 50px">
                 <div style="float: left; margin-right: 10px">
                     <input type="submit" value="Создать" class="btn btn-default" />

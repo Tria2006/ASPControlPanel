@@ -49,6 +49,15 @@ namespace IGSLControlPanel.Controllers
             var helper = new ProductsHelper();
             await helper.AddProduct(product, _context);
             _productsHelper.IsProductCreateInProgress = false;
+            if (_productsHelper.IsParameterCreateInProgress)
+            {
+                product.LinkToProductParameters.ForEach(p =>
+                {
+                    p.ProductId = product.Id;
+                    p.Product = product;
+                });
+                _productsHelper.IsParameterCreateInProgress = false;
+            }
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
