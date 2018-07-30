@@ -79,9 +79,10 @@
                     @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null).Select(s => s.Parameter).ToList())
                 </div>
             }
-            <div class="form-group">
-                <input type="submit" value="Сохранить изменения" class="btn btn-default" />
-            </div>
+                <div class="form-group">
+                    <input type="submit" value="Сохранить изменения" class="btn btn-default" />
+                    <button class="btn btn-default" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
+                </div>
         </form>
     </div>
 </body>
