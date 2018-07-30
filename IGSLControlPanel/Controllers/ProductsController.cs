@@ -34,8 +34,17 @@ namespace IGSLControlPanel.Controllers
         public IActionResult CreateProduct(Guid folderId)
         {
             var tempProduct = new Product {FolderId = folderId};
-            _productsHelper.CurrentProduct = tempProduct;
-            _productsHelper.IsProductCreateInProgress = true;
+            // такое может быть если возвращаемся с экрана создания нового параметра
+            if (_productsHelper.IsProductCreateInProgress)
+            {
+                // возвращаемся к заполнению нового продукта
+                tempProduct = _productsHelper.CurrentProduct;
+            }
+            else
+            {
+                _productsHelper.CurrentProduct = tempProduct;
+                _productsHelper.IsProductCreateInProgress = true;
+            }
             var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
             ViewData["ParentFolderId"] = folderId;
@@ -49,8 +58,10 @@ namespace IGSLControlPanel.Controllers
             var helper = new ProductsHelper();
             await helper.AddProduct(product, _context);
             _productsHelper.IsProductCreateInProgress = false;
+            // такое может быть если создавали новый продукт и сразу добавляли туда параметры
             if (_productsHelper.IsParameterCreateInProgress)
             {
+                // нужно проставить ProductId в линки созданных параметров
                 product.LinkToProductParameters.ForEach(p =>
                 {
                     p.ProductId = product.Id;
@@ -124,6 +135,16 @@ namespace IGSLControlPanel.Controllers
                 await products.ForEachAsync(x => x.FolderId = Guid.Empty);
             }
             await _context.SaveChangesAsync();
+        }
+
+        // Нужно сохранить значения полей продукта если он еще не был сохранен, иначе при возвращении обратно 
+        // на экран создания нового продукта все данные очистятся
+        public void SaveTempData(Guid folderId, string name, DateTime? dateFrom, DateTime? dateTo)
+        {
+            _productsHelper.CurrentProduct.Name = name;
+            _productsHelper.CurrentProduct.FolderId = folderId;
+            _productsHelper.CurrentProduct.ValidFrom = dateFrom;
+            _productsHelper.CurrentProduct.ValidTo = dateTo;
         }
     }
 }
