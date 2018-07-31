@@ -55,19 +55,19 @@ namespace IGSLControlPanel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> CreateProduct(Product product)
         {
-            var helper = new ProductsHelper();
-            await helper.AddProduct(product, _context);
+            await _productsHelper.AddProduct(product, _context);
             _productsHelper.IsProductCreateInProgress = false;
             // такое может быть если создавали новый продукт и сразу добавляли туда параметры
             if (_productsHelper.IsParameterCreateInProgress)
             {
+                product.LinkToProductParameters = _productsHelper.CurrentProduct.LinkToProductParameters;
                 // нужно проставить ProductId в линки созданных параметров
                 product.LinkToProductParameters.ForEach(p =>
                 {
                     p.ProductId = product.Id;
-                    p.Product = product;
                 });
                 _productsHelper.IsParameterCreateInProgress = false;
+                await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             }
             return RedirectToAction("Index", new { id = product.FolderId });
         }
@@ -76,7 +76,7 @@ namespace IGSLControlPanel.Controllers
         {
             var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
-            var product = await _context.Products.SingleOrDefaultAsync(m => m.Id == id);
+            var product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == id);
             _productsHelper.CurrentProduct = product;
             if (product == null)
             {

@@ -11,7 +11,9 @@ namespace IGSLControlPanel.Helpers
     public class TariffsHelper
     {
         public Tariff CurrentTariff { get; set; }
-        public bool IsCreateInProgress { get; set; }
+        public InsuranceRule CurrentRule { get; set; }
+        public bool IsTariffCreateInProgress { get; set; }
+        public bool IsInsRuleCreateInProgress { get; set; }
         private List<Tariff> _tariffs { get; set; }
         public List<Tariff> RootTariffs { get; set; }
         private List<Tariff> _checkedTariffs { get; } = new List<Tariff>();
@@ -92,6 +94,13 @@ namespace IGSLControlPanel.Helpers
             // очищаем список выбранных тарифов
             _checkedTariffs.Clear();
             BuildTariffs(parentFolder);
+        }
+
+        public void SelectUnselectRule(Guid ruleId)
+        {
+            CurrentRule = CurrentTariff.InsRuleTariffLink
+                .SingleOrDefault(s => s.InsRuleId == ruleId)
+                ?.InsRule;
         }
     }
 }

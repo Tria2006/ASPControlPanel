@@ -28,6 +28,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create()
         {
+            _tariffsHelper.IsInsRuleCreateInProgress = true;
             return View();
         }
 
@@ -36,17 +37,29 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(InsuranceRule insuranceRule)
         {
             if (!ModelState.IsValid) return View(insuranceRule);
-            _context.Add(insuranceRule);
-            await _context.SaveChangesAsync();
-            insuranceRule.LinksToTariff.Add(new InsRuleTariffLink
+
+            if (_tariffsHelper.IsTariffCreateInProgress)
             {
-                TariffId = _tariffsHelper.CurrentTariff.Id,
-                Tariff = _tariffsHelper.CurrentTariff,
-                InsRuleId = insuranceRule.Id,
-                InsRule = insuranceRule
-            });
-            await _context.SaveChangesAsync();
-            return RedirectToAction(_tariffsHelper.IsCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                _tariffsHelper.CurrentTariff.InsRuleTariffLink.Add(new InsRuleTariffLink
+                {
+                    Tariff = _tariffsHelper.CurrentTariff,
+                    InsRule = insuranceRule
+                });
+            }
+            else
+            {
+                _context.Add(insuranceRule);
+                await _context.SaveChangesAsync();
+                insuranceRule.LinksToTariff.Add(new InsRuleTariffLink
+                {
+                    TariffId = _tariffsHelper.CurrentTariff.Id,
+                    InsRuleId = insuranceRule.Id,
+                    InsRule = insuranceRule
+                });
+                await _context.SaveChangesAsync();
+                _tariffsHelper.IsInsRuleCreateInProgress = false;
+            }
+            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         public async Task<IActionResult> Edit(Guid id)
@@ -85,23 +98,16 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var insuranceRule = await _context.InsuranceRules
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var insuranceRule = await _context.InsuranceRules.FirstOrDefaultAsync(m => m.Id == id);
             if (insuranceRule == null)
             {
                 return NotFound();
             }
-
             return View(insuranceRule);
         }
 
@@ -110,14 +116,27 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var insuranceRule = await _context.InsuranceRules.FindAsync(id);
-            _context.InsuranceRules.Remove(insuranceRule);
+
+            if (insuranceRule != null)
+            {
+                insuranceRule.IsDeleted = true;
+            }
+            var contextTariff = _context.Tariffs.Include(x => x.InsRuleTariffLink)
+                .SingleOrDefault(x => x.Id == _tariffsHelper.CurrentTariff.Id);
+
+            contextTariff?.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         private bool InsuranceRuleExists(Guid id)
         {
             return _context.InsuranceRules.Any(e => e.Id == id);
+        }
+
+        public void InsRuleClick(Guid id)
+        {
+            _tariffsHelper.SelectUnselectRule(id);
         }
     }
 }

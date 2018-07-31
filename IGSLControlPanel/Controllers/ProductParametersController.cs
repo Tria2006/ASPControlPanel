@@ -46,18 +46,18 @@ namespace IGSLControlPanel.Controllers
         {
             if (!ModelState.IsValid) return View(productParameter);
             if (productParameter.GroupId == Guid.Empty) productParameter.GroupId = null;
-            _context.Add(productParameter);
-            _context.SaveChanges();
-            var link = new ProductLinkToProductParameter
-            {
-                ProductId = _productsHelper.CurrentProduct.Id,
-                ProductParameterId = productParameter.Id,
-                Parameter = productParameter
-            };
-            productParameter.LinkToProduct = new List<ProductLinkToProductParameter>{ link };
 
             if (!_productsHelper.IsProductCreateInProgress)
             {
+                _context.Add(productParameter);
+                _context.SaveChanges();
+                var link = new ProductLinkToProductParameter
+                {
+                    ProductId = _productsHelper.CurrentProduct.Id,
+                    ProductParameterId = productParameter.Id,
+                    Parameter = productParameter
+                };
+                productParameter.LinkToProduct = new List<ProductLinkToProductParameter> { link };
                 await _context.SaveChangesAsync();
                 var productId = _productsHelper.CurrentProduct.Id;
                 _productsHelper.CurrentProduct = _context.Products.Include(x => x.LinkToProductParameters)
@@ -70,7 +70,11 @@ namespace IGSLControlPanel.Controllers
             else
             {
                 // если попадаем сюда, то продукт еще не был сохранен и считаем, что добавление параметра не завершено
-                _productsHelper.CurrentProduct.LinkToProductParameters.Add(link);
+                _productsHelper.CurrentProduct.LinkToProductParameters.Add(new ProductLinkToProductParameter
+                {
+                    Product = _productsHelper.CurrentProduct,
+                    Parameter = productParameter
+                });
             }
             return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }

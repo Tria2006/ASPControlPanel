@@ -6,8 +6,8 @@
 
 <h2>Редактирование тарифа</h2>
 <div class="row">
-    <div class="col-md-4" style="width: 500px">
-        <form asp-action="Edit">
+    <div class="col-md-4">
+        <form asp-action="Edit" style="min-width: 700px; margin-bottom: 70px; margin-top: 30px">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
             <div class="form-group">
@@ -25,12 +25,19 @@
                 <input asp-for="ValidTo" class="form-control" />
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
+
+            <h5>Правила страхования</h5>
+            <a asp-controller="InsuranceRules" asp-action="Create">
+                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
+            </a>
+            @await Html.PartialAsync("_InsuranceRulesBlock", Model.InsRuleTariffLink)
+
             <div class="form-group" style="margin-top: 50px">
                 <div style="float: left; margin-right: 10px">
-                    <input type="submit" value="Сохранить изменения" class="btn btn-default"/>
+                    <input type="submit" value="Сохранить изменения" class="btn btn-default" />
                 </div>
                 <div>
-                    <button class="btn btn-default" asp-controller="Tariffs" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
+                    <button class="btn btn-default" asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@Model.FolderId">Отменить и выйти</button>
                 </div>
             </div>
         </form>

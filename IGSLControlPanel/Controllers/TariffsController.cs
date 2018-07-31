@@ -24,17 +24,24 @@ namespace IGSLControlPanel.Controllers
             _tariffsHelper = tariffsHelper;
         }
 
-        public IActionResult Index(Guid id)
+        public IActionResult Index(Guid parentid)
         {
-            _tariffsHelper.Initialize(_context, GetFolderById(id));
-            return View(GetFolderById(id));
+            _tariffsHelper.Initialize(_context, GetFolderById(parentid));
+            return View(GetFolderById(parentid));
         }
 
         public IActionResult Create(Guid folderId)
         {
             var tempTariff = new Tariff { FolderId = folderId };
-            _tariffsHelper.CurrentTariff = tempTariff;
-            _tariffsHelper.IsCreateInProgress = true;
+            if (_tariffsHelper.IsTariffCreateInProgress)
+            {
+                tempTariff = _tariffsHelper.CurrentTariff;
+            }
+            else
+            {
+                _tariffsHelper.CurrentTariff = tempTariff;
+                _tariffsHelper.IsTariffCreateInProgress = true;
+            }
             ViewData["ParentFolderId"] = folderId;
             return View(tempTariff);
         }
@@ -46,21 +53,28 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(tariff);
             _context.Add(tariff);
             await _context.SaveChangesAsync();
+            if (_tariffsHelper.IsInsRuleCreateInProgress)
+            {
+                tariff.InsRuleTariffLink = _tariffsHelper.CurrentTariff.InsRuleTariffLink;
+                tariff.InsRuleTariffLink.ForEach(p =>
+                {
+                    p.TariffId = tariff.Id;
+                });
+                _tariffsHelper.IsInsRuleCreateInProgress = false;
+                await _context.SaveChangesAsync();
+            }
+            _tariffsHelper.IsTariffCreateInProgress = false;
             return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        public IActionResult Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
-            var tariff = await _context.Tariffs.FindAsync(id);
+            var tariff = _context.Tariffs.Include(x => x.InsRuleTariffLink).ThenInclude(x => x.InsRule).SingleOrDefault(x => x.Id == id);
             if (tariff == null)
             {
                 return NotFound();
             }
+            _tariffsHelper.CurrentTariff = tariff;
             return View(tariff);
         }
 
@@ -142,6 +156,16 @@ namespace IGSLControlPanel.Controllers
                 await tariffs.ForEachAsync(x => x.FolderId = Guid.Empty);
             }
             await _context.SaveChangesAsync();
+        }
+
+        // Нужно сохранить значения полей продукта если он еще не был сохранен, иначе при возвращении обратно 
+        // на экран создания нового продукта все данные очистятся
+        public void SaveTempData(Guid folderId, string name, DateTime? dateFrom, DateTime? dateTo)
+        {
+            _tariffsHelper.CurrentTariff.Name = name;
+            _tariffsHelper.CurrentTariff.FolderId = folderId;
+            _tariffsHelper.CurrentTariff.ValidFrom = dateFrom;
+            _tariffsHelper.CurrentTariff.ValidTo = dateTo;
         }
     }
 }

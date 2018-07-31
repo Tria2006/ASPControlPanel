@@ -11,7 +11,6 @@ namespace IGSLControlPanel.Helpers
     public class ProductsHelper
     {
         private List<Product> _products { get; set; }
-        //public List<Product> RootProducts { get; set; }
         public Product CurrentProduct { get; set; }
         public ProductParameter CurrentParameter { get; set; }
         public bool IsProductCreateInProgress { get; set; }
@@ -34,8 +33,6 @@ namespace IGSLControlPanel.Helpers
                             x => x.ProductId == p.Id && x.ParameterId == link.ProductParameterId && !x.IsDeleted);
                 }
             });
-            // продукты, не привязанные ни к какой папке
-            //RootProducts = _products.Where(x => (x.FolderId == null || x.FolderId == Guid.Empty) && !x.IsDeleted).ToList();
 
             BuildProducts(rootFolder);
         }
@@ -58,11 +55,19 @@ namespace IGSLControlPanel.Helpers
         public async Task RemoveProducts(IGSLContext _context, FolderTreeEntry parentFolder)
         {
             // двигаемся по списку выбранных продуктов
-            foreach (var f in _checkedProducts)
+            foreach (var product in _checkedProducts)
             {
                 // получаем продукт из контекста и далее работавем с ним
-                var contextProduct = _context.Products.SingleOrDefault(x => x.Id == f.Id);
+                var contextProduct = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(x => x.Parameter).SingleOrDefault(x => x.Id == product.Id);
                 if (contextProduct == null) continue;
+                // проставляем IsDeleted всем связанным параметрам
+                contextProduct.LinkToProductParameters.ForEach(l =>
+                {
+                    l.Parameter.IsDeleted = true;
+                });
+                // удаляем связи
+                contextProduct.LinkToProductParameters.Clear();
+
                 contextProduct.IsDeleted = true;
             }
 
@@ -70,8 +75,6 @@ namespace IGSLControlPanel.Helpers
             // в контексте БД они остаются
             parentFolder?.Products.RemoveAll(x => x.IsDeleted);
 
-            // удалить продукты нужно и из _productsWOFolder
-            //RootProducts.RemoveAll(x => x.IsDeleted);
             await _context.SaveChangesAsync();
 
             // очищаем список выбранных продуктов
@@ -100,6 +103,8 @@ namespace IGSLControlPanel.Helpers
             if (contextProduct == null) return;
             contextProduct.ValidFrom = product.ValidFrom;
             contextProduct.ValidTo = product.ValidTo;
+            contextProduct.LinkToProductParameters = product.LinkToProductParameters;
+            contextProduct.Name = product.Name;
             await _context.SaveChangesAsync();
             BuildProducts(parentFolder);
         }

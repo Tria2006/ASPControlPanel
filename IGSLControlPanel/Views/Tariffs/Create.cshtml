@@ -7,26 +7,27 @@
 <h2>Новый тариф</h2>
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" style="min-width: 700px; margin-bottom: 70px; margin-top: 30px">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <input id="folderId" asp-for="FolderId" type="hidden" />
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input id="name" asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ValidFrom" class="control-label"></label>
-                <input asp-for="ValidFrom" class="form-control" />
+                <input id="validFromDt" asp-for="ValidFrom" class="form-control" />
                 <span asp-validation-for="ValidFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ValidTo" class="control-label"></label>
-                <input asp-for="ValidTo" class="form-control" />
+                <input id="validToDt" asp-for="ValidTo" class="form-control" />
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
-            
+
             <h5>Правила страхования</h5>
-            <a asp-controller="InsuranceRules" asp-action="Create">
+            <a asp-controller="InsuranceRules" asp-action="Create" onclick="SaveProductData()">
                 <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
             </a>
             @await Html.PartialAsync("_InsuranceRulesBlock", Model.InsRuleTariffLink)
@@ -42,4 +43,20 @@
         </form>
     </div>
 </div>
+
+<script>
+    function SaveProductData() {
+        $.ajax({
+            url: "/Tariffs/SaveTempData",
+            type: "post",
+            data: {
+                folderId: $("#folderId").val(),
+                name: $("#name").val(),
+                dateFrom: $("#validFromDt").val(),
+                dateTo: $("#validToDt").val()
+            },
+            success: function () {}
+        });
+    };
+</script>
 
