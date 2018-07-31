@@ -116,17 +116,17 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Index", new { id });
         }
 
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(Guid id)
-        {
-            var tariff = await _context.Tariffs.FindAsync(id);
-            tariff.IsDeleted = true;
-            await _context.SaveChangesAsync();
-            var parentFolder = GetFolderById(tariff.FolderId);
-            _tariffsHelper.BuildTariffs(parentFolder);
-            return RedirectToAction(nameof(Index), parentFolder);
-        }
+        //[HttpPost, ActionName("Delete")]
+        //[ValidateAntiForgeryToken]
+        //public async Task<IActionResult> DeleteConfirmed(Guid id)
+        //{
+        //    var tariff = await _context.Tariffs.FindAsync(id);
+        //    tariff.IsDeleted = true;
+        //    await _context.SaveChangesAsync();
+        //    var parentFolder = GetFolderById(tariff.FolderId);
+        //    _tariffsHelper.BuildTariffs(parentFolder);
+        //    return RedirectToAction(nameof(Index), parentFolder);
+        //}
 
         private bool TariffExists(Guid id)
         {

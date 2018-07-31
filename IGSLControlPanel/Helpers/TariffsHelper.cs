@@ -79,8 +79,15 @@ namespace IGSLControlPanel.Helpers
             foreach (var f in _checkedTariffs)
             {
                 // получаем тариф из контекста и далее работавем с ним
-                var contextTariff = _context.Tariffs.SingleOrDefault(x => x.Id == f.Id);
+                var contextTariff = _context.Tariffs.Include(x => x.InsRuleTariffLink).ThenInclude(x => x.InsRule).SingleOrDefault(x => x.Id == f.Id);
                 if (contextTariff == null) continue;
+                // проставляем IsDeleted всем связанным правилам
+                contextTariff.InsRuleTariffLink.ForEach(l =>
+                {
+                    l.InsRule.IsDeleted = true;
+                });
+                // удаляем связи
+                contextTariff.InsRuleTariffLink.Clear();
                 contextTariff.IsDeleted = true;
             }
 
