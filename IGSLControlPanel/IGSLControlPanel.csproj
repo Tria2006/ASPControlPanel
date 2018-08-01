@@ -26,6 +26,8 @@
     <Compile Remove="Migrations\20180723101629_added ParametersGroup model.cs" />
     <Compile Remove="Migrations\20180730135918_added InsuranceRule model + link to tariff.cs" />
     <Compile Remove="Migrations\20180730142626_InsuranceRule add tariff link.cs" />
+    <Compile Remove="Migrations\20180801093937_add Risk model + many to many link to ins rules.cs" />
+    <Compile Remove="Migrations\20180801094825_add Risk model + many to many link to ins rules.cs" />
   </ItemGroup>
 
   <ItemGroup>

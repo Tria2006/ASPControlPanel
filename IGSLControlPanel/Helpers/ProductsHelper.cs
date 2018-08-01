@@ -63,12 +63,10 @@ namespace IGSLControlPanel.Helpers
                 // проставляем IsDeleted всем связанным параметрам
                 contextProduct.LinkToProductParameters.ForEach(l =>
                 {
-                    l.Parameter.ModifyDate = DateTime.Now;
                     l.Parameter.IsDeleted = true;
                 });
                 // удаляем связи
                 contextProduct.LinkToProductParameters.Clear();
-                contextProduct.ModifyDate = DateTime.Now;
                 contextProduct.IsDeleted = true;
             }
 
@@ -94,7 +92,6 @@ namespace IGSLControlPanel.Helpers
 
         public async Task AddProduct(Product product,IGSLContext _context)
         {
-            product.CreateDate = DateTime.Now;
             await _context.Products.AddAsync(product);
             await _context.SaveChangesAsync();
         }
@@ -103,7 +100,6 @@ namespace IGSLControlPanel.Helpers
         {
             var contextProduct = _context.Products.SingleOrDefault(x => x.Id == product.Id);
             if (contextProduct == null) return;
-            contextProduct.ModifyDate = DateTime.Now;
             contextProduct.ValidFrom = product.ValidFrom;
             contextProduct.ValidTo = product.ValidTo;
             contextProduct.LinkToProductParameters = product.LinkToProductParameters;

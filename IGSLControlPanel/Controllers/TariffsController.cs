@@ -8,7 +8,6 @@ using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -52,7 +51,6 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(Tariff tariff)
         {
             if (!ModelState.IsValid) return View(tariff);
-            tariff.CreateDate = DateTime.Now;
             _context.Add(tariff);
             await _context.SaveChangesAsync();
             if (_tariffsHelper.IsInsRuleCreateInProgress)
@@ -60,7 +58,6 @@ namespace IGSLControlPanel.Controllers
                 tariff.InsRuleTariffLink = _tariffsHelper.CurrentTariff.InsRuleTariffLink;
                 tariff.InsRuleTariffLink.ForEach(p =>
                 {
-                    p.InsRule.CreateDate = DateTime.Now;
                     p.TariffId = tariff.Id;
                 });
                 _tariffsHelper.IsInsRuleCreateInProgress = false;
@@ -93,7 +90,6 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(tariff);
             try
             {
-                tariff.ModifyDate = DateTime.Now;
                 _context.Update(tariff);
                 await _context.SaveChangesAsync();
             }
