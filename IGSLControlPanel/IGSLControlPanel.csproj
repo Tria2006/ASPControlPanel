@@ -5,6 +5,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Models\**" />
+    <Content Remove="Models\**" />
+    <EmbeddedResource Remove="Models\**" />
+    <None Remove="Models\**" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Compile Remove="Migrations\20180706110923_123.cs" />
     <Compile Remove="Migrations\20180706110923_123.Designer.cs" />
     <Compile Remove="Migrations\20180706112115_Product to ProductParameter many-to-many relation.cs" />
@@ -57,6 +64,10 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\DBModels\DBModels.csproj" />
   </ItemGroup>
 
 </Project>

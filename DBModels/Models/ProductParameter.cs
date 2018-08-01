@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using DBModels.Models.ManyToManyLinks;
 
 namespace DBModels.Models
 {

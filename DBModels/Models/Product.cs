@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using IGSLControlPanel.Models.ManyToManyLinks;
+using DBModels.Models.ManyToManyLinks;
 
-namespace IGSLControlPanel.Models
+namespace DBModels.Models
 {
     public class Product : BaseModel
     {

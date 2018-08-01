@@ -1,12 +1,12 @@
 ﻿using System;
 using System.Linq;
 using System.Threading.Tasks;
+using DBModels.Models;
+using DBModels.Models.ManyToManyLinks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
-using IGSLControlPanel.Models;
-using IGSLControlPanel.Models.ManyToManyLinks;
 
 namespace IGSLControlPanel.Controllers
 {

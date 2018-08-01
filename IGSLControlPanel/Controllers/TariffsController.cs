@@ -2,12 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DBModels.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
-using IGSLControlPanel.Models;
+using Microsoft.EntityFrameworkCore.Internal;
 
 namespace IGSLControlPanel.Controllers
 {

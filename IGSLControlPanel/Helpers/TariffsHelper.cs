@@ -2,8 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using DBModels.Models;
 using IGSLControlPanel.Data;
-using IGSLControlPanel.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Helpers

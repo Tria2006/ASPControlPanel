@@ -1,5 +1,5 @@
-﻿using IGSLControlPanel.Models;
-using IGSLControlPanel.Models.ManyToManyLinks;
+﻿using DBModels.Models;
+using DBModels.Models.ManyToManyLinks;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Data
@@ -28,6 +28,6 @@ namespace IGSLControlPanel.Data
 
         public DbSet<ParameterGroup> ParameterGroups { get; set; }
 
-        public DbSet<IGSLControlPanel.Models.ManyToManyLinks.InsRuleTariffLink> InsRuleTariffLink { get; set; }
+        public DbSet<InsRuleTariffLink> InsRuleTariffLink { get; set; }
     }
 }
