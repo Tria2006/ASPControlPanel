@@ -65,6 +65,7 @@ namespace IGSLControlPanel.Controllers
                 product.LinkToProductParameters.ForEach(p =>
                 {
                     p.ProductId = product.Id;
+                    p.Parameter.CreateDate = DateTime.Now;
                 });
                 _productsHelper.IsParameterCreateInProgress = false;
                 await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);

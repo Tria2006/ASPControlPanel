@@ -51,6 +51,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(Tariff tariff)
         {
             if (!ModelState.IsValid) return View(tariff);
+            tariff.CreateDate = DateTime.Now;
             _context.Add(tariff);
             await _context.SaveChangesAsync();
             if (_tariffsHelper.IsInsRuleCreateInProgress)
@@ -58,6 +59,7 @@ namespace IGSLControlPanel.Controllers
                 tariff.InsRuleTariffLink = _tariffsHelper.CurrentTariff.InsRuleTariffLink;
                 tariff.InsRuleTariffLink.ForEach(p =>
                 {
+                    p.InsRule.CreateDate = DateTime.Now;
                     p.TariffId = tariff.Id;
                 });
                 _tariffsHelper.IsInsRuleCreateInProgress = false;
@@ -90,6 +92,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(tariff);
             try
             {
+                tariff.ModifyDate = DateTime.Now;
                 _context.Update(tariff);
                 await _context.SaveChangesAsync();
             }
@@ -115,18 +118,6 @@ namespace IGSLControlPanel.Controllers
             }
             return RedirectToAction("Index", new { id });
         }
-
-        //[HttpPost, ActionName("Delete")]
-        //[ValidateAntiForgeryToken]
-        //public async Task<IActionResult> DeleteConfirmed(Guid id)
-        //{
-        //    var tariff = await _context.Tariffs.FindAsync(id);
-        //    tariff.IsDeleted = true;
-        //    await _context.SaveChangesAsync();
-        //    var parentFolder = GetFolderById(tariff.FolderId);
-        //    _tariffsHelper.BuildTariffs(parentFolder);
-        //    return RedirectToAction(nameof(Index), parentFolder);
-        //}
 
         private bool TariffExists(Guid id)
         {

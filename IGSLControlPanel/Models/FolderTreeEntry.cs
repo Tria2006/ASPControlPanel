@@ -1,17 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.ComponentModel;
-using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace IGSLControlPanel.Models
 {
-    public class FolderTreeEntry
+    public class FolderTreeEntry : BaseModel
     {
-        [Key]
-        [DatabaseGenerated(DatabaseGeneratedOption.Identity)]
-        public Guid Id { get; set; }
-
         public Guid? ParentFolderId { get; set; }
 
         [NotMapped]
@@ -22,11 +16,6 @@ namespace IGSLControlPanel.Models
 
         [NotMapped]
         public List<Tariff> Tariffs { get; set; } = new List<Tariff>();
-
-        [DisplayName("Название")]
-        public string Name { get; set; }
-
-        public bool IsDeleted { get; set; }
 
         public int ModelTypeId { get; set; }
     }

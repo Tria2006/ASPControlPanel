@@ -48,6 +48,7 @@ namespace IGSLControlPanel.Controllers
             }
             else
             {
+                insuranceRule.CreateDate = DateTime.Now;
                 _context.Add(insuranceRule);
                 await _context.SaveChangesAsync();
                 insuranceRule.LinksToTariff.Add(new InsRuleTariffLink
@@ -84,6 +85,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(insuranceRule);
             try
             {
+                insuranceRule.ModifyDate = DateTime.Now;
                 _context.Update(insuranceRule);
                 await _context.SaveChangesAsync();
             }
@@ -120,6 +122,7 @@ namespace IGSLControlPanel.Controllers
             if (insuranceRule != null)
             {
                 insuranceRule.IsDeleted = true;
+                insuranceRule.ModifyDate = DateTime.Now;
             }
             var contextTariff = _context.Tariffs.Include(x => x.InsRuleTariffLink)
                 .SingleOrDefault(x => x.Id == _tariffsHelper.CurrentTariff.Id);

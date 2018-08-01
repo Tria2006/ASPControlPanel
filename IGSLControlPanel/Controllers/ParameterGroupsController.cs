@@ -32,19 +32,14 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(ParameterGroup parameterGroup)
         {
             if (!ModelState.IsValid) return View(parameterGroup);
-            parameterGroup.Id = Guid.NewGuid();
+            parameterGroup.CreateDate = DateTime.Now;
             _context.Add(parameterGroup);
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
 
-        public async Task<IActionResult> Edit(Guid? id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var parameterGroup = await _context.ParameterGroups.FindAsync(id);
             if (parameterGroup == null)
             {
@@ -65,6 +60,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(parameterGroup);
             try
             {
+                parameterGroup.ModifyDate = DateTime.Now;
                 _context.Update(parameterGroup);
                 await _context.SaveChangesAsync();
             }
@@ -105,6 +101,7 @@ namespace IGSLControlPanel.Controllers
         {
             var parameterGroup = await _context.ParameterGroups.FindAsync(id);
             parameterGroup.IsDeleted = true;
+            parameterGroup.ModifyDate = DateTime.Now;
             var parameters = _context.ProductParameters.Where(x => x.GroupId == id);
             foreach (var parameter in parameters)
             {

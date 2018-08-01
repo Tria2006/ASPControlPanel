@@ -5,19 +5,12 @@ using IGSLControlPanel.Models.ManyToManyLinks;
 
 namespace IGSLControlPanel.Models
 {
-    public class ProductParameter
+    public class ProductParameter : BaseModel
     {
-        public Guid Id { get; set; }
-
-        [DisplayName("Название")]
-        public string Name { get; set; }
-
         [DisplayName("Тип данных")]
         public int DataType { get; set; }
 
         public List<ProductLinkToProductParameter> LinkToProduct { get; set; }
-
-        public bool IsDeleted { get; set; }
 
         [DisplayName("Обязателен для расчета")]
         public bool IsRequiredForCalc { get; set; }

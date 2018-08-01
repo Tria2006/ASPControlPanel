@@ -38,6 +38,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(valueLimit);
             valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
             _productsHelper.CurrentParameter.Limit = valueLimit;
+            valueLimit.CreateDate = DateTime.Now;
             _context.Add(valueLimit);
             await _context.SaveChangesAsync();
             return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
@@ -61,6 +62,7 @@ namespace IGSLControlPanel.Controllers
             try
             {
                 valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
+                valueLimit.ModifyDate = DateTime.Now;
                 _context.Update(valueLimit);
                 _productsHelper.CurrentParameter.Limit = valueLimit;
                 await _context.SaveChangesAsync();
@@ -89,6 +91,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var valueLimit = await _context.ValueLimits.FindAsync(id);
+            valueLimit.ModifyDate = DateTime.Now;
             valueLimit.IsDeleted = true;
             _productsHelper.CurrentParameter.Limit = null;
             await _context.SaveChangesAsync();

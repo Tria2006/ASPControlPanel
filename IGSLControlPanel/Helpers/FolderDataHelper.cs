@@ -57,7 +57,8 @@ namespace IGSLControlPanel.Helpers
             var newFolder = new FolderTreeEntry
             {
                 Name = name,
-                ModelTypeId = modelTypeId
+                ModelTypeId = modelTypeId,
+                CreateDate = DateTime.Now
             };
 
             // если parent не пустой, то помещаем новую папку в ChildFolders parent'a
@@ -80,6 +81,7 @@ namespace IGSLControlPanel.Helpers
                 var contextFolder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == f.Id);
                 if (contextFolder == null) continue;
                 RemoveChildFoldersAndProducts(contextFolder);
+                f.ModifyDate = DateTime.Now;
                 f.IsDeleted = true;
             }
             var parentFolder = GetFolderById(parentId, FoldersTree);
@@ -137,6 +139,7 @@ namespace IGSLControlPanel.Helpers
                 var contextFolder = context.FolderTreeEntries.SingleOrDefault(f => f.Id == folder.Id);
                 if(contextFolder == null) continue;
                 contextFolder.ParentFolderId = SelectedDestFolderId;
+                contextFolder.ModifyDate = DateTime.Now;
             }
             _checkedFolders.Clear();
         }

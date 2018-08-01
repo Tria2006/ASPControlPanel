@@ -4,13 +4,8 @@ using System.ComponentModel.DataAnnotations;
 
 namespace IGSLControlPanel.Models
 {
-    public class ValueLimit
+    public class ValueLimit : BaseModel
     {
-        public Guid Id { get; set; }
-
-        [DisplayName("Название")]
-        public string Name { get; set; }
-
         [DisplayName("Тип данных")]
         public int ParameterDataType { get; set; }
 
@@ -27,8 +22,6 @@ namespace IGSLControlPanel.Models
         [DisplayName("Конечная дата")]
         [DataType(DataType.Date)]
         public DateTime? DateValueTo { get; set; }
-
-        public bool IsDeleted { get; set; }
 
         public Guid ParameterId { get; set; }
 

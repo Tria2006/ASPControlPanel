@@ -49,6 +49,7 @@ namespace IGSLControlPanel.Controllers
 
             if (!_productsHelper.IsProductCreateInProgress)
             {
+                productParameter.CreateDate = DateTime.Now;
                 _context.Add(productParameter);
                 _context.SaveChanges();
                 var link = new ProductLinkToProductParameter
@@ -109,6 +110,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(productParameter);
             try
             {
+                productParameter.ModifyDate = DateTime.Now;
                 _context.Update(productParameter);
                 _productsHelper.CurrentParameter = productParameter;
                 await _context.SaveChangesAsync();
@@ -161,6 +163,7 @@ namespace IGSLControlPanel.Controllers
             var productParameter = _context.ProductParameters.Include(x => x.LinkToProduct).ThenInclude(p => p.Product).SingleOrDefault(x => x.Id == id);
             if (productParameter == null) return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
             productParameter.IsDeleted = true;
+            productParameter.ModifyDate = DateTime.Now;
             var link = productParameter.LinkToProduct.SingleOrDefault(
                 p => p.ProductParameterId == id && p.ProductId == _productsHelper.CurrentProduct.Id);
             if (link != null)

@@ -84,10 +84,12 @@ namespace IGSLControlPanel.Helpers
                 // проставляем IsDeleted всем связанным правилам
                 contextTariff.InsRuleTariffLink.ForEach(l =>
                 {
+                    l.InsRule.ModifyDate = DateTime.Now;
                     l.InsRule.IsDeleted = true;
                 });
                 // удаляем связи
                 contextTariff.InsRuleTariffLink.Clear();
+                contextTariff.ModifyDate = DateTime.Now;
                 contextTariff.IsDeleted = true;
             }
 
