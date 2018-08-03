@@ -74,6 +74,7 @@ namespace IGSLControlPanel.Controllers
             {
                 return NotFound();
             }
+            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tariff.InsRuleTariffLink.Select(x => x.InsRule));
             _tariffsHelper.CurrentTariff = tariff;
             return View(tariff);
         }

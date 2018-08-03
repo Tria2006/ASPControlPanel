@@ -138,5 +138,15 @@ namespace IGSLControlPanel.Controllers
         {
             _tariffsHelper.SelectUnselectRule(id);
         }
+
+        public async Task InsRuleCheckBoxClick(Guid id)
+        {
+            await _tariffsHelper.CheckInsRule(id, _context);
+        }
+
+        public IActionResult AddRulesToTariff(Guid tariffId, Guid? insRuleId = null)
+        {
+            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+        }
     }
 }

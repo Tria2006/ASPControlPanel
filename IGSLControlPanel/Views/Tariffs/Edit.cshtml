@@ -2,9 +2,39 @@
 
 @{
     ViewData["Title"] = "Edit";
+    ViewData["TariffId"] = Model.Id;
 }
 
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/lib/bootstrap/dist/css/bootstrap.min.css.map" />
+    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
+</head>
+
 <h2>Редактирование тарифа</h2>
+<div id="moveItemModal" class="modal fade">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal">
+                    ×
+                </button>
+                <h4 class="modal-title">Выберите правила страхования</h4>
+            </div>
+            <form asp-controller="InsuranceRules" asp-action="AddRulesToTariff" asp-route-tariffId="@Model.Id">
+                 @await Html.PartialAsync("_InsuranceRulesSelectView", ViewData["InsRulesList"], ViewData)
+
+                <div class="form-group" style="margin-left: 18px;">
+                    <button id="moveOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
+                    <button id="moveCancelBtn" type="button" class="btn btn-primary">
+                        Отмена
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
 <div class="row">
     <div class="col-md-4">
         <form asp-action="Edit" style="min-width: 700px; margin-bottom: 70px; margin-top: 30px">
@@ -17,19 +47,27 @@
             </div>
             <div class="form-group">
                 <label asp-for="ValidFrom" class="control-label"></label>
-                <input asp-for="ValidFrom" class="form-control" />
+                <input asp-for="ValidFrom" class="form-control" style="width: 160px" />
                 <span asp-validation-for="ValidFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ValidTo" class="control-label"></label>
-                <input asp-for="ValidTo" class="form-control" />
+                <input asp-for="ValidTo" class="form-control" style="width: 160px" />
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
 
             <h5>Правила страхования</h5>
-            <a asp-controller="InsuranceRules" asp-action="Create">
-                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
-            </a>
+            <div style="float: left">
+                <a asp-controller="InsuranceRules" asp-action="Create">
+                    <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
+                </a>
+            </div>
+            <div>
+                <!-- кнопка выбора правила -->
+                <a id="selectInsRuleBtn">
+                    <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
+                </a>
+            </div>
             @await Html.PartialAsync("_InsuranceRulesBlock", Model.InsRuleTariffLink)
 
             <div class="form-group" style="margin-top: 50px">
@@ -44,3 +82,16 @@
     </div>
 </div>
 
+<script>
+    $(document).ready(function () {
+        $("#selectInsRuleBtn").click(function () {
+            $("#moveItemModal").modal('show');
+        });
+        $("#moveOkBtn").click(function () {
+            $("#moveItemModal").modal('hide');
+        });
+        $("#moveCancelBtn").click(function () {
+            $("#moveItemModal").modal('hide');
+        });
+    });
+</script>

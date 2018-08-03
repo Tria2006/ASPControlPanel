@@ -17,6 +17,7 @@ namespace IGSLControlPanel.Helpers
         private List<Tariff> _tariffs { get; set; }
         public List<Tariff> RootTariffs { get; set; }
         private List<Tariff> _checkedTariffs { get; } = new List<Tariff>();
+        private List<InsuranceRule> _checkedInsRules { get; } = new List<InsuranceRule>();
         public bool HasSelectedTariffs => _checkedTariffs.Any();
 
         public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)
@@ -108,6 +109,20 @@ namespace IGSLControlPanel.Helpers
             CurrentRule = CurrentTariff.InsRuleTariffLink
                 .SingleOrDefault(s => s.InsRuleId == ruleId)
                 ?.InsRule;
+        }
+
+        public async Task CheckInsRule(Guid id, IGSLContext context)
+        {
+            var rule = await context.InsuranceRules.FindAsync(id);
+            var ruleChecked = _checkedInsRules.Any(x => x.Id == id);
+            if (ruleChecked)
+            {
+                _checkedInsRules.RemoveAll(x => x.Id == id);
+            }
+            else
+            {
+                _checkedInsRules.Add(rule);
+            }
         }
     }
 }

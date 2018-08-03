@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection.Emit;
 using System.Threading.Tasks;
 using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -299,6 +301,20 @@ namespace IGSLControlPanel.Controllers
             // добавляем resultList
             _productsHelper.CurrentProduct.LinkToProductParameters.AddRange(resultList);
             await _context.SaveChangesAsync();
+        }
+
+        // Нужно сохранить значения полей параметра если он еще не был сохранен, иначе при возвращении обратно 
+        // на экран создания нового параметра все данные очистятся
+        public void SaveTempData(int dataType, string name, DateTime? dateFrom, DateTime? dateTo, bool requiredForSave, bool requiredForCalc, Guid? groupId, int order)
+        {
+            _productsHelper.CurrentParameter.Name = name;
+            _productsHelper.CurrentParameter.ValidFrom = dateFrom;
+            _productsHelper.CurrentParameter.ValidTo = dateTo;
+            _productsHelper.CurrentParameter.DataType = dataType;
+            _productsHelper.CurrentParameter.IsRequiredForCalc = requiredForCalc;
+            _productsHelper.CurrentParameter.IsRequiredForSave = requiredForSave;
+            _productsHelper.CurrentParameter.GroupId = groupId;
+            _productsHelper.CurrentParameter.Order = order;
         }
     }
 }

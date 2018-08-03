@@ -1,0 +1,33 @@
+﻿@model IEnumerable<DBModels.Models.InsuranceRule>
+
+
+<div class="form-group" style="float: left; width: 100%; margin-left: 16px">
+    @foreach (var rule in Model)
+    {
+        <a asp-controller="InsuranceRules" asp-action="AddRulesToTariff" asp-route-tariffId="@ViewData["TariffId"]" asp-route-insRuleId="@rule.Id" 
+           style="float: left; margin: 2px; border: 1px solid lightgrey">
+            <table id="folderItem" style="height: 90px; width: 90px">
+                <tr>
+                    <td>
+                        <input type="checkbox" onclick="checkBoxClick('@rule.Id')" style="margin: 2px; width: 16px; height: 16px" />
+                        <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                    </td>
+                </tr>
+                <tr>
+                    <td style="text-align: center; vertical-align: text-top">
+                        @Html.DisplayTextFor(n => rule.Name)
+                    </td>
+                </tr>
+            </table>
+        </a>
+    }
+</div>
+
+<script>
+    function checkBoxClick(id) {
+        $.get("/InsuranceRules/InsRuleCheckBoxClick/" + id);
+    }
+    function checkBoxClick(id) {
+        $.get("/InsuranceRules/InsRuleCheckBoxClick/" + id);
+    }
+</script>

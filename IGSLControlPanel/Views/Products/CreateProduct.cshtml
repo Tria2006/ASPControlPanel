@@ -12,23 +12,22 @@
             <input id="folderId" asp-for="FolderId" type="hidden" />
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group" style="width: 600px">
-                <label class="control-label">Название продукта</label>
+                <label asp-for="Name" class="control-label"></label>
                 <input id="name" asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label" style="width: 150px">Действителен с</label>
+                <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
                 <input asp-for="ValidFrom" type="date" id="validFromDt">
                 <span asp-validation-for="ValidFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label class="control-label" style="width: 150px">Действителен по</label>
+                <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
                 <input asp-for="ValidTo" type="date" id="validToDt" />
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
-            <div>
-                <label class="control-label">Параметры продукта</label>
-            </div>
+            <hr />
+            <h3 class="control-label" style="margin-bottom: 20px">Параметры продукта</h3>
             @{
                 var groupsList = ViewData["ParamGroups"] as SelectList;
             }
@@ -40,9 +39,7 @@
                     {
                         continue;
                     }
-                    <div>
-                        @Html.DisplayFor(x => p.Text)
-                    </div>
+                    @Html.LabelFor(x => p.Text, new { style = "margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium" })
 
                     <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveProductData()">
                         <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
@@ -62,9 +59,7 @@
 
             @if (Model.LinkToProductParameters.Any(x => x.Parameter.GroupId == null))
             {
-                <div>
-                    <label>Параметры без группы</label>
-                </div>
+                <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
 
                 <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveProductData()">
                     <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
@@ -83,9 +78,7 @@
 
             @if (!Model.LinkToProductParameters.Any())
             {
-                <div>
-                    <label>Параметры без группы</label>
-                </div>
+                <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
 
                 <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveProductData()">
                     <img src="~/images/Icons/add_param.png" alt="Добавить параметр" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />

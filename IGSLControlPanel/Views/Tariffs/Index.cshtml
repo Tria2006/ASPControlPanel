@@ -121,7 +121,7 @@
                     </tr>
                     <tr>
                         <td style="text-align: center; vertical-align: text-top">
-                            @Html.DisplayTextFor(n => child.Name)
+                            @Html.LabelFor(n => child.Name, child.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
                         </td>
                     </tr>
                 </table>
@@ -141,7 +141,7 @@
                     </tr>
                     <tr>
                         <td style="text-align: center; vertical-align: text-top">
-                            @Html.DisplayTextFor(n => p.Name)
+                            @Html.LabelFor(n => p.Name, p.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
                         </td>
                     </tr>
                 </table>
