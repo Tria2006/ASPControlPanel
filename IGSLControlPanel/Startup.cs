@@ -24,6 +24,7 @@ namespace IGSLControlPanel
             services.AddSingleton<FolderDataHelper>();
             services.AddSingleton<ProductsHelper>();
             services.AddSingleton<TariffsHelper>();
+            services.AddSingleton<InsuranceRulesHelper>();
             services.AddMvc();
         }
 

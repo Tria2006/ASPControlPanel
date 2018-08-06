@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
@@ -14,16 +15,18 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
+        private readonly InsuranceRulesHelper _insRulesHelper;
 
-        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper)
+        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper, InsuranceRulesHelper insRulesHelper)
         {
             _context = context;
             _tariffsHelper = tariffsHelper;
+            _insRulesHelper = insRulesHelper;
         }
 
         public async Task<IActionResult> Index()
         {
-            return View(await _context.InsuranceRules.ToListAsync());
+            return View(await _context.InsuranceRules.Where(x => !x.IsDeleted).ToListAsync());
         }
 
         public IActionResult Create()
@@ -101,6 +104,30 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateRule(InsuranceRule insuranceRule)
+        {
+            if (!ModelState.IsValid) return View("Edit" ,insuranceRule);
+            try
+            {
+                _context.Update(insuranceRule);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!InsuranceRuleExists(insuranceRule.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            return RedirectToAction("Index");
+        }
+
         public async Task<IActionResult> Delete(Guid id)
         {
             var insuranceRule = await _context.InsuranceRules.FirstOrDefaultAsync(m => m.Id == id);
@@ -125,8 +152,42 @@ namespace IGSLControlPanel.Controllers
                 .SingleOrDefault(x => x.Id == _tariffsHelper.CurrentTariff.Id);
 
             contextTariff?.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
+            _tariffsHelper.CurrentTariff.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             await _context.SaveChangesAsync();
             return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+        }
+
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveRuleConfirmed(Guid id)
+        {
+            var insuranceRule = _context.InsuranceRules.Include(x => x.LinksToTariff).Include(x => x.LinksToRisks).SingleOrDefault(s => s.Id == id);
+
+            if (insuranceRule != null)
+            {
+                insuranceRule.IsDeleted = true;
+                if (insuranceRule.LinksToTariff.Count > 0)
+                {
+                    foreach (var link in insuranceRule.LinksToTariff)
+                    {
+                        var contextTariff = _context.Tariffs.Include(x => x.InsRuleTariffLink)
+                            .SingleOrDefault(x => x.Id == link.TariffId);
+
+                        contextTariff?.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
+                    }
+                }
+
+                if (insuranceRule.LinksToRisks.Count > 0)
+                {
+                    foreach (var link in insuranceRule.LinksToRisks)
+                    {
+                        var contextRisk = _context.Risks.SingleOrDefault(x => x.Id == link.RiskId);
+
+                        contextRisk?.LinksToInsRules.RemoveAll(x => x.InsRuleId == id);
+                    }
+                }
+            }
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Index");
         }
 
         private bool InsuranceRuleExists(Guid id)
@@ -141,11 +202,52 @@ namespace IGSLControlPanel.Controllers
 
         public async Task InsRuleCheckBoxClick(Guid id)
         {
-            await _tariffsHelper.CheckInsRule(id, _context);
+            await _insRulesHelper.CheckInsRule(id, _context);
         }
 
-        public IActionResult AddRulesToTariff(Guid tariffId, Guid? insRuleId = null)
+        public async Task<IActionResult> AddRulesToTariff(Guid? insRuleId = null)
         {
+            var rules = new List<InsRuleTariffLink>();
+            if (insRuleId != null)
+            {
+                var rule = await _context.InsuranceRules.FindAsync(insRuleId);
+                if(rule == null) return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                rules.Add(new InsRuleTariffLink
+                {
+                    InsRuleId = rule.Id,
+                    TariffId = _tariffsHelper.CurrentTariff.Id
+                });
+            }
+            else
+            {
+                foreach (var selectedRule in _insRulesHelper.SelectedRules)
+                {
+                    rules.Add(new InsRuleTariffLink
+                    {
+                        InsRuleId = selectedRule.Id,
+                        TariffId = _tariffsHelper.CurrentTariff.Id
+                    });
+                }
+            }
+
+            if (!_tariffsHelper.IsTariffCreateInProgress)
+            {
+                var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
+                if (contextTariff != null)
+                {
+                    contextTariff.InsRuleTariffLink.AddRange(rules);
+                    await _context.SaveChangesAsync();
+                    _insRulesHelper.SelectedRules.Clear();
+                }
+            }
+            else
+            {
+                foreach (var link in rules)
+                {
+                    link.InsRule = await _context.InsuranceRules.FindAsync(link.InsRuleId);
+                }
+                _tariffsHelper.CurrentTariff.InsRuleTariffLink.AddRange(rules);
+            }
             return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
     }

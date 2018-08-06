@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
+using DBModels.Models.ManyToManyLinks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
@@ -43,6 +44,7 @@ namespace IGSLControlPanel.Controllers
                 _tariffsHelper.IsTariffCreateInProgress = true;
             }
             ViewData["ParentFolderId"] = folderId;
+            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tempTariff.InsRuleTariffLink.Select(x => x.InsRule));
             return View(tempTariff);
         }
 
@@ -62,6 +64,18 @@ namespace IGSLControlPanel.Controllers
                 });
                 _tariffsHelper.IsInsRuleCreateInProgress = false;
                 await _context.SaveChangesAsync();
+            }
+            if (_tariffsHelper.CurrentTariff.InsRuleTariffLink.Count > 0)
+            {
+                foreach (var link in _tariffsHelper.CurrentTariff.InsRuleTariffLink)
+                {
+                    tariff.InsRuleTariffLink.Add(new InsRuleTariffLink
+                    {
+                        InsRuleId = link.InsRuleId,
+                        TariffId = tariff.Id
+                    });
+                    await _context.SaveChangesAsync();
+                }
             }
             _tariffsHelper.IsTariffCreateInProgress = false;
             return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));

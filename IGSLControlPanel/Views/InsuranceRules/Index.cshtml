@@ -6,27 +6,37 @@
     <title>Index</title>
 </head>
 <body>
+<p>
+    <a asp-controller="InsuranceRules" asp-action="Create">
+        <img src="~/images/Icons/add_param.png" alt="Добавить правило страхования" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px"/>
+    </a>
+</p>
 <table class="table">
     <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.Name)
-            </th>
-            <th></th>
-        </tr>
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
+    @foreach (var item in Model)
+    {
         <tr>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td style="width: 90px; align-content: right">
+                <a asp-controller="InsuranceRules" asp-action="Edit" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/edit_param.png" alt="Редактировать правило страхования" style="width: 30px; height: 30px"/>
+                </a>
+                <a style="margin-left: 10px;" asp-controller="InsuranceRules" asp-action="Delete" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/del_param.png" alt="Удалить правило страхования" style="width: 30px; height: 30px"/>
+                </a>
             </td>
         </tr>
-}
+    }
     </tbody>
 </table>
 </body>

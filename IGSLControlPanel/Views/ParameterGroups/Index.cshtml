@@ -7,7 +7,9 @@
 </head>
 <body>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a asp-controller="ParameterGroups" asp-action="Create">
+        <img src="~/images/Icons/add_param.png" alt="Добавить группу параметров" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px" />
+    </a>
 </p>
 <table class="table">
     <thead>
@@ -24,9 +26,13 @@
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
-            <td>
-                <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
-                <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+            <td style="width: 90px; align-content: right">
+                <a asp-controller="ParameterGroups" asp-action="Edit" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/edit_param.png" alt="Редактировать группу параметров" style="width: 30px; height: 30px" />
+                </a>
+                <a style="margin-left: 10px;" asp-controller="ParameterGroups" asp-action="Delete" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/del_param.png" alt="Удалить группу параметров" style="width: 30px; height: 30px" />
+                </a>
             </td>
         </tr>
 }

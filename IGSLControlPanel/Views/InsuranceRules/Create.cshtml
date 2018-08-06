@@ -8,14 +8,13 @@
 <body>
 
     <h4>Правило страхования</h4>
-    <hr />
     <div class="row">
         <div class="col-md-4">
             <form asp-action="Create" style="min-width: 700px; margin-bottom: 70px; margin-top: 30px">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <div class="form-group">
                     <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
+                    <input asp-for="Name" class="form-control" style="width: 400px" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 @Html.HiddenFor(x => x.LinksToTariff)

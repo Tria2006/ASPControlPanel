@@ -1,14 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection.Emit;
 using System.Threading.Tasks;
 using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
-using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
@@ -301,6 +299,12 @@ namespace IGSLControlPanel.Controllers
             // добавляем resultList
             _productsHelper.CurrentProduct.LinkToProductParameters.AddRange(resultList);
             await _context.SaveChangesAsync();
+        }
+
+        public bool ProductCheckBoxClick(Guid id)
+        {
+            _productsHelper.CheckProduct(id, _context);
+            return _productsHelper.HasSelectedProducts;
         }
 
         // Нужно сохранить значения полей параметра если он еще не был сохранен, иначе при возвращении обратно 

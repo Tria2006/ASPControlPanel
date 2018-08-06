@@ -39,7 +39,7 @@
 
     <!-- кнопка Удалить продукт-->
     <a asp-controller="Products" asp-action="DeleteProduct" asp-route-id="@Model.Id">
-        <img id="productDeleteImg" src="~/images/Icons/product_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
+        <img id="productDeleteImg" src="~/images/Icons/document_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
     <!-- кнопка Переместить в папку-->
@@ -210,7 +210,7 @@
             if (data === true) {
                 $("#productDeleteImg").attr("src", "/images/Icons/documentRemove.png");
             } else {
-                $("#productDeleteImg").attr("src", "/images/Icons/product_remove_gray.png");
+                $("#productDeleteImg").attr("src", "/images/Icons/document_remove_gray.png");
             }
             ActivateMoveButton();
         });

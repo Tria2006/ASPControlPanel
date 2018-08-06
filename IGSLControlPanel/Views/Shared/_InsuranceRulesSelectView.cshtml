@@ -4,7 +4,7 @@
 <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
     @foreach (var rule in Model)
     {
-        <a asp-controller="InsuranceRules" asp-action="AddRulesToTariff" asp-route-tariffId="@ViewData["TariffId"]" asp-route-insRuleId="@rule.Id" 
+        <a asp-controller="InsuranceRules" asp-action="AddRulesToTariff" asp-route-insRuleId="@rule.Id" 
            style="float: left; margin: 2px; border: 1px solid lightgrey">
             <table id="folderItem" style="height: 90px; width: 90px">
                 <tr>

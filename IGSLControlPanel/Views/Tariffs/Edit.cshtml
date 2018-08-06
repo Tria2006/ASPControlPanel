@@ -22,7 +22,7 @@
                 </button>
                 <h4 class="modal-title">Выберите правила страхования</h4>
             </div>
-            <form asp-controller="InsuranceRules" asp-action="AddRulesToTariff" asp-route-tariffId="@Model.Id">
+            <form asp-controller="InsuranceRules" asp-action="AddRulesToTariff">
                  @await Html.PartialAsync("_InsuranceRulesSelectView", ViewData["InsRulesList"], ViewData)
 
                 <div class="form-group" style="margin-left: 18px;">
