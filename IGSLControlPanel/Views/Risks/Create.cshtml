@@ -1,42 +1,25 @@
 ﻿@model DBModels.Models.Risk
 
 @{
-    ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Новый риск";
 }
 
-<h2>Create</h2>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+    <link href="~/css/site.css" />
+</head>
 
-<h4>Risk</h4>
+<h2>Новый риск</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create">
+        <form asp-action="Create" class="create_update_form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="BaseTariffValue" class="control-label"></label>
-                <input asp-for="BaseTariffValue" class="form-control" />
-                <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BaseTariffType" class="control-label"></label>
-                <input asp-for="BaseTariffType" class="form-control" />
-                <span asp-validation-for="BaseTariffType" class="text-danger"></span>
-            </div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreateDate" class="control-label"></label>
-                <input asp-for="CreateDate" class="form-control" />
-                <span asp-validation-for="CreateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModifyDate" class="control-label"></label>
-                <input asp-for="ModifyDate" class="form-control" />
-                <span asp-validation-for="ModifyDate" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ValidFrom" class="control-label"></label>
@@ -49,20 +32,25 @@
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
-                    </label>
-                </div>
+                <label asp-for="BaseTariffType" class="control-label"></label>
+                <select asp-for="BaseTariffType" asp-items="Html.GetEnumSelectList<BaseTariffTypes>()" style="width: 250px"></select>
+                <span asp-validation-for="BaseTariffType" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
+                <label asp-for="BaseTariffValue" class="control-label"></label>
+                <input asp-for="BaseTariffValue" class="form-control" />
+                <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-default" />
+                <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
             </div>
         </form>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+<script>
+    function GoBack() {
+        javascript: history.go(-1);
+    }
+</script>

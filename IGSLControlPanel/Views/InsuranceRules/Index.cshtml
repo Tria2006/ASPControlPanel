@@ -4,11 +4,12 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Index</title>
+    <link href="~/css/site.css" />
 </head>
 <body>
 <p>
     <a asp-controller="InsuranceRules" asp-action="Create">
-        <img src="~/images/Icons/add_param.png" alt="Добавить правило страхования" style="margin-bottom: 5px; margin-top: 10px; width: 30px; height: 30px"/>
+        <img src="~/images/Icons/add_param.png" alt="Добавить правило страхования" class="small-button-img"/>
     </a>
 </p>
 <table class="table">
@@ -29,10 +30,10 @@
             </td>
             <td style="width: 90px; align-content: right">
                 <a asp-controller="InsuranceRules" asp-action="Edit" asp-route-id="@item.Id">
-                    <img src="~/images/Icons/edit_param.png" alt="Редактировать правило страхования" style="width: 30px; height: 30px"/>
+                    <img src="~/images/Icons/edit_param.png" alt="Редактировать правило страхования" class="small-button-img"/>
                 </a>
                 <a style="margin-left: 10px;" asp-controller="InsuranceRules" asp-action="Delete" asp-route-id="@item.Id">
-                    <img src="~/images/Icons/del_param.png" alt="Удалить правило страхования" style="width: 30px; height: 30px"/>
+                    <img src="~/images/Icons/del_param.png" alt="Удалить правило страхования" class="small-button-img"/>
                 </a>
             </td>
         </tr>

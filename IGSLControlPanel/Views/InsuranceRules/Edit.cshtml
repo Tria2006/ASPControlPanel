@@ -4,13 +4,14 @@
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Редактирование</title>
+    <link href="~/css/site.css" />
 </head>
 <body>
 
     <h4>Правило страхования</h4>
     <div class="row">
         <div class="col-md-4">
-            <form asp-action="UpdateRule" style="width: 500px">
+            <form asp-action="UpdateRule" class="create_update_form">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <div class="form-group">
@@ -18,6 +19,47 @@
                     <input asp-for="Name" class="form-control" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
+
+                <div class="form-group">
+                    @{
+                        var counter = 1;
+                    }
+                    <h4>
+                        Риски
+                    </h4>
+                    <a asp-controller="Risks" asp-action="Create">
+                        <img src="~/images/Icons/add_param.png" class="small-button-img" />
+                    </a>
+                    @if (Model.LinksToRisks.Count == 0)
+                    {
+                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
+                            <label>Нет рисков</label>
+                        </div>
+                    }
+                    else
+                    {
+                        foreach (var link in Model.LinksToRisks)
+                        {
+                            <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative"
+                                 onclick="ParameterClick(this, '@link.RiskId')">
+                                <div style="float: left; position: absolute; top: 9px;">
+                                    <label style="margin-right: 10px">@counter.</label>
+                                    <label>@link.Risk.Name</label>
+                                </div>
+                                <div style="position: absolute; right: 10px; top: 5px">
+                                    <a asp-controller="Risks" asp-action="Edit" asp-route-id="@link.RiskId">
+                                        <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" />
+                                    </a>
+                                    <a style="margin-left: 10px;" asp-controller="Risks" asp-action="Delete" asp-route-id="@link.RiskId">
+                                        <img src="~/images/Icons/del_param.png" alt="Создать папку" class="small-button-img" />
+                                    </a>
+                                </div>
+                            </div>
+                            counter++;
+                        }
+                    }
+                </div>
+
                 <div class="form-group">
                     <input type="submit" value="Сохранить изменения" class="btn btn-default" />
                     <input type="button" class="btn btn-default" onclick="GoBack()" value="Выйти без сохранения" />

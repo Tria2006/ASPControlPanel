@@ -3,14 +3,15 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Create</title>
+    <title>Новый параметр продукта</title>
+    <link href="~/css/site.css" />
 </head>
 <body>
 
     <h4>Параметр продукта</h4>
     <div class="row" style="margin-top: 20px">
         <div class="col-md-4">
-            <form asp-action="Create">
+            <form asp-action="Create" class="create_update_form">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 <input type="hidden" asp-for="Id" />
                 <div class="form-group">
@@ -52,15 +53,15 @@
                     <label>
                         Лимиты значений
                         <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
-                            <img src="~/images/Icons/add_param.png" style="margin: 2px; margin-left: 28px; width: 25px; height: 25px" alt="" />
+                            <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
                         </a>
                         @if (Model.Limit != null)
                         {
                             <a asp-controller="ValueLimits" asp-action="Edit">
-                                <img src="~/images/Icons/edit_param.png" style="margin: 2px; width: 25px; height: 25px" alt=""/>
+                                <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt=""/>
                             </a>
                             <a asp-controller="ValueLimits" asp-action="Delete">
-                                <img src="~/images/Icons/del_param.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
+                                <img src="~/images/Icons/del_param.png" class="small-button-img" style="margin: 2px" alt="" />
                             </a>
                         }
                         else
