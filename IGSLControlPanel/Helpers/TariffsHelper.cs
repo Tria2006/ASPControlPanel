@@ -22,7 +22,9 @@ namespace IGSLControlPanel.Helpers
         public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)
         {
             // продукты получаем вместе со связанными параметрами 
-            _tariffs = _context.Tariffs.Include(x => x.InsRuleTariffLink).ThenInclude(s => s.InsRule).Where(s => !s.IsDeleted).ToList();
+            _tariffs = _context.Tariffs.Include(x => x.InsRuleTariffLink)
+                .ThenInclude(s => s.InsRule)
+                .Where(s => !s.IsDeleted).ToList();
 
             // продукты, не привязанные ни к какой папке
             RootTariffs = _tariffs.Where(x => x.FolderId == Guid.Empty && !x.IsDeleted).ToList();

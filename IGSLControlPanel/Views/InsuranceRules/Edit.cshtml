@@ -27,7 +27,7 @@
                     <h4>
                         Риски
                     </h4>
-                    <a asp-controller="Risks" asp-action="Create">
+                    <a asp-controller="Risks" asp-action="Create" asp-route-insRuleId="@Model.Id" asp-route-tariffId="@ViewData["TariffId"]">
                         <img src="~/images/Icons/add_param.png" alt="Создать" class="small-button-img" />
                     </a>
                     @if (Model.LinksToRisks.Count == 0)

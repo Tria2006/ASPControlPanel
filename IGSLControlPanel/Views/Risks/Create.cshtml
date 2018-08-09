@@ -1,4 +1,5 @@
-﻿@model DBModels.Models.Risk
+﻿@using DBModels.Models
+@model Risk
 
 @{
     ViewData["Title"] = "Новый риск";
@@ -14,21 +15,21 @@
 <hr />
 <div class="row">
     <div class="col-md-4">
-        <form asp-action="Create" class="create_update_form">
+        <form asp-controller="Risks" asp-action="Create" asp-route-insRuleId="@ViewData["InsRuleId"]" asp-route-tariffId="@ViewData["TariffId"]" class="create_update_form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
+                <input asp-for="Name" class="form-control"/>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ValidFrom" class="control-label"></label>
-                <input asp-for="ValidFrom" class="form-control" style="width: 160px" />
+                <input asp-for="ValidFrom" class="form-control" style="width: 160px"/>
                 <span asp-validation-for="ValidFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="ValidTo" class="control-label"></label>
-                <input asp-for="ValidTo" class="form-control" style="width: 160px" />
+                <input asp-for="ValidTo" class="form-control" style="width: 160px"/>
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -38,12 +39,16 @@
             </div>
             <div class="form-group">
                 <label asp-for="BaseTariffValue" class="control-label"></label>
-                <input asp-for="BaseTariffValue" class="form-control" style="width: 100px" />
+                <input asp-for="BaseTariffValue" class="form-control" style="width: 100px"/>
                 <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Создать" class="btn btn-default" />
-                <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
+                <label class="control-label" style="float: left">Обязателен</label>
+                <input asp-for="OnCreateRequired" style="margin-left: 20px" />
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Создать" class="btn btn-default"/>
+                <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти"/>
             </div>
         </form>
     </div>

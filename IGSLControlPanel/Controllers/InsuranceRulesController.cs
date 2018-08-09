@@ -32,6 +32,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create()
         {
             _tariffsHelper.IsInsRuleCreateInProgress = true;
+            ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
             return View();
         }
 
@@ -65,9 +66,13 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
-        public async Task<IActionResult> Edit(Guid id)
+        public IActionResult Edit(Guid id)
         {
-            var insuranceRule = await _context.InsuranceRules.FindAsync(id);
+            var insuranceRule = _context.InsuranceRules
+                .Include(x => x.LinksToRisks)
+                .ThenInclude(x => x.Risk)
+                .ThenInclude(x => x.Requirements).SingleOrDefault(x => x.Id == id);
+            ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
             if (insuranceRule == null)
             {
                 return NotFound();

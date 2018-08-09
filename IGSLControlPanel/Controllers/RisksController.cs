@@ -27,23 +27,32 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create(Guid tariffId, Guid insRuleId)
         {
             var tempRisk = new Risk();
-            tempRisk.LinksToInsRules.Add(new RiskInsRuleLink
-            {
-                InsRuleId = insRuleId
-            });
-            tempRisk.Requirements.Add(new RiskRequirement
-            {
-                TariffId = tariffId
-            });
+            ViewData["InsRuleId"] = insRuleId;
+            ViewData["TariffId"] = tariffId;
             return View(tempRisk);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Risk risk)
+        public async Task<IActionResult> Create(Risk risk, Guid tariffId, Guid insRuleId)
         {
             if (!ModelState.IsValid) return View(risk);
             _context.Add(risk);
+            await _context.SaveChangesAsync();
+
+            risk.LinksToInsRules.Add(new RiskInsRuleLink
+            {
+                InsRuleId = insRuleId,
+                RiskId = risk.Id
+            });
+
+            risk.Requirements.Add(new RiskRequirement
+            {
+                RiskId = risk.Id,
+                TariffId = tariffId,
+                IsRequired = risk.OnCreateRequired
+            });
+
             await _context.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
