@@ -7,66 +7,62 @@
 </head>
 <body>
 
-<h3>Вы уверены, что хотите удалить этот параметр продукта?</h3>
-<div>
-    <h4>Параметр продукта</h4>
-    <div style="margin-top: 20px; margin-bottom: 20px">
-        <div style="margin-top: 5px; margin-bottom: 5px">
-            <div style="float: left; width: 250px">
-                <label asp-for="Name" style="font-weight: normal"></label>
+    <h3>Вы уверены, что хотите удалить этот параметр продукта?</h3>
+    <div>
+        <h4>Параметр продукта</h4>
+        <div style="margin-top: 20px; margin-bottom: 20px">
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <div style="float: left; width: 250px">
+                    <label asp-for="Name" style="font-weight: normal"></label>
+                </div>
+                <div>
+                    @Html.DisplayFor(model => model.Name)
+                </div>
             </div>
-            <div>
-                @Html.DisplayFor(model => model.Name)
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <div style="float: left; width: 250px">
+                    <label asp-for="DataType" style="font-weight: normal"></label>
+                </div>
+                <div>
+                    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="margin-left: 5px" disabled="disabled"></select>
+                </div>
             </div>
-        </div>
-        <div style="margin-top: 5px; margin-bottom: 5px">
-            <div style="float: left; width: 250px">
-                <label asp-for="DataType" style="font-weight: normal"></label>
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <div style="float: left; width: 250px">
+                    <label asp-for="IsRequiredForCalc" style="font-weight: normal"></label>
+                </div>
+                <div>
+                    @Html.DisplayFor(model => model.IsRequiredForCalc)
+                </div>
             </div>
-            <div>
-                <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px" disabled="disabled"></select>
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <div style="float: left; width: 250px">
+                    <label asp-for="IsRequiredForSave" style="font-weight: normal"></label>
+                </div>
+                <div>
+                    @Html.DisplayFor(model => model.IsRequiredForSave)
+                </div>
             </div>
-        </div>
-        <div style="margin-top: 5px; margin-bottom: 5px">
-            <div style="float: left; width: 250px">
-                <label asp-for="IsRequiredForCalc" style="font-weight: normal"></label>
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <label asp-for="Order" style="float: left; width: 220px; height: 30px; margin-top: 5px; font-weight: normal"></label>
+                <input asp-for="Order" min="1" disabled="disabled" class="form-control" type="number" style="width: 60px; text-align: right" />
             </div>
-            <div>
-                @Html.DisplayFor(model => model.IsRequiredForCalc)
-            </div>
-        </div>
-        <div style="margin-top: 5px; margin-bottom: 5px">
-            <div style="float: left; width: 250px">
-                <label asp-for="IsRequiredForSave" style="font-weight: normal"></label>
-            </div>
-            <div>
-                @Html.DisplayFor(model => model.IsRequiredForSave)
-            </div>
-        </div>
-        <div style="margin-top: 5px; margin-bottom: 5px">
-            <div style="float: left; width: 250px">
-                <label asp-for="Order" style="font-weight: normal"></label>
-            </div>
-            <div>
-                @Html.DisplayFor(model => model.Order)
-            </div>
-        </div>
-        <div style="margin-top: 5px; margin-bottom: 5px">
-            <div style="float: left; width: 250px">
-                <label asp-for="GroupId" style="font-weight: normal"></label>
-            </div>
-            <div>
-                <select asp-for="GroupId" disabled="disabled" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
+            <div style="margin-top: 5px; margin-bottom: 5px">
+                <div style="float: left; width: 250px">
+                    <label asp-for="GroupId" style="font-weight: normal"></label>
+                </div>
+                <div>
+                    <select asp-for="GroupId" class="form-control" disabled="disabled" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
+                </div>
             </div>
         </div>
+
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Удалить" class="btn btn-default" />
+            <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить удаление" />
+        </form>
     </div>
-    
-    <form asp-action="Delete">
-        <input type="hidden" asp-for="Id" />
-        <input type="submit" value="Удалить" class="btn btn-default" />
-        <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить удаление"/>
-    </form>
-</div>
 </body>
 </html>
 

@@ -20,7 +20,7 @@
                 </div>
                 <div class="form-group">
                     <label class="control-label">Тип данных</label>
-                    <select asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" style="margin-left: 5px; width: 150px"></select>
+                    <select asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
                 </div>
                 @if (Model.ParameterDataType == (int)DataTypes.Дата)
                 {

@@ -28,7 +28,7 @@
                         Риски
                     </h4>
                     <a asp-controller="Risks" asp-action="Create">
-                        <img src="~/images/Icons/add_param.png" class="small-button-img" />
+                        <img src="~/images/Icons/add_param.png" alt="Создать" class="small-button-img" />
                     </a>
                     @if (Model.LinksToRisks.Count == 0)
                     {
@@ -48,10 +48,10 @@
                                 </div>
                                 <div style="position: absolute; right: 10px; top: 5px">
                                     <a asp-controller="Risks" asp-action="Edit" asp-route-id="@link.RiskId">
-                                        <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" />
+                                        <img src="~/images/Icons/edit_param.png" alt="Редактировать" class="small-button-img" />
                                     </a>
                                     <a style="margin-left: 10px;" asp-controller="Risks" asp-action="Delete" asp-route-id="@link.RiskId">
-                                        <img src="~/images/Icons/del_param.png" alt="Создать папку" class="small-button-img" />
+                                        <img src="~/images/Icons/del_param.png" alt="Удалить" class="small-button-img" />
                                     </a>
                                 </div>
                             </div>

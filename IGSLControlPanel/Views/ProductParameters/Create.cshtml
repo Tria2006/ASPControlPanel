@@ -21,17 +21,17 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
-                    <input asp-for="ValidFrom" type="date" id="validFromDt">
+                    <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt">
                     <span asp-validation-for="ValidFrom" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
-                    <input asp-for="ValidTo" type="date" id="validToDt" />
+                    <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" />
                     <span asp-validation-for="ValidTo" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="DataType" class="control-label" style="width: 220px"></label>
-                    <select id="dataType" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" onchange="SaveTempData()" style="width: 150px"></select>
+                    <select id="dataType" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
                 </div>
                 <div class="form-group">
                     <label asp-for="IsRequiredForCalc" class="control-label" style="width: 220px"></label>
@@ -42,12 +42,12 @@
                     <input asp-for="IsRequiredForSave" style="vertical-align: top" />
                 </div>
                 <div class="form-group">
-                    <label asp-for="Order" class="control-label" style="width: 220px"></label>
-                    <input asp-for="Order" min="1" type="number" style="width: 60px; text-align: right" />
+                    <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+                    <input asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" />
                 </div>
                 <div class="form-group">
                     <label asp-for="GroupId" class="control-label" style="width: 220px"></label>
-                    <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList" style="width: 150px"></select>
+                    <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList" class="form-control" style="width: 150px"></select>
                 </div>
                 <div class="form-group">
                     <label>
@@ -89,7 +89,7 @@
                             </div>
                             <div>
                                 <label asp-for="DataType" class="control-label" style="width: 180px"></label>
-                                <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()"  style="width: 150px"></select>
+                                <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
                             </div>
                             <div>
                                 @if (Model.Limit.ParameterDataType == (int)DataTypes.Дата)
