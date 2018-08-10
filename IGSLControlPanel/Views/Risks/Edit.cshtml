@@ -1,8 +1,8 @@
 ﻿@model DBModels.Models.Risk
 
 @{
-    ViewData["Title"] = "Edit";
-    Layout = "~/Views/Shared/_Layout.cshtml";
+    ViewData["Title"] = "Редактирование";
+    var Requirement = Model.Requirements.SingleOrDefault(x => x.TariffId == (Guid)ViewData["TariffId"]);
 }
 
 <head>
@@ -10,66 +10,57 @@
     <title></title>
     <link href="~/css/site.css" />
 </head>
-
-<h2>Edit</h2>
-
-<h4>Risk</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit" class="create_update_form">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="BaseTariffValue" class="control-label"></label>
-                <input asp-for="BaseTariffValue" class="form-control" />
-                <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="BaseTariffType" class="control-label"></label>
-                <input asp-for="BaseTariffType" class="form-control" />
-                <span asp-validation-for="BaseTariffType" class="text-danger"></span>
-            </div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CreateDate" class="control-label"></label>
-                <input asp-for="CreateDate" class="form-control" />
-                <span asp-validation-for="CreateDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ModifyDate" class="control-label"></label>
-                <input asp-for="ModifyDate" class="form-control" />
-                <span asp-validation-for="ModifyDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ValidFrom" class="control-label"></label>
-                <input asp-for="ValidFrom" class="form-control" style="width: 160px" />
-                <span asp-validation-for="ValidFrom" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ValidTo" class="control-label"></label>
-                <input asp-for="ValidTo" class="form-control" style="width: 160px" />
-                <span asp-validation-for="ValidTo" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <div class="checkbox">
-                    <label>
-                        <input asp-for="IsDeleted" /> @Html.DisplayNameFor(model => model.IsDeleted)
-                    </label>
-                </div>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-default" />
-            </div>
-        </form>
+<h2>Риск</h2>
+<form asp-action="Edit" class="create_update_form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" style="width: 500px" />
+        <span asp-validation-for="Name" class="text-danger"></span>
     </div>
-</div>
+    <div class="form-group">
+        <label asp-for="ValidFrom" class="control-label"></label>
+        <input asp-for="ValidFrom" class="form-control" style="width: 160px" />
+        <span asp-validation-for="ValidFrom" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ValidTo" class="control-label"></label>
+        <input asp-for="ValidTo" class="form-control" style="width: 160px" />
+        <span asp-validation-for="ValidTo" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BaseTariffType" class="control-label"></label>
+        <select asp-for="BaseTariffType" asp-items="Html.GetEnumSelectList<BaseTariffTypes>()" class="form-control" style="width: 250px"></select>
+        <span asp-validation-for="BaseTariffType" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="BaseTariffValue" class="control-label"></label>
+        <input asp-for="BaseTariffValue" class="form-control" style="width: 100px" />
+        <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
+    </div>
+    @if (Requirement != null)
+    {
+        <input id="reqStartValue" type="hidden" asp-for="@Requirement.IsRequired"/>
+        <input id="reqId" type="hidden" asp-for="@Requirement.Id"/>
+        @await Html.PartialAsync("_RequirementBlock", Requirement)
+    }
+    <div class="form-group" style="margin-top: 50px">
+        <input type="submit" value="Сохранить" class="btn btn-default" />
+        <input type="button" class="btn btn-default" onclick="GoBack()" value="Не сохранять" />
+    </div>
+</form>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
+<script>
+    function GoBack() {
+        $.ajax({
+            url: "/Risks/UpdateRequirement",
+            type: "post",
+            data: {
+                reqId: $("#reqId").val(),
+                required: $("#reqStartValue").val()
+            }
+        });
+        javascript: history.go(-1);
+    };
+</script>

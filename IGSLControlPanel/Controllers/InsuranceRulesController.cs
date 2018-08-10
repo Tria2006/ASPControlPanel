@@ -16,12 +16,14 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
         private readonly InsuranceRulesHelper _insRulesHelper;
+        private readonly EntityStateHelper _stateHelper;
 
-        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper, InsuranceRulesHelper insRulesHelper)
+        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper, InsuranceRulesHelper insRulesHelper, EntityStateHelper stateHelper)
         {
             _context = context;
             _tariffsHelper = tariffsHelper;
             _insRulesHelper = insRulesHelper;
+            _stateHelper = stateHelper;
         }
 
         public async Task<IActionResult> Index()
@@ -31,8 +33,10 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create()
         {
-            _tariffsHelper.IsInsRuleCreateInProgress = true;
+            _stateHelper.IsInsRuleCreateInProgress = true;
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
+            var tempRule = new InsuranceRule();
+            _insRulesHelper.CurrentRule = tempRule;
             return View();
         }
 
@@ -42,7 +46,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (!ModelState.IsValid) return View(insuranceRule);
 
-            if (_tariffsHelper.IsTariffCreateInProgress)
+            if (_stateHelper.IsTariffCreateInProgress)
             {
                 _tariffsHelper.CurrentTariff.InsRuleTariffLink.Add(new InsRuleTariffLink
                 {
@@ -61,9 +65,9 @@ namespace IGSLControlPanel.Controllers
                     InsRule = insuranceRule
                 });
                 await _context.SaveChangesAsync();
-                _tariffsHelper.IsInsRuleCreateInProgress = false;
+                _stateHelper.IsInsRuleCreateInProgress = false;
             }
-            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         public IActionResult Edit(Guid id)
@@ -72,11 +76,12 @@ namespace IGSLControlPanel.Controllers
                 .Include(x => x.LinksToRisks)
                 .ThenInclude(x => x.Risk)
                 .ThenInclude(x => x.Requirements).SingleOrDefault(x => x.Id == id);
-            ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
+            ViewData["TariffId"] = _tariffsHelper.CurrentTariff?.Id;
             if (insuranceRule == null)
             {
                 return NotFound();
             }
+            _insRulesHelper.CurrentRule = insuranceRule;
             return View(insuranceRule);
         }
 
@@ -106,7 +111,7 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         [HttpPost]
@@ -133,9 +138,12 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Index");
         }
 
-        public async Task<IActionResult> Delete(Guid id)
+        public IActionResult Delete(Guid id)
         {
-            var insuranceRule = await _context.InsuranceRules.FirstOrDefaultAsync(m => m.Id == id);
+            var insuranceRule = _context.InsuranceRules
+                .Include(x => x.LinksToRisks)
+                .ThenInclude(x => x.Risk)
+                .ThenInclude(x => x.Requirements).SingleOrDefault(x => x.Id == id);
             if (insuranceRule == null)
             {
                 return NotFound();
@@ -159,7 +167,7 @@ namespace IGSLControlPanel.Controllers
             contextTariff?.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             _tariffsHelper.CurrentTariff.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             await _context.SaveChangesAsync();
-            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         [ValidateAntiForgeryToken]
@@ -216,7 +224,7 @@ namespace IGSLControlPanel.Controllers
             if (insRuleId != null)
             {
                 var rule = await _context.InsuranceRules.FindAsync(insRuleId);
-                if(rule == null) return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                if(rule == null) return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
                 rules.Add(new InsRuleTariffLink
                 {
                     InsRuleId = rule.Id,
@@ -235,7 +243,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
 
-            if (!_tariffsHelper.IsTariffCreateInProgress)
+            if (!_stateHelper.IsTariffCreateInProgress)
             {
                 var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
                 if (contextTariff != null)
@@ -253,7 +261,12 @@ namespace IGSLControlPanel.Controllers
                 }
                 _tariffsHelper.CurrentTariff.InsRuleTariffLink.AddRange(rules);
             }
-            return RedirectToAction(_tariffsHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+        }
+
+        public IActionResult GoBack()
+        {
+            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
     }
 }

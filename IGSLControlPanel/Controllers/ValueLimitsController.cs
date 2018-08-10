@@ -13,11 +13,13 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
+        private readonly EntityStateHelper _stateHelper;
 
-        public ValueLimitsController(IGSLContext context, ProductsHelper productsHelper)
+        public ValueLimitsController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper)
         {
             _context = context;
             _productsHelper = productsHelper;
+            _stateHelper = stateHelper;
         }
 
         public IActionResult Create()
@@ -40,7 +42,7 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.Limit = valueLimit;
             _context.Add(valueLimit);
             await _context.SaveChangesAsync();
-            return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
         public IActionResult Edit(Guid id)
@@ -76,7 +78,7 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
         public IActionResult Delete(Guid id)
@@ -92,7 +94,7 @@ namespace IGSLControlPanel.Controllers
             valueLimit.IsDeleted = true;
             _productsHelper.CurrentParameter.Limit = null;
             await _context.SaveChangesAsync();
-            return RedirectToAction(_productsHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
         private bool ValueLimitExists(Guid id)

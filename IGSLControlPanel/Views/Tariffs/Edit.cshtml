@@ -37,11 +37,10 @@
     </div>
 </div>
 <div class="row">
-    <div class="col-md-4">
         <form asp-action="Edit" class="create_update_form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <input type="hidden" asp-for="Id" />
-            <div class="form-group">
+            <div class="form-group" style="width: 600px">
                 <label asp-for="Name" class="control-label"></label>
                 <input asp-for="Name" class="form-control" />
                 <span asp-validation-for="Name" class="text-danger"></span>
@@ -57,7 +56,7 @@
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
 
-            <h5>Правила страхования</h5>
+            <h3>Правила страхования</h3>
             <div style="float: left">
                 <a asp-controller="InsuranceRules" asp-action="Create">
                     <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px" />
@@ -80,7 +79,6 @@
                 </div>
             </div>
         </form>
-    </div>
 </div>
 
 <script>

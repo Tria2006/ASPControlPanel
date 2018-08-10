@@ -16,13 +16,15 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
+        private readonly EntityStateHelper _stateHelper;
 
-        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper)
+        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, EntityStateHelper stateHelper)
             : base(context, helper)
         {
             _context = context;
             BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
+            _stateHelper = stateHelper;
         }
 
         public IActionResult Index(Guid parentid)
@@ -34,14 +36,14 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create(Guid folderId)
         {
             var tempTariff = new Tariff { FolderId = folderId };
-            if (_tariffsHelper.IsTariffCreateInProgress)
+            if (_stateHelper.IsTariffCreateInProgress)
             {
                 tempTariff = _tariffsHelper.CurrentTariff;
             }
             else
             {
                 _tariffsHelper.CurrentTariff = tempTariff;
-                _tariffsHelper.IsTariffCreateInProgress = true;
+                _stateHelper.IsTariffCreateInProgress = true;
             }
             ViewData["ParentFolderId"] = folderId;
             ViewData["InsRulesList"] = _context.InsuranceRules.Except(tempTariff.InsRuleTariffLink.Select(x => x.InsRule));
@@ -55,14 +57,14 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(tariff);
             _context.Add(tariff);
             await _context.SaveChangesAsync();
-            if (_tariffsHelper.IsInsRuleCreateInProgress)
+            if (_stateHelper.IsInsRuleCreateInProgress)
             {
                 tariff.InsRuleTariffLink = _tariffsHelper.CurrentTariff.InsRuleTariffLink;
                 tariff.InsRuleTariffLink.ForEach(p =>
                 {
                     p.TariffId = tariff.Id;
                 });
-                _tariffsHelper.IsInsRuleCreateInProgress = false;
+                _stateHelper.IsInsRuleCreateInProgress = false;
                 await _context.SaveChangesAsync();
             }
             if (_tariffsHelper.CurrentTariff.InsRuleTariffLink.Count > 0)
@@ -77,7 +79,7 @@ namespace IGSLControlPanel.Controllers
                     await _context.SaveChangesAsync();
                 }
             }
-            _tariffsHelper.IsTariffCreateInProgress = false;
+            _stateHelper.IsTariffCreateInProgress = false;
             return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
         }
 

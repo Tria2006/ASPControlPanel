@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore.Internal;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -17,13 +16,15 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
+        private readonly EntityStateHelper _stateHelper;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper) 
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, EntityStateHelper stateHelper) 
             : base(context, helper)
         {
             _context = context;
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
+            _stateHelper = stateHelper;
         }
 
         public IActionResult Index(Guid id)
@@ -36,7 +37,7 @@ namespace IGSLControlPanel.Controllers
         {
             var tempProduct = new Product {FolderId = folderId};
             // такое может быть если возвращаемся с экрана создания нового параметра
-            if (_productsHelper.IsProductCreateInProgress)
+            if (_stateHelper.IsProductCreateInProgress)
             {
                 // возвращаемся к заполнению нового продукта
                 tempProduct = _productsHelper.CurrentProduct;
@@ -44,7 +45,7 @@ namespace IGSLControlPanel.Controllers
             else
             {
                 _productsHelper.CurrentProduct = tempProduct;
-                _productsHelper.IsProductCreateInProgress = true;
+                _stateHelper.IsProductCreateInProgress = true;
             }
             var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
@@ -57,9 +58,9 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> CreateProduct(Product product)
         {
             await _productsHelper.AddProduct(product, _context);
-            _productsHelper.IsProductCreateInProgress = false;
+            _stateHelper.IsProductCreateInProgress = false;
             // такое может быть если создавали новый продукт и сразу добавляли туда параметры
-            if (_productsHelper.IsParameterCreateInProgress)
+            if (_stateHelper.IsParameterCreateInProgress)
             {
                 product.LinkToProductParameters = _productsHelper.CurrentProduct.LinkToProductParameters;
                 // нужно проставить ProductId в линки созданных параметров
@@ -67,7 +68,7 @@ namespace IGSLControlPanel.Controllers
                 {
                     p.ProductId = product.Id;
                 });
-                _productsHelper.IsParameterCreateInProgress = false;
+                _stateHelper.IsParameterCreateInProgress = false;
                 await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             }
             return RedirectToAction("Index", new { id = product.FolderId });

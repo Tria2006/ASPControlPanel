@@ -12,14 +12,11 @@
 </head>
 
 <h2>Новый риск</h2>
-<hr />
-<div class="row">
-    <div class="col-md-4">
         <form asp-controller="Risks" asp-action="Create" asp-route-insRuleId="@ViewData["InsRuleId"]" asp-route-tariffId="@ViewData["TariffId"]" class="create_update_form">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control"/>
+                <input asp-for="Name" class="form-control" style="width: 600px"/>
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
             <div class="form-group">
@@ -46,13 +43,11 @@
                 <label class="control-label" style="float: left">Обязателен</label>
                 <input asp-for="OnCreateRequired" style="margin-left: 20px" />
             </div>
-            <div class="form-group">
+            <div class="form-group" style="margin-top: 50px">
                 <input type="submit" value="Создать" class="btn btn-default"/>
                 <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти"/>
             </div>
         </form>
-    </div>
-</div>
 
 <script>
     function GoBack() {

@@ -13,8 +13,6 @@ namespace IGSLControlPanel.Helpers
         private List<Product> _products { get; set; }
         public Product CurrentProduct { get; set; }
         public ProductParameter CurrentParameter { get; set; }
-        public bool IsProductCreateInProgress { get; set; }
-        public bool IsParameterCreateInProgress { get; set; }
         private List<Product> _checkedProducts { get; } = new List<Product>();
         public bool HasSelectedProducts => _checkedProducts.Any();
 

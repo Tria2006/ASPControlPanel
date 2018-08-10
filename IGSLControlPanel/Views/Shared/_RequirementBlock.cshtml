@@ -1,0 +1,19 @@
+﻿@model DBModels.Models.RiskRequirement
+
+<div class="form-group">
+    <input id="reqId" asp-for="Id" type="hidden" value="@Model.Id"/>
+    <label asp-for="IsRequired" class="control-label" style="width: 220px"></label>
+    <input id="required" asp-for="IsRequired" style="vertical-align: top" onchange="UpdateRequirement()"/>
+</div>
+
+<script>
+    function UpdateRequirement() {
+        $.ajax({
+            url: "/Risks/UpdateRequirement",
+            type: "post",
+            data: {
+                reqId: $("#reqId").val()
+            }
+        });
+    }
+</script>

@@ -16,11 +16,13 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
+        private readonly EntityStateHelper _stateHelper;
 
-        public ProductParametersController(IGSLContext context, ProductsHelper productsHelper)
+        public ProductParametersController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper)
         {
             _context = context;
             _productsHelper = productsHelper;
+            _stateHelper = stateHelper;
         }
 
         public IActionResult Create(Guid? groupId)
@@ -31,7 +33,7 @@ namespace IGSLControlPanel.Controllers
             };
             groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groupId ?? groups.First().Id);
-            _productsHelper.IsParameterCreateInProgress = true;
+            _stateHelper.IsParameterCreateInProgress = true;
             var tempParam = new ProductParameter
             {
                 GroupId = groupId
@@ -47,7 +49,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(productParameter);
             if (productParameter.GroupId == Guid.Empty) productParameter.GroupId = null;
 
-            if (!_productsHelper.IsProductCreateInProgress)
+            if (!_stateHelper.IsProductCreateInProgress)
             {
                 _context.Add(productParameter);
                 _context.SaveChanges();
@@ -65,7 +67,7 @@ namespace IGSLControlPanel.Controllers
                     .SingleOrDefault(x => x.Id == productId);
                 await CheckParameterOrders(productParameter);
                 _productsHelper.CurrentParameter = null;
-                _productsHelper.IsParameterCreateInProgress = false;
+                _stateHelper.IsParameterCreateInProgress = false;
             }
             else
             {
@@ -76,7 +78,7 @@ namespace IGSLControlPanel.Controllers
                     Parameter = productParameter
                 });
             }
-            return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         public IActionResult Edit(Guid id)
@@ -126,7 +128,7 @@ namespace IGSLControlPanel.Controllers
             }
             await CheckParameterOrders(productParameter);
             _productsHelper.CurrentParameter = null;
-            return RedirectToAction(_productsHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
 
         public async Task<IActionResult> Delete(Guid id)

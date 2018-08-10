@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
@@ -7,16 +6,21 @@ using Microsoft.EntityFrameworkCore;
 using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Helpers;
 
 namespace IGSLControlPanel.Controllers
 {
     public class RisksController : Controller
     {
         private readonly IGSLContext _context;
+        private readonly InsuranceRulesHelper _insRuleHelper;
+        private readonly EntityStateHelper _stateHelper;
 
-        public RisksController(IGSLContext context)
+        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, EntityStateHelper stateHelper)
         {
             _context = context;
+            _insRuleHelper = insRuleHelper;
+            _stateHelper = stateHelper;
         }
 
         public async Task<IActionResult> Index()
@@ -54,12 +58,15 @@ namespace IGSLControlPanel.Controllers
             });
 
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
 
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(Guid id, Guid tariffId)
         {
-            var risk = _context.Risks.Include(x => x.LinksToInsRules).ThenInclude(x => x.InsRule).Include(x => x.Requirements).SingleOrDefault(x => x.Id == id);
+            ViewData["TariffId"] = tariffId;
+            var risk = _context.Risks.Include(x => x.LinksToInsRules)
+                .ThenInclude(x => x.InsRule)
+                .Include(x => x.Requirements).SingleOrDefault(x => x.Id == id);
             if (risk == null)
             {
                 return NotFound();
@@ -90,7 +97,7 @@ namespace IGSLControlPanel.Controllers
                 }
                 throw;
             }
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
 
         public async Task<IActionResult> Delete(Guid id)
@@ -112,12 +119,21 @@ namespace IGSLControlPanel.Controllers
             var risk = await _context.Risks.FindAsync(id);
             risk.IsDeleted = true;
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
 
         private bool RiskExists(Guid id)
         {
             return _context.Risks.Any(e => e.Id == id);
+        }
+
+        public async Task UpdateRequirement(Guid reqId, bool? required = null)
+        {
+            var requirement = await _context.RiskRequirements.FindAsync(reqId);
+
+            if(requirement == null) return;
+            requirement.IsRequired = required ?? !requirement.IsRequired;
+            await _context.SaveChangesAsync();
         }
     }
 }
