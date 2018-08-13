@@ -44,10 +44,10 @@ namespace IGSLControlPanel
             }
             else
             {
-                app.UseBrowserLink();
-                app.UseDeveloperExceptionPage();
-                app.UseDatabaseErrorPage();
-                //app.UseExceptionHandler("/Home/Error");
+                //app.UseBrowserLink();
+                //app.UseDeveloperExceptionPage();
+                //app.UseDatabaseErrorPage();
+                app.UseExceptionHandler("/Home/Error");
             }
 
             app.UseMvc(routes =>

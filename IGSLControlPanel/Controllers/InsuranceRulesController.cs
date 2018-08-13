@@ -113,31 +113,7 @@ namespace IGSLControlPanel.Controllers
             }
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
-
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateRule(InsuranceRule insuranceRule)
-        {
-            if (!ModelState.IsValid) return View("Edit" ,insuranceRule);
-            try
-            {
-                _context.Update(insuranceRule);
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!InsuranceRuleExists(insuranceRule.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-            return RedirectToAction("Index");
-        }
-
+        
         public IActionResult Delete(Guid id)
         {
             var insuranceRule = _context.InsuranceRules
