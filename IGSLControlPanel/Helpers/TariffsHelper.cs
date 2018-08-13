@@ -38,6 +38,11 @@ namespace IGSLControlPanel.Helpers
                 if (parent.Tariffs.Contains(tariff)) continue;
                 parent.Tariffs.Add(tariff);
             }
+
+            foreach (var childFolder in parent.ChildFolders)
+            {
+                BuildTariffs(childFolder);
+            }
         }
 
         public async Task RemoveFolderId(Tariff tariff, IGSLContext _context)

@@ -57,7 +57,8 @@ namespace IGSLControlPanel.Helpers
             var newFolder = new FolderTreeEntry
             {
                 Name = name,
-                ModelTypeId = modelTypeId
+                ModelTypeId = modelTypeId,
+                ParentFolderId = Guid.Empty
             };
 
             // если parent не пустой, то помещаем новую папку в ChildFolders parent'a

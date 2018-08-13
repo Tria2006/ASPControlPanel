@@ -103,7 +103,7 @@
         foreach (var child in Model.ChildFolders)
         {
             // Папки
-            <a asp-controller="Tariffs" asp-action="Index" asp-route-id="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
+            <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
                 <table id="folderItem" style="height: 90px; width: 90px">
                     <tr>
                         <td>

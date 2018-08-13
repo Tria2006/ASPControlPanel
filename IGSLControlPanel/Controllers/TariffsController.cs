@@ -67,18 +67,6 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsInsRuleCreateInProgress = false;
                 await _context.SaveChangesAsync();
             }
-            if (_tariffsHelper.CurrentTariff.InsRuleTariffLink.Count > 0)
-            {
-                foreach (var link in _tariffsHelper.CurrentTariff.InsRuleTariffLink)
-                {
-                    tariff.InsRuleTariffLink.Add(new InsRuleTariffLink
-                    {
-                        InsRuleId = link.InsRuleId,
-                        TariffId = tariff.Id
-                    });
-                    await _context.SaveChangesAsync();
-                }
-            }
             _stateHelper.IsTariffCreateInProgress = false;
             return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
         }
@@ -161,6 +149,11 @@ namespace IGSLControlPanel.Controllers
                 await tariffs.ForEachAsync(x => x.FolderId = Guid.Empty);
             }
             await _context.SaveChangesAsync();
+        }
+
+        public bool GetFolderOrTariffSelected()
+        {
+            return _tariffsHelper.HasSelectedTariffs || HasSelectedFolders;
         }
 
         // Нужно сохранить значения полей продукта если он еще не был сохранен, иначе при возвращении обратно 
