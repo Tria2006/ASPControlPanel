@@ -33,6 +33,15 @@ namespace IGSLControlPanel.Controllers
             var tempRisk = new Risk();
             ViewData["InsRuleId"] = insRuleId;
             ViewData["TariffId"] = tariffId;
+            if (_stateHelper.IsRiskCreateInProgress)
+            {
+                tempRisk = _insRuleHelper.CurrentRisk;
+            }
+            else
+            {
+                _insRuleHelper.CurrentRisk = tempRisk;
+                _stateHelper.IsRiskCreateInProgress = true;
+            }
             return View(tempRisk);
         }
 
@@ -41,23 +50,36 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(Risk risk, Guid tariffId, Guid insRuleId)
         {
             if (!ModelState.IsValid) return View(risk);
-            _context.Add(risk);
-            await _context.SaveChangesAsync();
 
-            risk.LinksToInsRules.Add(new RiskInsRuleLink
+            if (_stateHelper.IsInsRuleCreateInProgress)
             {
-                InsRuleId = insRuleId,
-                RiskId = risk.Id
-            });
-
-            risk.Requirements.Add(new RiskRequirement
+                _insRuleHelper.CurrentRule.LinksToRisks.Add(new RiskInsRuleLink
+                {
+                    InsRule = _insRuleHelper.CurrentRule,
+                    Risk = risk
+                });
+            }
+            else
             {
-                RiskId = risk.Id,
-                TariffId = tariffId,
-                IsRequired = risk.OnCreateRequired
-            });
+                _context.Add(risk);
+                await _context.SaveChangesAsync();
 
-            await _context.SaveChangesAsync();
+                risk.LinksToInsRules.Add(new RiskInsRuleLink
+                {
+                    InsRuleId = insRuleId,
+                    RiskId = risk.Id
+                });
+
+                risk.Requirements.Add(new RiskRequirement
+                {
+                    RiskId = risk.Id,
+                    TariffId = tariffId,
+                    IsRequired = risk.OnCreateRequired
+                });
+
+                await _context.SaveChangesAsync();
+                _stateHelper.IsRiskCreateInProgress = false;
+            }
             return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
 
@@ -134,6 +156,11 @@ namespace IGSLControlPanel.Controllers
             if(requirement == null) return;
             requirement.IsRequired = required ?? !requirement.IsRequired;
             await _context.SaveChangesAsync();
+        }
+
+        public IActionResult GoBack()
+        {
+            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
     }
 }

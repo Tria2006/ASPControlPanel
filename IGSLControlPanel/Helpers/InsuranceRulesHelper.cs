@@ -11,6 +11,7 @@ namespace IGSLControlPanel.Helpers
     {
         public List<InsuranceRule> SelectedRules { get; set; } = new List<InsuranceRule>();
         public InsuranceRule CurrentRule { get; set; }
+        public Risk CurrentRisk { get; set; }
 
         public async Task CheckInsRule(Guid id, IGSLContext context)
         {

@@ -6,5 +6,6 @@
         public bool IsParameterCreateInProgress { get; set; }
         public bool IsTariffCreateInProgress { get; set; }
         public bool IsInsRuleCreateInProgress { get; set; }
+        public bool IsRiskCreateInProgress { get; set; }
     }
 }

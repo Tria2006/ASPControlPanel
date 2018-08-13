@@ -33,11 +33,18 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create()
         {
-            _stateHelper.IsInsRuleCreateInProgress = true;
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
             var tempRule = new InsuranceRule();
-            _insRulesHelper.CurrentRule = tempRule;
-            return View();
+            if (_stateHelper.IsInsRuleCreateInProgress)
+            {
+                tempRule = _insRulesHelper.CurrentRule;
+            }
+            else
+            {
+                _insRulesHelper.CurrentRule = tempRule;
+                _stateHelper.IsInsRuleCreateInProgress = true;
+            }
+            return View(tempRule);
         }
 
         [HttpPost]
@@ -65,6 +72,7 @@ namespace IGSLControlPanel.Controllers
                     InsRule = insuranceRule
                 });
                 await _context.SaveChangesAsync();
+                _stateHelper.IsRiskCreateInProgress = false;
                 _stateHelper.IsInsRuleCreateInProgress = false;
             }
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
@@ -243,6 +251,11 @@ namespace IGSLControlPanel.Controllers
         public IActionResult GoBack()
         {
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+        }
+
+        public void SaveTempData(string name)
+        {
+            _insRulesHelper.CurrentRule.Name = name;
         }
     }
 }

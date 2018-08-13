@@ -47,13 +47,9 @@
         <form asp-action="RemoveRuleConfirmed">
             <input type="hidden" asp-for="Id" />
             <input type="submit" value="Удалить" class="btn btn-default" />
-            <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить удаление" />
+            <a asp-action="GoBack">
+                <input class="btn btn-default" value="Отменить удаление"/>
+            </a>
         </form>
 </body>
 </html>
-
-<script>
-    function GoBack() {
-        javascript: history.go(-1);
-    }
-</script>

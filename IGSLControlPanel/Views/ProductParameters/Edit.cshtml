@@ -76,9 +76,9 @@
                     </label>
                     @if (Model.Limit == null)
                     {
-                    <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
-                        <label>Нет ограничений по значению</label>
-                    </div>
+                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
+                            <label>Нет ограничений по значению</label>
+                        </div>
                     }
                     else
                     {
@@ -94,10 +94,10 @@
                             <div>
                                 @if (Model.Limit.ParameterDataType == (int)DataTypes.Дата)
                                 {
-                                <div>
-                                    <label asp-for="Limit.DateValueFrom" class="control-label" style="width: 180px"></label>
-                                    <label>@Model.Limit.DateValueFrom</label>
-                                </div>
+                                    <div>
+                                        <label asp-for="Limit.DateValueFrom" class="control-label" style="width: 180px"></label>
+                                        <label>@Model.Limit.DateValueFrom</label>
+                                    </div>
                                     <div>
                                         <label asp-for="Limit.DateValueTo" class="control-label" style="width: 180px"></label>
                                         <label>@Model.Limit.DateValueTo</label>
@@ -120,7 +120,9 @@
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Сохранить" class="btn btn-default" />
-                    <input type="button" class="btn btn-default" onclick="GoBack()" value="Не сохранять" />
+                    <a asp-action="GoBack">
+                        <input class="btn btn-default" value="Выйти без сохранения" />
+                    </a>
                 </div>
             </form>
         </div>
@@ -128,8 +130,3 @@
 
 </body>
 </html>
-<script>
-    function GoBack() {
-        javascript: history.go(-1);
-    };
-</script>

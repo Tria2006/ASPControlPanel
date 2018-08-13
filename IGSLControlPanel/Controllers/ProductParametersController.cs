@@ -33,12 +33,19 @@ namespace IGSLControlPanel.Controllers
             };
             groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groupId ?? groups.First().Id);
-            _stateHelper.IsParameterCreateInProgress = true;
             var tempParam = new ProductParameter
             {
                 GroupId = groupId
             };
-            _productsHelper.CurrentParameter = tempParam;
+            if (_stateHelper.IsParameterCreateInProgress)
+            {
+                tempParam = _productsHelper.CurrentParameter;
+            }
+            else
+            {
+                _productsHelper.CurrentParameter = tempParam;
+                _stateHelper.IsParameterCreateInProgress = true;
+            }
             return View(tempParam);
         }
 
@@ -311,7 +318,10 @@ namespace IGSLControlPanel.Controllers
 
         // Нужно сохранить значения полей параметра если он еще не был сохранен, иначе при возвращении обратно 
         // на экран создания нового параметра все данные очистятся
-        public void SaveTempData(int dataType, string name, DateTime? dateFrom, DateTime? dateTo, bool requiredForSave, bool requiredForCalc, Guid? groupId, int order)
+        public void SaveTempData(int dataType, string name, 
+            DateTime? dateFrom, DateTime? dateTo, 
+            bool requiredForSave, bool requiredForCalc,
+            Guid? groupId, int order)
         {
             _productsHelper.CurrentParameter.Name = name;
             _productsHelper.CurrentParameter.ValidFrom = dateFrom;
@@ -321,6 +331,11 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.IsRequiredForSave = requiredForSave;
             _productsHelper.CurrentParameter.GroupId = groupId;
             _productsHelper.CurrentParameter.Order = order;
+        }
+
+        public IActionResult GoBack()
+        {
+            return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "Create" : "Edit", "Products", _productsHelper.CurrentProduct);
         }
     }
 }
