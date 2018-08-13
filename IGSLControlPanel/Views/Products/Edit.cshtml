@@ -57,7 +57,7 @@
                 }
             }
 
-            @if (Model.LinkToProductParameters.Any(x => x.Parameter.GroupId == null))
+            @if (Model.LinkToProductParameters.Any(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty))
             {
                 <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
 
