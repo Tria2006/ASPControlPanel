@@ -268,7 +268,7 @@ namespace IGSLControlPanel.Controllers
             if(currentLink == null) return;
 
             // если добавляем в начало
-            if (parameter.Order == 0)
+            if (parameter.Order == 1)
             {
                 paramsList.Remove(currentLink);
                 resultList = new List<ProductLinkToProductParameter>{currentLink};
@@ -292,7 +292,7 @@ namespace IGSLControlPanel.Controllers
             }
 
             // задаем Order каждому в списке
-            var i = 0;
+            var i = 1;
             foreach (var link in resultList)
             {
                 var contextParam = _context.ProductParameters.SingleOrDefault(x => x.Id == link.ProductParameterId);
