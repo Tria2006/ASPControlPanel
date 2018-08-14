@@ -8,6 +8,8 @@ using IGSLControlPanel.Enums;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Helpers;
+using log4net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IGSLControlPanel.Controllers
@@ -17,11 +19,15 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly EntityStateHelper _stateHelper;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ILog logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, EntityStateHelper stateHelper) 
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor) 
             : base(context, helper)
         {
             _context = context;
+            _httpAccessor = accessor;
+            logger = LogManager.GetLogger(typeof(ProductsController));
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
             _stateHelper = stateHelper;
@@ -71,6 +77,7 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsParameterCreateInProgress = false;
                 await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             }
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created product (id={product.Id})");
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 

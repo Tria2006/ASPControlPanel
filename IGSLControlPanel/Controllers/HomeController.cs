@@ -1,4 +1,6 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using Microsoft.AspNetCore.Diagnostics;
+using Microsoft.AspNetCore.Mvc;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -9,8 +11,11 @@ namespace IGSLControlPanel.Controllers
             return View();
         }
 
-        public IActionResult Error()
+        public IActionResult Error(Exception e)
         {
+            var feature = HttpContext.Features.Get<IExceptionHandlerPathFeature>();
+            var logger = log4net.LogManager.GetLogger(typeof(ProductsController));
+            logger.Error($"Message: {feature.Error.Message}; Trace: {feature.Error.StackTrace}");
             return View();
         }
     }

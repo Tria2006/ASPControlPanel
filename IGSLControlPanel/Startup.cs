@@ -2,6 +2,7 @@
 using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -26,11 +27,13 @@ namespace IGSLControlPanel
             services.AddSingleton<TariffsHelper>();
             services.AddSingleton<InsuranceRulesHelper>();
             services.AddSingleton<EntityStateHelper>();
+            services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
             services.AddMvc();
         }
 
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            app.UseStatusCodePages();
 
             app.UseStaticFiles();
 
@@ -44,9 +47,6 @@ namespace IGSLControlPanel
             }
             else
             {
-                //app.UseBrowserLink();
-                //app.UseDeveloperExceptionPage();
-                //app.UseDatabaseErrorPage();
                 app.UseExceptionHandler("/Home/Error");
             }
 
