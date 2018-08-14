@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
+using log4net;
+using Microsoft.AspNetCore.Http;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -14,10 +16,14 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly EntityStateHelper _stateHelper;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ILog logger;
 
-        public ValueLimitsController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper)
+        public ValueLimitsController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
         {
             _context = context;
+            _httpAccessor = accessor;
+            logger = LogManager.GetLogger(typeof(ProductsController));
             _productsHelper = productsHelper;
             _stateHelper = stateHelper;
         }
@@ -42,6 +48,7 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.Limit = valueLimit;
             _context.Add(valueLimit);
             await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ValueLimit (id={valueLimit.Id})");
             return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
@@ -66,6 +73,7 @@ namespace IGSLControlPanel.Controllers
                 _context.Update(valueLimit);
                 _productsHelper.CurrentParameter.Limit = valueLimit;
                 await _context.SaveChangesAsync();
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ValueLimit (id={valueLimit.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -94,6 +102,7 @@ namespace IGSLControlPanel.Controllers
             valueLimit.IsDeleted = true;
             _productsHelper.CurrentParameter.Limit = null;
             await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ValueLimit (id={id})");
             return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 

@@ -77,7 +77,7 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsParameterCreateInProgress = false;
                 await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             }
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created product (id={product.Id})");
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Product (id={product.Id})");
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
@@ -99,6 +99,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Edit(Product product)
         {
             await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Product (id={product.Id})");
             return RedirectToAction("Index", new { id = product.FolderId });
         }
 
@@ -106,7 +107,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (_productsHelper.HasSelectedProducts)
             {
-                await _productsHelper.RemoveProducts(_context, GetFolderById(id));
+                await _productsHelper.RemoveProducts(_context, GetFolderById(id), logger, _httpAccessor);
             }
             return RedirectToAction("Index", new { id });
         }

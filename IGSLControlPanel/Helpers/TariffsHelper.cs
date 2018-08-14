@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
 using IGSLControlPanel.Data;
+using log4net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Helpers
@@ -78,7 +80,7 @@ namespace IGSLControlPanel.Helpers
             context.SaveChanges();
         }
 
-        public async Task RemoveTariffs(IGSLContext _context, FolderTreeEntry parentFolder)
+        public async Task RemoveTariffs(IGSLContext _context, FolderTreeEntry parentFolder, ILog logger, IHttpContextAccessor _httpAccessor)
         {
             // двигаемся по списку выбранных тарифов
             foreach (var f in _checkedTariffs)
@@ -94,6 +96,7 @@ namespace IGSLControlPanel.Helpers
                 // удаляем связи
                 contextTariff.InsRuleTariffLink.Clear();
                 contextTariff.IsDeleted = true;
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Tariff (id={f.Id})");
             }
 
             // удаляются тарифы только из FoldersTree

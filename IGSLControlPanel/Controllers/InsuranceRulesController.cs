@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
+using log4net;
+using Microsoft.AspNetCore.Http;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -17,10 +19,15 @@ namespace IGSLControlPanel.Controllers
         private readonly TariffsHelper _tariffsHelper;
         private readonly InsuranceRulesHelper _insRulesHelper;
         private readonly EntityStateHelper _stateHelper;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ILog logger;
 
-        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper, InsuranceRulesHelper insRulesHelper, EntityStateHelper stateHelper)
+        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper, 
+            InsuranceRulesHelper insRulesHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
         {
             _context = context;
+            _httpAccessor = accessor;
+            logger = LogManager.GetLogger(typeof(ProductsController));
             _tariffsHelper = tariffsHelper;
             _insRulesHelper = insRulesHelper;
             _stateHelper = stateHelper;
@@ -74,6 +81,7 @@ namespace IGSLControlPanel.Controllers
                 await _context.SaveChangesAsync();
                 _stateHelper.IsRiskCreateInProgress = false;
                 _stateHelper.IsInsRuleCreateInProgress = false;
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created InsuranceRule (id={insuranceRule.Id})");
             }
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
@@ -107,6 +115,7 @@ namespace IGSLControlPanel.Controllers
             {
                 _context.Update(insuranceRule);
                 await _context.SaveChangesAsync();
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated InsuranceRule (id={insuranceRule.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -151,6 +160,7 @@ namespace IGSLControlPanel.Controllers
             contextTariff?.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             _tariffsHelper.CurrentTariff.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) InsuranceRule (id={id})");
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
@@ -184,6 +194,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) from Index InsuranceRule (id={id})");
             return RedirectToAction("Index");
         }
 

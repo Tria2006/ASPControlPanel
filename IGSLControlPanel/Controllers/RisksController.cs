@@ -7,6 +7,8 @@ using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
+using log4net;
+using Microsoft.AspNetCore.Http;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -15,10 +17,14 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly InsuranceRulesHelper _insRuleHelper;
         private readonly EntityStateHelper _stateHelper;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ILog logger;
 
-        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, EntityStateHelper stateHelper)
+        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
         {
             _context = context;
+            _httpAccessor = accessor;
+            logger = LogManager.GetLogger(typeof(ProductsController));
             _insRuleHelper = insRuleHelper;
             _stateHelper = stateHelper;
         }
@@ -79,6 +85,7 @@ namespace IGSLControlPanel.Controllers
 
                 await _context.SaveChangesAsync();
                 _stateHelper.IsRiskCreateInProgress = false;
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Risk (id={risk.Id})");
             }
             return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
@@ -110,6 +117,7 @@ namespace IGSLControlPanel.Controllers
             {
                 _context.Update(risk);
                 await _context.SaveChangesAsync();
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Risk (id={risk.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -141,6 +149,7 @@ namespace IGSLControlPanel.Controllers
             var risk = await _context.Risks.FindAsync(id);
             risk.IsDeleted = true;
             await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Risk (id={id})");
             return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
 

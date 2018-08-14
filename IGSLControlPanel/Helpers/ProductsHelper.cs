@@ -4,6 +4,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
 using IGSLControlPanel.Data;
+using log4net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Helpers
@@ -50,7 +52,7 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        public async Task RemoveProducts(IGSLContext _context, FolderTreeEntry parentFolder)
+        public async Task RemoveProducts(IGSLContext _context, FolderTreeEntry parentFolder, ILog logger, IHttpContextAccessor _httpAccessor)
         {
             // двигаемся по списку выбранных продуктов
             foreach (var product in _checkedProducts)
@@ -66,6 +68,7 @@ namespace IGSLControlPanel.Helpers
                 // удаляем связи
                 contextProduct.LinkToProductParameters.Clear();
                 contextProduct.IsDeleted = true;
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Product (id={product.Id})");
             }
 
             // удаляются продукты только из FoldersTree

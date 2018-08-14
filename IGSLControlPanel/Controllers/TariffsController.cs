@@ -9,6 +9,8 @@ using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
+using log4net;
+using Microsoft.AspNetCore.Http;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -17,11 +19,15 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
         private readonly EntityStateHelper _stateHelper;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ILog logger;
 
-        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, EntityStateHelper stateHelper)
+        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
             : base(context, helper)
         {
             _context = context;
+            _httpAccessor = accessor;
+            logger = LogManager.GetLogger(typeof(ProductsController));
             BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
             _stateHelper = stateHelper;
@@ -68,6 +74,7 @@ namespace IGSLControlPanel.Controllers
                 await _context.SaveChangesAsync();
             }
             _stateHelper.IsTariffCreateInProgress = false;
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Tariff (id={tariff.Id})");
             return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
         }
 
@@ -97,6 +104,7 @@ namespace IGSLControlPanel.Controllers
             {
                 _context.Update(tariff);
                 await _context.SaveChangesAsync();
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Tariff (id={tariff.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -116,7 +124,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (_tariffsHelper.HasSelectedTariffs)
             {
-                await _tariffsHelper.RemoveTariffs(_context, GetFolderById(id));
+                await _tariffsHelper.RemoveTariffs(_context, GetFolderById(id), logger, _httpAccessor);
             }
             return RedirectToAction("Index", new { id });
         }

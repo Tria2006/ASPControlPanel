@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
+using log4net;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace IGSLControlPanel.Controllers
@@ -17,10 +19,14 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly EntityStateHelper _stateHelper;
+        private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ILog logger;
 
-        public ProductParametersController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper)
+        public ProductParametersController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
         {
             _context = context;
+            _httpAccessor = accessor;
+            logger = LogManager.GetLogger(typeof(ProductsController));
             _productsHelper = productsHelper;
             _stateHelper = stateHelper;
         }
@@ -75,6 +81,7 @@ namespace IGSLControlPanel.Controllers
                 await CheckParameterOrders(productParameter);
                 _productsHelper.CurrentParameter = null;
                 _stateHelper.IsParameterCreateInProgress = false;
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ProductParameter (id={productParameter.Id})");
             }
             else
             {
@@ -121,6 +128,7 @@ namespace IGSLControlPanel.Controllers
                 _context.Update(productParameter);
                 _productsHelper.CurrentParameter = productParameter;
                 await _context.SaveChangesAsync();
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ProductParameter (id={productParameter.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -177,6 +185,7 @@ namespace IGSLControlPanel.Controllers
                 productParameter.LinkToProduct.Remove(link);
             }
             await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ProductParameter (id={id})");
             return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
         }
 
