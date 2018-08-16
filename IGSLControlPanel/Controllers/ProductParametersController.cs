@@ -198,17 +198,17 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult ParameterUp(Guid? groupId)
         {
-            MoveParam(groupId);
-            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => x.Parameter.GroupId == groupId).Select(s => s.Parameter).ToList());
+            MoveParam(groupId ?? Guid.Empty);
+            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => groupId != null ? x.Parameter.GroupId == groupId : x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).ToList());
         }
 
         public IActionResult ParameterDown(Guid? groupId)
         {
-            MoveParam(groupId, false);
-            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => x.Parameter.GroupId == groupId).Select(s => s.Parameter).ToList());
+            MoveParam(groupId ?? Guid.Empty, false);
+            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => groupId != null ? x.Parameter.GroupId == groupId : x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).ToList());
         }
 
-        private void MoveParam(Guid? groupId, bool up = true)
+        private void MoveParam(Guid groupId, bool up = true)
         {
             if(_productsHelper.CurrentParameter == null) return;
             // выбранный параметр из контекста
@@ -281,25 +281,18 @@ namespace IGSLControlPanel.Controllers
             // если добавляем в начало
             if (parameter.Order == 1)
             {
-                paramsList.Remove(currentLink);
                 resultList = new List<ProductLinkToProductParameter>{currentLink};
-                resultList.AddRange(paramsList);
+                resultList.AddRange(paramsList.Where(x => x.ProductParameterId != parameter.Id));
 
             } // если Order больше, чем максимальный, то добавляем в конец
             else if (parameter.Order >= paramsList.Max(x => x.Parameter.Order))
             {
-                paramsList.Remove(currentLink);
-                resultList = new List<ProductLinkToProductParameter>(paramsList) {currentLink};
+                resultList = new List<ProductLinkToProductParameter>(paramsList.Where(x => x.ProductParameterId != parameter.Id)) {currentLink};
             }
             else
             {
-                var lower = paramsList.Where(x => x.Parameter.Order < parameter.Order); // Order меньше нужного
-                var upper = paramsList.Where(x => x.Parameter.Order >= parameter.Order); // Order больше нужного
-
-                // собираем результат: 1. все, кто с меньшим Order; 2. текущий параметр; 3. все, кто с бОльшим Order
-                resultList = new List<ProductLinkToProductParameter>(lower) {currentLink};
-                resultList.AddRange(upper);
-
+                resultList = paramsList.Where(x => x.ProductParameterId != parameter.Id).ToList();
+                resultList.Insert(parameter.Order - 1, currentLink);
             }
 
             // задаем Order каждому в списке

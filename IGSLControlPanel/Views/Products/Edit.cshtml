@@ -72,7 +72,7 @@
                 </a>
 
                 <div id="partialNoGroup">
-                    @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
+                    @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
                 </div>
             }
 
