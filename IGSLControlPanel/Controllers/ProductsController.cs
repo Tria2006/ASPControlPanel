@@ -41,7 +41,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult CreateProduct(Guid folderId)
         {
-            var tempProduct = new Product {FolderId = folderId};
+            var tempProduct = new Product {FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1)};
             // такое может быть если возвращаемся с экрана создания нового параметра
             if (_stateHelper.IsProductCreateInProgress)
             {

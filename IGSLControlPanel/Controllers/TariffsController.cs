@@ -41,7 +41,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create(Guid folderId)
         {
-            var tempTariff = new Tariff { FolderId = folderId };
+            var tempTariff = new Tariff { FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
             if (_stateHelper.IsTariffCreateInProgress)
             {
                 tempTariff = _tariffsHelper.CurrentTariff;

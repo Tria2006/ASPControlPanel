@@ -41,7 +41,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create()
         {
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
-            var tempRule = new InsuranceRule();
+            var tempRule = new InsuranceRule{ ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
             if (_stateHelper.IsInsRuleCreateInProgress)
             {
                 tempRule = _insRulesHelper.CurrentRule;

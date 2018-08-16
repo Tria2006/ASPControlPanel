@@ -36,7 +36,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Create(Guid tariffId, Guid insRuleId)
         {
-            var tempRisk = new Risk();
+            var tempRisk = new Risk{ ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
             ViewData["InsRuleId"] = insRuleId;
             ViewData["TariffId"] = tariffId;
             if (_stateHelper.IsRiskCreateInProgress)

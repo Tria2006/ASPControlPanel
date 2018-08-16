@@ -34,7 +34,9 @@ namespace IGSLControlPanel.Controllers
             {
                 ProductId = _productsHelper.CurrentProduct.Id,
                 ParameterId = _productsHelper.CurrentParameter.Id,
-                ParameterDataType = _productsHelper.CurrentParameter.DataType
+                ParameterDataType = _productsHelper.CurrentParameter.DataType,
+                ValidFrom = DateTime.Today,
+                ValidTo = new DateTime(2100, 1, 1)
             };
             return View(tempLimit);
         }

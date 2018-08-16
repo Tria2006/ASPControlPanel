@@ -41,7 +41,9 @@ namespace IGSLControlPanel.Controllers
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groupId ?? groups.First().Id);
             var tempParam = new ProductParameter
             {
-                GroupId = groupId
+                GroupId = groupId,
+                ValidFrom = DateTime.Today,
+                ValidTo = new DateTime(2100, 1, 1)
             };
             if (_stateHelper.IsParameterCreateInProgress)
             {
