@@ -17,6 +17,11 @@ namespace IGSLControlPanel.Data
         public DbSet<InsuranceRule> InsuranceRules { get; set; }
         public DbSet<Risk> Risks { get; set; }
         public DbSet<RiskRequirement> RiskRequirements { get; set; }
+        public DbSet<FactorValue> FactorValues { get; set; }
+        public DbSet<RiskFactor> RiskFactors { get; set; }
+        public DbSet<ProductParameter> ProductParameters { get; set; }
+        public DbSet<ValueLimit> ValueLimits { get; set; }
+        public DbSet<ParameterGroup> ParameterGroups { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,11 +29,5 @@ namespace IGSLControlPanel.Data
             modelBuilder.Entity<InsRuleTariffLink>().HasKey(p => new {p.TariffId, p.InsRuleId});
             modelBuilder.Entity<RiskInsRuleLink>().HasKey(p => new {p.RiskId, p.InsRuleId});
         }
-
-        public DbSet<ProductParameter> ProductParameters { get; set; }
-
-        public DbSet<ValueLimit> ValueLimits { get; set; }
-
-        public DbSet<ParameterGroup> ParameterGroups { get; set; }
     }
 }
