@@ -27,7 +27,7 @@ namespace IGSLControlPanel.Controllers
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(ProductsController));
+            logger = LogManager.GetLogger(typeof(InsuranceRulesController));
             _tariffsHelper = tariffsHelper;
             _insRulesHelper = insRulesHelper;
             _stateHelper = stateHelper;

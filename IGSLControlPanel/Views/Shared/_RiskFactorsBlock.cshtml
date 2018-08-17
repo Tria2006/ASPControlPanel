@@ -1,0 +1,26 @@
+﻿@using DBModels.Models.ManyToManyLinks
+@model List<RiskFactorTariffLink>
+
+<div class="form-group" style="min-height: 200px; max-height: 300px; border: 1px lightgrey solid; padding: 1px">
+    @{
+        var counter = 1;
+    }
+    @foreach (var link in Model)
+    {
+        <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative">
+            <div style="float: left; position: absolute; top: 9px;">
+                <label style="margin-right: 10px">@counter.</label>
+                <label>@link.RiskFactor.Name</label>
+            </div>
+            <div style="position: absolute; right: 10px; top: 5px">
+                <a asp-controller="RiskFactors" asp-action="Edit" asp-route-id="@link.RiskFactorId">
+                    <img src="~/images/Icons/edit_param.png" alt="Редактировать" class="small-button-img" />
+                </a>
+                <a style="margin-left: 10px;" asp-controller="RiskFactors" asp-action="Delete" asp-route-id="@link.RiskFactorId">
+                    <img src="~/images/Icons/del_param.png" alt="Удалить" class="small-button-img" />
+                </a>
+            </div>
+        </div>
+        counter++;
+    }
+</div>

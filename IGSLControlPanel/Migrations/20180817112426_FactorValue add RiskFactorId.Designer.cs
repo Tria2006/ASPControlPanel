@@ -4,14 +4,16 @@ using IGSLControlPanel.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    partial class IGSLContextModelSnapshot : ModelSnapshot
+    [Migration("20180817112426_FactorValue add RiskFactorId")]
+    partial class FactorValueaddRiskFactorId
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -125,19 +127,6 @@ namespace IGSLControlPanel.Migrations
                     b.ToTable("ProductLinkToProductParameter");
                 });
 
-            modelBuilder.Entity("DBModels.Models.ManyToManyLinks.RiskFactorTariffLink", b =>
-                {
-                    b.Property<Guid>("RiskFactorId");
-
-                    b.Property<Guid>("TariffId");
-
-                    b.HasKey("RiskFactorId", "TariffId");
-
-                    b.HasIndex("TariffId");
-
-                    b.ToTable("RiskFactorTariffLink");
-                });
-
             modelBuilder.Entity("DBModels.Models.ManyToManyLinks.RiskInsRuleLink", b =>
                 {
                     b.Property<Guid>("RiskId");
@@ -155,8 +144,6 @@ namespace IGSLControlPanel.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<bool>("CanRepeat");
 
                     b.Property<DateTime>("CreateDate");
 
@@ -274,11 +261,15 @@ namespace IGSLControlPanel.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<Guid>("TariffId");
+
                     b.Property<DateTime?>("ValidFrom");
 
                     b.Property<DateTime?>("ValidTo");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TariffId");
 
                     b.ToTable("RiskFactors");
                 });
@@ -395,19 +386,6 @@ namespace IGSLControlPanel.Migrations
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 
-            modelBuilder.Entity("DBModels.Models.ManyToManyLinks.RiskFactorTariffLink", b =>
-                {
-                    b.HasOne("DBModels.Models.RiskFactor", "RiskFactor")
-                        .WithMany("RiskFactorsTariffLinks")
-                        .HasForeignKey("RiskFactorId")
-                        .OnDelete(DeleteBehavior.Cascade);
-
-                    b.HasOne("DBModels.Models.Tariff", "Tariff")
-                        .WithMany("RiskFactorsTariffLinks")
-                        .HasForeignKey("TariffId")
-                        .OnDelete(DeleteBehavior.Cascade);
-                });
-
             modelBuilder.Entity("DBModels.Models.ManyToManyLinks.RiskInsRuleLink", b =>
                 {
                     b.HasOne("DBModels.Models.InsuranceRule", "InsRule")
@@ -426,6 +404,14 @@ namespace IGSLControlPanel.Migrations
                     b.HasOne("DBModels.Models.ValueLimit", "Limit")
                         .WithMany()
                         .HasForeignKey("LimitId");
+                });
+
+            modelBuilder.Entity("DBModels.Models.RiskFactor", b =>
+                {
+                    b.HasOne("DBModels.Models.Tariff")
+                        .WithMany("RiskFactors")
+                        .HasForeignKey("TariffId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("DBModels.Models.RiskRequirement", b =>

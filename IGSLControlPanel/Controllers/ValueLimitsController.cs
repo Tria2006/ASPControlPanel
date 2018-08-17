@@ -23,7 +23,7 @@ namespace IGSLControlPanel.Controllers
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(ProductsController));
+            logger = LogManager.GetLogger(typeof(ValueLimitsController));
             _productsHelper = productsHelper;
             _stateHelper = stateHelper;
         }

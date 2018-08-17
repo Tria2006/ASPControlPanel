@@ -24,6 +24,8 @@ namespace IGSLControlPanel.Helpers
             // продукты получаем вместе со связанными параметрами 
             _tariffs = _context.Tariffs.Include(x => x.InsRuleTariffLink)
                 .ThenInclude(s => s.InsRule)
+                .Include(x => x.RiskFactorsTariffLinks)
+                .ThenInclude(x => x.RiskFactor)
                 .Where(s => !s.IsDeleted).ToList();
 
             // продукты, не привязанные ни к какой папке
@@ -86,7 +88,12 @@ namespace IGSLControlPanel.Helpers
             foreach (var f in _checkedTariffs)
             {
                 // получаем тариф из контекста и далее работавем с ним
-                var contextTariff = _context.Tariffs.Include(x => x.InsRuleTariffLink).ThenInclude(x => x.InsRule).SingleOrDefault(x => x.Id == f.Id);
+                var contextTariff = _context.Tariffs
+                    .Include(x => x.RiskFactorsTariffLinks)
+                    .ThenInclude(x => x.RiskFactor)
+                    .Include(x => x.InsRuleTariffLink)
+                    .ThenInclude(x => x.InsRule)
+                    .SingleOrDefault(x => x.Id == f.Id);
                 if (contextTariff == null) continue;
                 // проставляем IsDeleted всем связанным правилам
                 contextTariff.InsRuleTariffLink.ForEach(l =>

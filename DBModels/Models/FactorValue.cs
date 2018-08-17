@@ -8,6 +8,8 @@ namespace DBModels.Models
 
         public Guid RiskId { get; set; }
 
+        public Guid RiskFactorId { get; set; }
+
         public int Value { get; set; }
     }
 }

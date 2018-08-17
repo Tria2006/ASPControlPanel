@@ -28,6 +28,7 @@ namespace IGSLControlPanel.Data
             modelBuilder.Entity<ProductLinkToProductParameter>().HasKey(p => new {p.ProductId, p.ProductParameterId});
             modelBuilder.Entity<InsRuleTariffLink>().HasKey(p => new {p.TariffId, p.InsRuleId});
             modelBuilder.Entity<RiskInsRuleLink>().HasKey(p => new {p.RiskId, p.InsRuleId});
+            modelBuilder.Entity<RiskFactorTariffLink>().HasKey(p => new {p.RiskFactorId, p.TariffId});
         }
     }
 }

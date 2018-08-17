@@ -9,5 +9,7 @@ namespace DBModels.Models
         public Guid FolderId { get; set; }
 
         public List<InsRuleTariffLink> InsRuleTariffLink { get; set; } = new List<InsRuleTariffLink>();
+
+        public List<RiskFactorTariffLink> RiskFactorsTariffLinks { get; set; } = new List<RiskFactorTariffLink>();
     }
 }

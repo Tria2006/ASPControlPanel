@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
-using DBModels.Models.ManyToManyLinks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
@@ -27,7 +26,7 @@ namespace IGSLControlPanel.Controllers
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(ProductsController));
+            logger = LogManager.GetLogger(typeof(TariffsController));
             BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
             _stateHelper = stateHelper;
@@ -52,7 +51,8 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsTariffCreateInProgress = true;
             }
             ViewData["ParentFolderId"] = folderId;
-            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tempTariff.InsRuleTariffLink.Select(x => x.InsRule));
+            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tempTariff.InsRuleTariffLink.Select(x => x.InsRule)).Where(x => !x.IsDeleted);
+            ViewData["RiskFactorsList"] = _context.RiskFactors.Where(x => tempTariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id && !x.IsDeleted));
             return View(tempTariff);
         }
 
@@ -80,12 +80,17 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Edit(Guid id)
         {
-            var tariff = _context.Tariffs.Include(x => x.InsRuleTariffLink).ThenInclude(x => x.InsRule).SingleOrDefault(x => x.Id == id);
+            var tariff = _context.Tariffs
+                .Include(x => x.RiskFactorsTariffLinks)
+                .ThenInclude(x => x.RiskFactor)
+                .Include(x => x.InsRuleTariffLink)
+                .ThenInclude(x => x.InsRule).SingleOrDefault(x => x.Id == id);
             if (tariff == null)
             {
                 return NotFound();
             }
-            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tariff.InsRuleTariffLink.Select(x => x.InsRule));
+            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tariff.InsRuleTariffLink.Select(x => x.InsRule)).Where(x => !x.IsDeleted);
+            ViewData["RiskFactorsList"] = _context.RiskFactors.Where(x => tariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id && !x.IsDeleted));
             _tariffsHelper.CurrentTariff = tariff;
             return View(tariff);
         }
