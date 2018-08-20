@@ -4,27 +4,30 @@
 <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
     @foreach (var factor in Model)
     {
-        <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id"
-           style="float: left; margin: 2px; border: 1px solid lightgrey">
+        <div style="float: left; margin: 2px; border: 1px solid lightgrey">
             <table id="folderItem" style="height: 90px; width: 90px">
                 <tr>
                     <td>
-                        <input type="checkbox" onclick="checkBoxClick('@factor.Id')" style="margin: 2px; width: 16px; height: 16px" />
-                        <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                        <input type="checkbox" onclick="FactorCheckBoxClick('@factor.Id', Event)" style="margin: 2px; width: 16px; height: 16px" />
+                        <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id">
+                            <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                        </a>
                     </td>
                 </tr>
                 <tr>
-                    <td style="text-align: center; vertical-align: text-top">
-                        @Html.DisplayTextFor(n => factor.Name)
-                    </td>
+                    <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id">
+                        <td style="text-align: center; vertical-align: text-top">
+                            @Html.DisplayTextFor(n => factor.Name)
+                        </td>
+                    </a>
                 </tr>
             </table>
-        </a>
+        </div>
     }
 </div>
 
 <script>
-    function checkBoxClick(id) {
+    function FactorCheckBoxClick(id) {
         $.get("/RiskFactors/FactorCheckBoxClick/" + id);
     }
 </script>

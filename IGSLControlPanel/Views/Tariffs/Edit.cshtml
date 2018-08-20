@@ -46,11 +46,11 @@
                 </button>
                 <h4 class="modal-title">Выберите факторы риска</h4>
             </div>
-            <form asp-controller="RiskFactors" asp-action="AddFactorsToTariff">
+            <form>
                 @await Html.PartialAsync("_RiskFactorsSelectView", ViewData["RiskFactorsList"], ViewData)
 
                 <div class="form-group" style="margin-left: 18px;">
-                    <button id="factorOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
+                    <button id="factorOkBtn" type="submit" class="btn btn-primary" asp-controller="RiskFactors" asp-action="AddFactorsToTariff">Выбрать</button>
                     <button id="factorCancelBtn" type="button" class="btn btn-primary">
                         Отмена
                     </button>

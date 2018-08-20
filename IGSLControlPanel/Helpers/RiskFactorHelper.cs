@@ -11,7 +11,7 @@ namespace IGSLControlPanel.Helpers
     {
         public RiskFactor CurrentFactor { get; set; }
 
-        public List<RiskFactor> SelectedFactors { get; set; }
+        public List<RiskFactor> SelectedFactors { get; set; } = new List<RiskFactor>();
 
         public async Task CheckFactor(Guid id, IGSLContext context)
         {
