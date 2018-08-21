@@ -77,12 +77,26 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Edit(Guid id)
         {
-            var riskFactor = _context.RiskFactors.Include(x => x.RiskFactorsTariffLinks)
+            var riskFactor = _context.RiskFactors
+                .Include(x => x.RiskFactorsTariffLinks)
+                .Include(x => x.FactorValues)
                 .SingleOrDefault(x => x.Id == id);
             if (riskFactor == null)
             {
                 return NotFound();
             }
+            var contextTariff = _context.Tariffs
+                .Include(x => x.InsRuleTariffLink)
+                .ThenInclude(x => x.InsRule)
+                .ThenInclude(x => x.LinksToRisks)
+                .ThenInclude(x => x.Risk)
+                .SingleOrDefault(x => x.Id == _tariffsHelper.CurrentTariff.Id);
+            if (contextTariff != null)
+            {
+                riskFactor.InsuranceRulesLinks = contextTariff.InsRuleTariffLink;
+            }
+            _factorHelper.CurrentFactor = riskFactor;
+            _factorHelper.PrepareFactorData(_context);
             return View(riskFactor);
         }
 
@@ -98,6 +112,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(riskFactor);
             try
             {
+                riskFactor.FactorValues = _factorHelper.CurrentFactor.FactorValues;
                 _context.Update(riskFactor);
                 await _context.SaveChangesAsync();
             }
@@ -205,7 +220,16 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult GoBack()
         {
+            var factor = _context.RiskFactors.Find(_factorHelper.CurrentFactor.Id);
+            if (factor != null) _factorHelper.CurrentFactor = factor;
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+        }
+
+        public void UpdateFactorValue(Guid id, double factorValue)
+        {
+            var factor = _factorHelper.CurrentFactor.FactorValues.SingleOrDefault(x => x.Id == id && x.TariffId == _tariffsHelper.CurrentTariff.Id);
+            if(factor == null) return;
+            factor.Value = factorValue;
         }
     }
 }

@@ -1,9 +1,11 @@
-﻿@model DBModels.Models.RiskFactor
+﻿@using DBModels.Models
+@model RiskFactor
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
     <title>Редактирование</title>
+    <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
 
@@ -27,6 +29,9 @@
             <input asp-for="ValidTo" class="form-control" style="width: 160px" />
             <span asp-validation-for="ValidTo" class="text-danger"></span>
         </div>
+
+        @await Html.PartialAsync("_RiskFactorValuesBlock", Model)
+
         <div class="form-group" style="margin-top: 50px">
             <input type="submit" value="Сохранить" class="btn btn-default" />
             <a asp-action="GoBack">

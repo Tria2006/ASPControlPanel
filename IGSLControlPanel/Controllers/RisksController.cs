@@ -70,6 +70,12 @@ namespace IGSLControlPanel.Controllers
                 _context.Add(risk);
                 await _context.SaveChangesAsync();
 
+                _insRuleHelper.CurrentRule.LinksToRisks.Add(new RiskInsRuleLink
+                {
+                    InsRuleId = insRuleId,
+                    RiskId = risk.Id
+                });
+
                 risk.LinksToInsRules.Add(new RiskInsRuleLink
                 {
                     InsRuleId = insRuleId,
@@ -148,6 +154,13 @@ namespace IGSLControlPanel.Controllers
         {
             var risk = await _context.Risks.FindAsync(id);
             risk.IsDeleted = true;
+
+            var links = _context.InsuranceRules.Where(x => x.LinksToRisks.Any(s => s.RiskId == id));
+            foreach (var link in links)
+            {
+                link.LinksToRisks.RemoveAll(x => x.RiskId == id);
+            }
+
             await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Risk (id={id})");
             return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);

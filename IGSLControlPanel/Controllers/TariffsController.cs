@@ -84,7 +84,10 @@ namespace IGSLControlPanel.Controllers
                 .Include(x => x.RiskFactorsTariffLinks)
                 .ThenInclude(x => x.RiskFactor)
                 .Include(x => x.InsRuleTariffLink)
-                .ThenInclude(x => x.InsRule).SingleOrDefault(x => x.Id == id);
+                .ThenInclude(x => x.InsRule)
+                .ThenInclude(x => x.LinksToRisks)
+                .ThenInclude(x => x.Risk)
+                .SingleOrDefault(x => x.Id == id);
             if (tariff == null)
             {
                 return NotFound();

@@ -10,6 +10,6 @@ namespace DBModels.Models
 
         public Guid RiskFactorId { get; set; }
 
-        public int Value { get; set; }
+        public double Value { get; set; }
     }
 }
