@@ -51,8 +51,12 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsTariffCreateInProgress = true;
             }
             ViewData["ParentFolderId"] = folderId;
-            ViewData["InsRulesList"] = _context.InsuranceRules.Where(x => tempTariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id ) && !x.IsDeleted);
-            ViewData["RiskFactorsList"] = _context.RiskFactors.Where(x => tempTariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id && !x.IsDeleted));
+            var rules = _context.InsuranceRules.Where(x => !x.IsDeleted).ToList();
+            ViewData["InsRulesList"] = rules.Where(x => tempTariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id));
+
+            var factors = _context.RiskFactors.Where(x => !x.IsDeleted).ToList();
+            ViewData["RiskFactorsList"] =
+                factors.Where(x => tempTariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id));
             return View(tempTariff);
         }
 
