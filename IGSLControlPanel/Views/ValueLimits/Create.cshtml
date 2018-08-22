@@ -21,7 +21,7 @@
             <label asp-for="ParameterDataType" class="control-label"></label>
             <select asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
         </div>
-        @if (Model.ParameterDataType == (int)DataTypes.Дата)
+        @if (Model.ParameterDataType == (int)DataTypes.Date)
         {
             <div class="form-group">
                 <label asp-for="DateValueFrom" class="control-label"></label>
@@ -34,7 +34,7 @@
                 <span asp-validation-for="DateValueTo" class="text-danger"></span>
             </div>
         }
-        else if (Model.ParameterDataType == (int)DataTypes.Число)
+        else if (Model.ParameterDataType == (int)DataTypes.Number)
         {
             <div class="form-group">
                 <label asp-for="IntValueFrom" class="control-label"></label>

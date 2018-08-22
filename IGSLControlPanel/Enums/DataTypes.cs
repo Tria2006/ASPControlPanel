@@ -7,10 +7,11 @@ namespace IGSLControlPanel.Enums
     {
         [Display(Name = "")]
         empty = 0,
-        //Строка = 0,
-        Число = 1,
-        Дата = 2,
-        //Логический = 3,
-        //Список = 4
+        [Display(Name = "Число")]
+        Number = 1,
+        [Display(Name = "Дата")]
+        Date = 2,
+        [Display(Name = "Список")]
+        List = 3
     }
 }

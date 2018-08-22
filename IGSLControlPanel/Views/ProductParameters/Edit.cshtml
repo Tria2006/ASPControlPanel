@@ -94,7 +94,7 @@
                                 <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
                             </div>
                             <div>
-                                @if (Model.Limit.ParameterDataType == (int)DataTypes.Дата)
+                                @if (Model.Limit.ParameterDataType == (int)DataTypes.Date)
                                 {
                                     <div>
                                         <label asp-for="Limit.DateValueFrom" class="control-label" style="width: 180px"></label>
@@ -105,7 +105,7 @@
                                         <label>@Model.Limit.DateValueTo</label>
                                     </div>
                                 }
-                                else if (Model.Limit.ParameterDataType == (int)DataTypes.Число)
+                                else if (Model.Limit.ParameterDataType == (int)DataTypes.Number)
                                 {
                                     <div>
                                         <label asp-for="Limit.IntValueFrom" class="control-label" style="width: 180px"></label>
