@@ -25,12 +25,12 @@
         {
             <div class="form-group">
                 <label asp-for="DateValueFrom" class="control-label"></label>
-                <input asp-for="DateValueFrom" class="form-control" />
+                <input asp-for="DateValueFrom" class="form-control" style="width: 150px" />
                 <span asp-validation-for="DateValueFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DateValueTo" class="control-label"></label>
-                <input asp-for="DateValueTo" class="form-control" />
+                <input asp-for="DateValueTo" class="form-control" style="width: 150px" />
                 <span asp-validation-for="DateValueTo" class="text-danger"></span>
             </div>
         }
@@ -38,18 +38,18 @@
         {
             <div class="form-group">
                 <label asp-for="IntValueFrom" class="control-label"></label>
-                <input asp-for="IntValueFrom" class="form-control" />
+                <input asp-for="IntValueFrom" class="form-control" style="width: 80px" />
                 <span asp-validation-for="IntValueFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="IntValueTo" class="control-label"></label>
-                <input asp-for="IntValueTo" class="form-control" />
+                <input asp-for="IntValueTo" class="form-control" style="width: 80px" />
                 <span asp-validation-for="IntValueTo" class="text-danger"></span>
             </div>
         }
         @Html.HiddenFor(x => x.ParameterId)
         @Html.HiddenFor(x => x.ProductId)
-        <div class="form-group">
+        <div class="form-group" style="margin-top: 50px">
             <input type="submit" value="Создать" class="btn btn-default" />
             <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
         </div>
