@@ -51,7 +51,7 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsTariffCreateInProgress = true;
             }
             ViewData["ParentFolderId"] = folderId;
-            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tempTariff.InsRuleTariffLink.Select(x => x.InsRule)).Where(x => !x.IsDeleted);
+            ViewData["InsRulesList"] = _context.InsuranceRules.Where(x => tempTariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id ) && !x.IsDeleted);
             ViewData["RiskFactorsList"] = _context.RiskFactors.Where(x => tempTariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id && !x.IsDeleted));
             return View(tempTariff);
         }
@@ -92,8 +92,12 @@ namespace IGSLControlPanel.Controllers
             {
                 return NotFound();
             }
-            ViewData["InsRulesList"] = _context.InsuranceRules.Except(tariff.InsRuleTariffLink.Select(x => x.InsRule)).Where(x => !x.IsDeleted);
-            ViewData["RiskFactorsList"] = _context.RiskFactors.Where(x => tariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id && !x.IsDeleted));
+            var rules = _context.InsuranceRules.Where(x => !x.IsDeleted).ToList();
+            ViewData["InsRulesList"] = rules.Where(x => tariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id));
+
+            var factors = _context.RiskFactors.Where(x => !x.IsDeleted).ToList();
+            ViewData["RiskFactorsList"] =
+                factors.Where(x => tariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id));
             _tariffsHelper.CurrentTariff = tariff;
             return View(tariff);
         }
