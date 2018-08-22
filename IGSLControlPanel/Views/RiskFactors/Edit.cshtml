@@ -1,10 +1,12 @@
 ﻿@using DBModels.Models
 @model RiskFactor
+@{
+    ViewData["Title"] = "Редактирование фактора риска";
+}
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Редактирование</title>
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
@@ -35,7 +37,7 @@
         <div class="form-group" style="margin-top: 50px">
             <input type="submit" value="Сохранить" class="btn btn-default" />
             <a asp-action="GoBack">
-                <input class="btn btn-default" value="Выйти без сохранения" />
+                <input class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />
             </a>
         </div>
     </form>

@@ -1,10 +1,12 @@
 ﻿@using DBModels.Models
 @model Product
+@{
+    ViewData["Title"] = "Редактирование продукта";
+}
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
     <link href="~/css/site.css" type="text/css" />
 </head>
 <body>
@@ -68,7 +70,7 @@
                     <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
                 </a>
                 <a onclick="ParameterDownClick(this)">
-                    <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img"/>
+                    <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
                 </a>
 
                 <div id="partialNoGroup">
@@ -84,7 +86,7 @@
                     <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
                 </a>
                 <a onclick="ParameterUpClick(this)">
-                    <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img"/>
+                    <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
                 </a>
                 <a onclick="ParameterDownClick(this)">
                     <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
@@ -96,7 +98,7 @@
             }
             <div class="form-group">
                 <input type="submit" value="Сохранить изменения" class="btn btn-default" />
-                <button class="btn btn-default" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
+                <button class="btn btn-default" style="width: 200px" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Выйти без сохранения</button>
             </div>
         </form>
     </div>
@@ -108,7 +110,7 @@
         $.ajax({
             url: "/ProductParameters/ParameterUp",
             type: "post",
-            data: {groupId: link.id},
+            data: { groupId: link.id },
             success: function (result) {
                 if (link.id !== '') {
                     $("#" + link.id + "-partial").html(result);

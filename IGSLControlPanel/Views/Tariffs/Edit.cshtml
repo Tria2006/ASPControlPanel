@@ -1,13 +1,12 @@
 ﻿@model DBModels.Models.Tariff
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Редактирование тарифа";
     ViewData["TariffId"] = Model.Id;
 }
 
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
     <link href="~/css/site.css" />
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css.map" />
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
@@ -113,7 +112,7 @@
                 <input type="submit" value="Сохранить изменения" class="btn btn-default" />
             </div>
             <div>
-                <button class="btn btn-default" asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@Model.FolderId">Отменить и выйти</button>
+                <button class="btn btn-default" style="width: 200px" asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@Model.FolderId">Выйти без сохранения</button>
             </div>
         </div>
     </form>

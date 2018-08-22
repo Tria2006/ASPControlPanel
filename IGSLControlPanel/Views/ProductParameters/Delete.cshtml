@@ -1,9 +1,12 @@
 ﻿@model DBModels.Models.ProductParameter
 
+@{
+    ViewData["Title"] = "Удаление параметра продукта";
+}
+
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Подтверждение удаления</title>
 </head>
 <body>
 
@@ -61,7 +64,7 @@
             <input type="hidden" asp-for="Id" />
             <input type="submit" value="Удалить" class="btn btn-default" />
             <a asp-action="GoBack">
-                <input class="btn btn-default" value="Отменить удаление"/>
+                <input class="btn btn-default" value="Отменить удаление" />
             </a>
         </form>
     </div>

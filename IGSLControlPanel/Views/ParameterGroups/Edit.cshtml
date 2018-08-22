@@ -1,9 +1,12 @@
 ﻿@model DBModels.Models.ParameterGroup
 
+@{
+    ViewData["Title"] = "Редактирование группы";
+}
+
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Редактирование группы</title>
     <link href="~/css/site.css" />
 </head>
 <body>
@@ -25,7 +28,7 @@
                 </div>
                 <div class="form-group">
                     <input type="submit" value="Сохранить изменения" class="btn btn-default" />
-                    <input type="button" class="btn btn-default" onclick="GoBack()" value="Выйти без сохранения" />
+                    <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
                 </div>
             </form>
         </div>

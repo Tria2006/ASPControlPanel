@@ -1,62 +1,60 @@
 ﻿@model DBModels.Models.ValueLimit
+@{
+    ViewData["Title"] = "Редактирование лимита";
+}
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Редактирование лимита</title>
     <link href="~/css/site.css" />
 </head>
 <body>
 
     <h4>Ограничение значений параметра</h4>
-    <div class="row">
-        <div class="col-md-4">
-            <form asp-action="Edit" class="create_update_form">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <div class="form-group">
-                    <label class="control-label">Название</label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label class="control-label">Тип данных</label>
-                    <select asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
-                </div>
-                @if (Model.ParameterDataType == (int)DataTypes.Дата)
-                {
-                    <div class="form-group">
-                        <label asp-for="DateValueFrom" class="control-label"></label>
-                        <input asp-for="DateValueFrom" class="form-control" />
-                        <span asp-validation-for="DateValueFrom" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label asp-for="DateValueTo" class="control-label"></label>
-                        <input asp-for="DateValueTo" class="form-control" />
-                        <span asp-validation-for="DateValueTo" class="text-danger"></span>
-                    </div>
-                }
-                else if (Model.ParameterDataType == (int)DataTypes.Число)
-                {
-                    <div class="form-group">
-                        <label class="control-label">Конечное значение</label>
-                        <input asp-for="IntValueFrom" class="form-control" />
-                        <span asp-validation-for="IntValueFrom" class="text-danger"></span>
-                    </div>
-                    <div class="form-group">
-                        <label class="control-label">Начальное значение</label>
-                        <input asp-for="IntValueTo" class="form-control" />
-                        <span asp-validation-for="IntValueTo" class="text-danger"></span>
-                    </div>
-                }
-                @Html.HiddenFor(x => x.ParameterId)
-                @Html.HiddenFor(x => x.ProductId)
-                <div class="form-group">
-                    <input type="submit" value="Сохранить" class="btn btn-default" />
-                    <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
-                </div>
-            </form>
+    <form asp-action="Edit" class="create_update_form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group">
+            <label class="control-label">Название</label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
         </div>
-    </div>
+        <div class="form-group">
+            <label class="control-label">Тип данных</label>
+            <select asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
+        </div>
+        @if (Model.ParameterDataType == (int)DataTypes.Дата)
+        {
+            <div class="form-group">
+                <label asp-for="DateValueFrom" class="control-label"></label>
+                <input asp-for="DateValueFrom" class="form-control" />
+                <span asp-validation-for="DateValueFrom" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="DateValueTo" class="control-label"></label>
+                <input asp-for="DateValueTo" class="form-control" />
+                <span asp-validation-for="DateValueTo" class="text-danger"></span>
+            </div>
+        }
+        else if (Model.ParameterDataType == (int)DataTypes.Число)
+        {
+            <div class="form-group">
+                <label class="control-label">Конечное значение</label>
+                <input asp-for="IntValueFrom" class="form-control" />
+                <span asp-validation-for="IntValueFrom" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label class="control-label">Начальное значение</label>
+                <input asp-for="IntValueTo" class="form-control" />
+                <span asp-validation-for="IntValueTo" class="text-danger"></span>
+            </div>
+        }
+        @Html.HiddenFor(x => x.ParameterId)
+        @Html.HiddenFor(x => x.ProductId)
+        <div class="form-group">
+            <input type="submit" value="Сохранить" class="btn btn-default" />
+            <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Отменить и выйти" />
+        </div>
+    </form>
 </body>
 </html>
 <script>

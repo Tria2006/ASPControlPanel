@@ -2,67 +2,92 @@
 
 @{
     ViewData["Title"] = "Тарифы";
-    ViewData["ControllerName"] = "Tariffs";
 }
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
     <link href="~/lib/bootstrap/dist/css/bootstrap.min.css.map" />
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body style="background: whitesmoke">
 
-<!-- Id можели для использования в js функции $("#backBtn").click(function ()-->
-<input id="modelIdValue" type="hidden" value="@Model.Id" />
+    <!-- Id модели для использования в js функции $("#backBtn").click(function ()-->
+    <input id="modelIdValue" type="hidden" value="@Model.Id" />
 
-<!-- кнопка Назад-->
-<a id="backBtn" asp-controller="Tariffs" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId" asp-route-controllerName="Tariffs">
-    <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Назад-->
+    <a id="backBtn" asp-controller="Tariffs" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId" asp-route-controllerName="Tariffs">
+        <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
-<!-- кнопка Создать папку-->
-<a id="createFolderBtn">
-    <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Создать папку-->
+    <a id="createFolderBtn">
+        <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
-<!-- кнопка Удалить папку-->
-<a id="deleteFolderBtn" asp-controller="Tariffs" asp-action="DeleteFolder" asp-route-id="@Model.Id" asp-route-controllerName="Tariffs" style="margin-left: 10px">
-    <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Удалить папку-->
+    <a id="deleteFolderBtn" style="margin-left: 10px">
+        <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
-<!-- кнопка Создать тариф-->
-<a asp-controller="Tariffs" asp-action="Create" asp-route-folderId="@Model.Id">
-    <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Создать тариф-->
+    <a asp-controller="Tariffs" asp-action="Create" asp-route-folderId="@Model.Id">
+        <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
-<!-- кнопка Удалить тариф-->
-<a asp-controller="Tariffs" asp-action="Delete" asp-route-id="@Model.Id">
-    <img id="productDeleteImg" src="~/images/Icons/document_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Удалить тариф-->
+    <a id="removeTariffsBtn">
+        <img id="productDeleteImg" src="~/images/Icons/document_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
-<!-- кнопка Переместить в папку-->
-<a id="moveBtn">
-    <img id="moveImg" src="~/images/Icons/move_gray.png" alt="Переместить в папку" style="margin: 10px; width: 40px; height: 40px" />
-</a>
+    <!-- кнопка Переместить в папку-->
+    <a id="moveBtn">
+        <img id="moveImg" src="~/images/Icons/move_gray.png" alt="Переместить в папку" style="margin: 10px; width: 40px; height: 40px" />
+    </a>
 
-<!-- диалог для ввода имени новой папки -->
-<div id="addFolderModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 class="modal-title">Введите имя папки</h4>
+    <!-- диалог для ввода имени новой папки -->
+    <div id="addFolderModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Введите имя папки</h4>
+                </div>
+                <div class="modal-body">
+                    <form asp-controller="Tariffs" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id" asp-route-modelType="@ModelTypes.Tariffs">
+                        <div class="form-group">
+                            <input id="folderNameInput" asp-for="Name" />
+                            <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
+                            <button id="cancelBtn" type="button" class="btn btn-primary">
+                                Отмена
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="modal-body">
-                <form asp-controller="Tariffs" asp-action="CreateFolder" asp-route-parentFolderId="@Model.Id" asp-route-modelType="@ModelTypes.Tariffs">
-                    <div class="form-group">
-                        <input id="folderNameInput" asp-for="Name" />
-                        <button id="okBtn" type="submit" class="btn btn-primary">Создать</button>
-                        <button id="cancelBtn" type="button" class="btn btn-primary">
+        </div>
+    </div>
+    
+<!-- диалог для перемещения объектов -->
+    <div id="moveItemModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Выберите папку назначения</h4>
+                </div>
+                <form>
+                    <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
+                        @await Html.PartialAsync("FolderSelectView", Model)
+                    </div>
+
+                    <div class="form-group" style="margin-left: 18px;">
+                        <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Tariffs" asp-action="MoveSelectedItems">Выбрать</button>
+                        <button id="moveCancelBtn" type="button" class="btn btn-primary">
                             Отмена
                         </button>
                     </div>
@@ -70,85 +95,111 @@
             </div>
         </div>
     </div>
-</div>
 
-<div id="moveItemModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 class="modal-title">Выберите папку назначения</h4>
-            </div>
-            <form>
-                <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
-                    @await Html.PartialAsync("FolderSelectView", Model)
-                </div>
-
-                <div class="form-group" style="margin-left: 18px;">
-                    <button id="moveOkBtn" type="submit" class="btn btn-primary" asp-controller="Tariffs" asp-action="MoveSelectedItems">Выбрать</button>
-                    <button id="moveCancelBtn" type="button" class="btn btn-primary">
-                        Отмена
+    <!-- диалог для удаления папок -->
+    <div id="removeFolderModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
                     </button>
+                    <h4 class="modal-title">Вы действительно хотите удалить выбранные папки?</h4>
                 </div>
-            </form>
+                <form>
+                    <div class="form-group" style="margin: 18px;">
+                        <button id="removeFolderOkBtn" type="submit" class="btn btn-primary" asp-controller="Tariffs" asp-action="DeleteFolder" asp-route-id="@Model.Id" asp-route-controllerName="Tariffs">Удалить</button>
+                        <button id="removeFolderCancelBtn" type="button" class="btn btn-primary">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
 
-<div style="width: 100%; height: 90%; float: left">
-    @if (Model.ChildFolders.Any() || Model.Tariffs.Any())
-    {
-        foreach (var child in Model.ChildFolders)
+    <!-- диалог для удаления тарифов -->
+    <div id="removeTariffsModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Вы действительно хотите удалить выбранные тарифы?</h4>
+                </div>
+                <form>
+                    <div class="form-group" style="margin: 18px;">
+                        <button id="removeTariffsOkBtn" type="submit" class="btn btn-primary" asp-controller="Tariffs" asp-action="Delete" asp-route-id="@Model.Id">Удалить</button>
+                        <button id="removeTariffsCancelBtn" type="button" class="btn btn-primary">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div style="width: 100%; height: 90%; float: left">
+        @if (Model.ChildFolders.Any() || Model.Tariffs.Any())
         {
-            // Папки
-            <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
-                <table id="folderItem" style="height: 90px; width: 90px">
-                    <tr>
-                        <td>
-                            <input id="cb" type="checkbox" onclick="FolderCheckBoxClick(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
+            foreach (var child in Model.ChildFolders)
+            {
+                // Папки
+                <div style="float: left; margin: 2px; border: 1px solid lightgrey">
+                    <table id="folderItem" style="height: 90px; width: 90px">
+                        <tr>
+                            <td>
+                                <input id="cb" type="checkbox" onclick="FolderCheckBoxClick(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
 
-                            @if (child.ChildFolders.Any() || child.Tariffs.Any())
-                            {
-                                <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
-                            }
-                            else
-                            {
-                                <img src="~/images/Icons/emptyfolder.png" width="50" height="50" alt="Image" class="center-block" />
-                            }
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center; vertical-align: text-top">
-                            @Html.LabelFor(n => child.Name, child.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
-                        </td>
-                    </tr>
-                </table>
+                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id">
+                                    @if (child.ChildFolders.Any() || child.Tariffs.Any())
+                                    {
+                                        <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
+                                    }
+                                    else
+                                    {
+                                        <img src="~/images/Icons/emptyfolder.png" width="50" height="50" alt="Image" class="center-block" />
+                                    }
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; vertical-align: text-top">
+                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id">
+                                    @Html.LabelFor(n => child.Name, child.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
 
-            </a>
+                </div>
+            }
+            foreach (var p in Model.Tariffs)
+            {
+                // Тарифы
+                <div style="float: left; margin: 2px; border: 1px solid lightgrey">
+                    <table id="folderItem" style="height: 90px; width: 90px">
+                        <tr>
+                            <td>
+                                <input type="checkbox" onclick="TariffCheckBoxClick('@p.Id')" style="margin: 2px; width: 16px; height: 16px" />
+                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id">
+                                    <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
+                                </a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: center; vertical-align: text-top">
+                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id">
+                                    @Html.LabelFor(n => p.Name, p.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
+                                </a>
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+            }
         }
-        foreach (var p in Model.Tariffs)
-        {
-            // Тарифы
-            <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="float: left; margin: 2px; border: 1px solid lightgrey">
-                <table id="folderItem" style="height: 90px; width: 90px">
-                    <tr>
-                        <td>
-                            <input type="checkbox" onclick="TariffCheckBoxClick('@p.Id')" style="margin: 2px; width: 16px; height: 16px" />
-                            <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
-                        </td>
-                    </tr>
-                    <tr>
-                        <td style="text-align: center; vertical-align: text-top">
-                            @Html.LabelFor(n => p.Name, p.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
-                        </td>
-                    </tr>
-                </table>
-            </a>
-        }
-    }
-</div>
+    </div>
 </body>
 </html>
 
@@ -173,6 +224,26 @@
         });
         $("#moveCancelBtn").click(function () {
             $("#moveItemModal").modal('hide');
+        });
+        
+        $("#deleteFolderBtn").click(function () {
+            $("#removeFolderModal").modal('show');
+        });
+        $("#removeFolderOkBtn").click(function () {
+            $("#removeFolderModal").modal('hide');
+        });
+        $("#removeFolderCancelBtn").click(function () {
+            $("#removeFolderModal").modal('hide');
+        });
+        
+        $("#removeTariffsBtn").click(function () {
+            $("#removeTariffsModal").modal('show');
+        });
+        $("#removeTariffsOkBtn").click(function () {
+            $("#removeTariffsModal").modal('hide');
+        });
+        $("#removeTariffsCancelBtn").click(function () {
+            $("#removeTariffsModal").modal('hide');
         });
 
         $("#backBtn").click(function () {

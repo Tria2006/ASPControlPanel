@@ -1,9 +1,12 @@
 ﻿@model DBModels.Models.InsuranceRule
 
+@{
+    ViewData["Title"] = "Новое правило страхования";
+}
+
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Новое правило страхования</title>
     <link href="~/css/site.css" />
 </head>
 <body>
@@ -60,11 +63,11 @@
             <div class="form-group">
                 <input type="submit" value="Создать" class="btn btn-default" />
                 <a asp-action="GoBack">
-                    <input class="btn btn-default" value="Отменить и выйти"/>
+                    <input class="btn btn-default" value="Отменить и выйти" />
                 </a>
             </div>
         </form>
-        </div>
+    </div>
 </body>
 </html>
 

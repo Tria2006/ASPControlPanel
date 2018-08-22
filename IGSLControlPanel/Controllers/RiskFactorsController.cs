@@ -40,6 +40,7 @@ namespace IGSLControlPanel.Controllers
                 ValidFrom = DateTime.Today,
                 ValidTo = new DateTime(2100, 1, 1)
             };
+            _factorHelper.CurrentFactor = tempFactor;
             return View(tempFactor);
         }
 
@@ -115,6 +116,7 @@ namespace IGSLControlPanel.Controllers
                 riskFactor.FactorValues = _factorHelper.CurrentFactor.FactorValues;
                 _context.Update(riskFactor);
                 await _context.SaveChangesAsync();
+                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated RiskFactor (id={riskFactor.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {

@@ -33,11 +33,6 @@ namespace IGSLControlPanel.Controllers
             _stateHelper = stateHelper;
         }
 
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.InsuranceRules.Where(x => !x.IsDeleted).ToListAsync());
-        }
-
         public IActionResult Create()
         {
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
@@ -162,40 +157,6 @@ namespace IGSLControlPanel.Controllers
             await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) InsuranceRule (id={id})");
             return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
-        }
-
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> RemoveRuleConfirmed(Guid id)
-        {
-            var insuranceRule = _context.InsuranceRules.Include(x => x.LinksToTariff).Include(x => x.LinksToRisks).SingleOrDefault(s => s.Id == id);
-
-            if (insuranceRule != null)
-            {
-                insuranceRule.IsDeleted = true;
-                if (insuranceRule.LinksToTariff.Count > 0)
-                {
-                    foreach (var link in insuranceRule.LinksToTariff)
-                    {
-                        var contextTariff = _context.Tariffs.Include(x => x.InsRuleTariffLink)
-                            .SingleOrDefault(x => x.Id == link.TariffId);
-
-                        contextTariff?.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
-                    }
-                }
-
-                if (insuranceRule.LinksToRisks.Count > 0)
-                {
-                    foreach (var link in insuranceRule.LinksToRisks)
-                    {
-                        var contextRisk = _context.Risks.SingleOrDefault(x => x.Id == link.RiskId);
-
-                        contextRisk?.LinksToInsRules.RemoveAll(x => x.InsRuleId == id);
-                    }
-                }
-            }
-            await _context.SaveChangesAsync();
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) from Index InsuranceRule (id={id})");
-            return RedirectToAction("Index");
         }
 
         private bool InsuranceRuleExists(Guid id)

@@ -1,34 +1,37 @@
 ﻿@model DBModels.Models.ParameterGroup
 
+@{
+    ViewData["Title"] = "Новая группа";
+}
+
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Новая группа</title>
     <link href="~/css/site.css" />
 </head>
 <body>
 
-<h4>Новая группа параметров</h4>
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Create" class="create_update_form">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Name" class="control-label"></label>
-                <input asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="CanRepeat" class="control-label" style="width: 220px"></label>
-                <input id="calcRequired" asp-for="CanRepeat" style="vertical-align: top" />
-            </div>
-            <div class="form-group" style="margin-top: 50px">
-                <input type="submit" value="Создать" class="btn btn-default" />
-                <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
-            </div>
-        </form>
+    <h4>Новая группа параметров</h4>
+    <div class="row">
+        <div class="col-md-4">
+            <form asp-action="Create" class="create_update_form">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                <div class="form-group">
+                    <label asp-for="Name" class="control-label"></label>
+                    <input asp-for="Name" class="form-control" />
+                    <span asp-validation-for="Name" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <label asp-for="CanRepeat" class="control-label" style="width: 220px"></label>
+                    <input id="calcRequired" asp-for="CanRepeat" style="vertical-align: top" />
+                </div>
+                <div class="form-group" style="margin-top: 50px">
+                    <input type="submit" value="Создать" class="btn btn-default" />
+                    <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
+                </div>
+            </form>
+        </div>
     </div>
-</div>
 
 </body>
 </html>

@@ -28,12 +28,7 @@ namespace IGSLControlPanel.Controllers
             _insRuleHelper = insRuleHelper;
             _stateHelper = stateHelper;
         }
-
-        public async Task<IActionResult> Index()
-        {
-            return View(await _context.Risks.Include(x => x.LinksToInsRules).ThenInclude(x => x.InsRule).Include(x => x.Requirements).ToListAsync());
-        }
-
+        
         public IActionResult Create(Guid tariffId, Guid insRuleId)
         {
             var tempRisk = new Risk{ ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };

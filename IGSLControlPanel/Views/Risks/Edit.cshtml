@@ -1,13 +1,12 @@
 ﻿@model DBModels.Models.Risk
 
 @{
-    ViewData["Title"] = "Редактирование";
+    ViewData["Title"] = "Редактирование риска";
     var Requirement = Model.Requirements.SingleOrDefault(x => x.TariffId == (Guid)ViewData["TariffId"]);
 }
 
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title></title>
     <link href="~/css/site.css" />
 </head>
 <h2>Риск</h2>
@@ -47,7 +46,7 @@
     }
     <div class="form-group" style="margin-top: 50px">
         <input type="submit" value="Сохранить" class="btn btn-default" />
-        <input type="button" class="btn btn-default" onclick="GoBack()" value="Не сохранять" />
+        <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
     </div>
 </form>
 

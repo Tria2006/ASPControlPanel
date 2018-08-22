@@ -1,9 +1,12 @@
 ﻿@model DBModels.Models.ProductParameter
 
+@{
+    ViewData["Title"] = "Новый параметр продукта";
+}
+
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Новый параметр продукта</title>
     <link href="~/css/site.css" />
 </head>
 <body>
@@ -58,7 +61,7 @@
                         @if (Model.Limit != null)
                         {
                             <a asp-controller="ValueLimits" asp-action="Edit">
-                                <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt=""/>
+                                <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
                             </a>
                             <a asp-controller="ValueLimits" asp-action="Delete">
                                 <img src="~/images/Icons/del_param.png" class="small-button-img" style="margin: 2px" alt="" />
@@ -121,7 +124,7 @@
                 <div class="form-group">
                     <input type="submit" value="Создать" class="btn btn-default" />
                     <a asp-action="GoBack">
-                        <input class="btn btn-default" value="Отменить и выйти"/>
+                        <input class="btn btn-default" value="Отменить и выйти" />
                     </a>
                 </div>
             </form>

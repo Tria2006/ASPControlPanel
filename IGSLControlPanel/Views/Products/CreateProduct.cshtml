@@ -1,10 +1,12 @@
 ﻿@using DBModels.Models
 @model Product
+@{
+    ViewData["Title"] = "Новый продукт";
+}
 
 <html>
 <head>
     <meta name="viewport" content="width=device-width" />
-    <title>Новый продукт</title>
     <link href="~/css/site.css" />
 </head>
 <body>
@@ -116,7 +118,7 @@
                 dateFrom: $("#validFromDt").val(),
                 dateTo: $("#validToDt").val()
             },
-            success: function () {}
+            success: function () { }
         });
     };
     function ParameterUpClick(link) {
