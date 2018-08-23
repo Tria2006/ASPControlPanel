@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27703.2035
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IGSLControlPanel", "IGSLControlPanel\IGSLControlPanel.csproj", "{52930EC1-AE5B-486D-BC53-18DF2186F413}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DBModels", "DBModels\DBModels.csproj", "{185DD092-911D-493F-8835-EC5870088994}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBModels", "DBModels\DBModels.csproj", "{185DD092-911D-493F-8835-EC5870088994}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "IGSLPanelTests", "IGSLPanelTests\IGSLPanelTests.csproj", "{81A73CE2-DC9B-4621-ACA2-F98F843E6466}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{185DD092-911D-493F-8835-EC5870088994}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{185DD092-911D-493F-8835-EC5870088994}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{185DD092-911D-493F-8835-EC5870088994}.Release|Any CPU.Build.0 = Release|Any CPU
+		{81A73CE2-DC9B-4621-ACA2-F98F843E6466}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{81A73CE2-DC9B-4621-ACA2-F98F843E6466}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{81A73CE2-DC9B-4621-ACA2-F98F843E6466}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{81A73CE2-DC9B-4621-ACA2-F98F843E6466}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
