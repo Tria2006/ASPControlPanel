@@ -18,38 +18,38 @@
                 <input type="hidden" asp-for="Id" />
                 <div class="form-group">
                     <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" style="width: 500px" />
+                    <input id="name" asp-for="Name" class="form-control" style="width: 500px" onchange="SaveTempData()" />
                     <span asp-validation-for="Name" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
-                    <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt">
+                    <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt" onchange="SaveTempData()">
                     <span asp-validation-for="ValidFrom" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
-                    <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" />
+                    <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" onchange="SaveTempData()" />
                     <span asp-validation-for="ValidTo" class="text-danger"></span>
                 </div>
                 <div class="form-group">
                     <label asp-for="DataType" class="control-label" style="width: 220px"></label>
-                    <select id="dataTypeSelect" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
+                    <select id="dataType" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
                 </div>
                 <div class="form-group">
                     <label asp-for="IsRequiredForCalc" class="control-label" style="width: 220px"></label>
-                    <input asp-for="IsRequiredForCalc" style="vertical-align: top" />
+                    <input id="calcRequired" asp-for="IsRequiredForCalc" style="vertical-align: top" onchange="SaveTempData()" />
                 </div>
                 <div class="form-group">
                     <label asp-for="IsRequiredForSave" class="control-label" style="width: 220px"></label>
-                    <input asp-for="IsRequiredForSave" style="vertical-align: top" />
+                    <input id="saveRequired" asp-for="IsRequiredForSave" style="vertical-align: top" onchange="SaveTempData()" />
                 </div>
                 <div class="form-group">
                     <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
-                    <input asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" />
+                    <input id="order" asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" onchange="SaveTempData()" />
                 </div>
                 <div class="form-group">
                     <label asp-for="GroupId" class="control-label" style="width: 220px"></label>
-                    <select asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList" class="form-control" style="width: 150px"></select>
+                    <select id="groupId" asp-for="GroupId" asp-items="@ViewData["ParamGroups"] as SelectList" class="form-control" style="width: 150px" onchange="SaveTempData()"></select>
                 </div>
                 <div class="form-group">
                     <label>
@@ -132,3 +132,23 @@
 
 </body>
 </html>
+
+<script>
+    function SaveTempData() {
+        $.ajax({
+            url: "/ProductParameters/SaveTempData",
+            type: "post",
+            data: {
+                dataType: $("#dataType").val(),
+                name: $("#name").val(),
+                dateFrom: $("#validFromDt").val(),
+                dateTo: $("#validToDt").val(),
+                requiredForSave: $("#saveRequired").val(),
+                requiredForCalc: $("#calcRequired").val(),
+                groupId: $("#groupId").val(),
+                order: $("#order").val()
+            },
+            success: function () { }
+        });
+    }
+</script>

@@ -1,0 +1,35 @@
+﻿@model DBModels.Models.LimitListItem
+
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+</head>
+<body>
+
+    <h3>Вы действительно хотите удалить этот элемент списка?</h3>
+    <div>
+        <hr />
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" style="width: 600px" disabled="disabled" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Value" class="control-label"></label>
+            <input asp-for="Value" class="form-control" style="width: 300px" disabled="disabled" />
+        </div>
+
+        <form asp-action="Delete" style="margin-top: 50px">
+            <input type="hidden" asp-for="Id" />
+            <input type="submit" value="Удалить" class="btn btn-default" />
+            <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
+        </form>
+    </div>
+</body>
+</html>
+
+<script>
+    function GoBack() {
+        javascript: history.go(-1);
+    }
+</script>

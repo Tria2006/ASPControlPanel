@@ -99,6 +99,34 @@ namespace IGSLControlPanel.Migrations
                     b.ToTable("InsuranceRules");
                 });
 
+            modelBuilder.Entity("DBModels.Models.LimitListItem", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDate");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<DateTime>("ModifyDate");
+
+                    b.Property<string>("Name");
+
+                    b.Property<DateTime?>("ValidFrom");
+
+                    b.Property<DateTime?>("ValidTo");
+
+                    b.Property<string>("Value");
+
+                    b.Property<Guid>("ValueLimitId");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ValueLimitId");
+
+                    b.ToTable("LimitListItems");
+                });
+
             modelBuilder.Entity("DBModels.Models.ManyToManyLinks.InsRuleTariffLink", b =>
                 {
                     b.Property<Guid>("TariffId");
@@ -366,6 +394,14 @@ namespace IGSLControlPanel.Migrations
                     b.HasOne("DBModels.Models.RiskFactor")
                         .WithMany("FactorValues")
                         .HasForeignKey("RiskFactorId")
+                        .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("DBModels.Models.LimitListItem", b =>
+                {
+                    b.HasOne("DBModels.Models.ValueLimit")
+                        .WithMany("LimitListItems")
+                        .HasForeignKey("ValueLimitId")
                         .OnDelete(DeleteBehavior.Cascade);
                 });
 

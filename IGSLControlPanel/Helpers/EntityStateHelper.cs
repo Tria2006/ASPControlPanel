@@ -7,5 +7,6 @@
         public bool IsTariffCreateInProgress { get; set; }
         public bool IsInsRuleCreateInProgress { get; set; }
         public bool IsRiskCreateInProgress { get; set; }
+        public bool IsValueLimitCreateInProgress { get; set; }
     }
 }

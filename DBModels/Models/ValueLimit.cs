@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 
@@ -22,6 +23,9 @@ namespace DBModels.Models
         [DisplayName("Конечная дата")]
         [DataType(DataType.Date)]
         public DateTime? DateValueTo { get; set; }
+
+        [DisplayName("Список значений")]
+        public List<LimitListItem> LimitListItems { get; set; } = new List<LimitListItem>();
 
         public Guid ParameterId { get; set; }
 

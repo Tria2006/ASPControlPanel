@@ -34,6 +34,12 @@
     <Compile Remove="Migrations\20180801093937_add Risk model + many to many link to ins rules.cs" />
     <Compile Remove="Migrations\20180801094825_add Risk model + many to many link to ins rules.cs" />
     <Compile Remove="Migrations\20180817075410_added RiskFactor &amp; FactorValue models.cs" />
+    <Compile Remove="Migrations\20180824100225_LimitListItem table - wrong name.cs" />
+    <Compile Remove="Migrations\20180824101045_added LimitListItem model.cs" />
+    <Compile Remove="Migrations\20180824101544_added LimitListItem model.cs" />
+    <Compile Remove="Migrations\20180824101738_added LimitListItem model.cs" />
+    <Compile Remove="Migrations\20180824101929_added LimitListItem model.cs" />
+    <Compile Remove="Migrations\20180824102002_added LimitListItem model.cs" />
   </ItemGroup>
 
   <ItemGroup>

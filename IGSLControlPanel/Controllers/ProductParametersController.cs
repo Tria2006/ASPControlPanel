@@ -68,6 +68,9 @@ namespace IGSLControlPanel.Controllers
             {
                 _context.Add(productParameter);
                 _context.SaveChanges();
+                productParameter.Limit = _productsHelper.CurrentParameter.Limit;
+                productParameter.Limit.ParameterId = productParameter.Id;
+                productParameter.Limit.ProductId = _productsHelper.CurrentProduct.Id;
                 var link = new ProductLinkToProductParameter
                 {
                     ProductId = _productsHelper.CurrentProduct.Id,
@@ -81,6 +84,7 @@ namespace IGSLControlPanel.Controllers
                     .ThenInclude(p => p.Parameter)
                     .SingleOrDefault(x => x.Id == productId);
                 await CheckParameterOrders(productParameter);
+                _productsHelper.LoadProductLimits(_productsHelper.CurrentProduct, _context);
                 _productsHelper.CurrentParameter = null;
                 _stateHelper.IsParameterCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ProductParameter (id={productParameter.Id})");

@@ -45,6 +45,26 @@
                     <input asp-for="IntValueTo" class="form-control" disabled="disabled" style="width: 80px"/>
                 </div>
             }
+            else if (Model.ParameterDataType == (int)DataTypes.List)
+            {
+                @Html.LabelFor(x => Model.LimitListItems, new { style = "margin-right: 50px; margin-top: 20px; vertical-align: bottom" })
+                
+                <div id="limitList" class="form-group" style="min-height: 200px; max-height: 300px; border: 1px lightgrey solid; padding: 1px">
+                    @{
+                        var counter = 1;
+                    }
+                    @foreach (var item in Model.LimitListItems.Where(x => !x.IsDeleted))
+                    {
+                        <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative">
+                            <div style="float: left; position: absolute; top: 9px;">
+                                <label style="margin-right: 10px">@counter.</label>
+                                <label>@item.Name</label>
+                            </div>
+                        </div>
+                        counter++;
+                    }
+                </div>
+            }
         </div>
 
         <form asp-action="Delete" style="margin-top: 50px">

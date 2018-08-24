@@ -48,6 +48,16 @@
                 <span asp-validation-for="IntValueTo" class="text-danger"></span>
             </div>
         }
+        else if (Model.ParameterDataType == (int)DataTypes.List)
+        {
+            @Html.LabelFor(x => Model.LimitListItems, new { style = "margin-right: 50px; margin-top: 20px; vertical-align: bottom" })
+
+            <a asp-controller="LimitListItems" asp-action="Create" asp-route-limitId="@Model.Id" onclick="SaveProductData()">
+                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
+            </a>
+
+            @await Html.PartialAsync("_LimitListItemsBlock", Model.LimitListItems.Where(x => !x.IsDeleted).ToList())
+        }
         @Html.HiddenFor(x => x.ParameterId)
         @Html.HiddenFor(x => x.ProductId)
         <div class="form-group" style="margin-top: 50px">

@@ -21,18 +21,13 @@ namespace IGSLControlPanel.Helpers
         public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)
         {
             // продукты получаем вместе со связанными параметрами 
-            _products = _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(p => p.Parameter).Where(s => !s.IsDeleted).ToList();
+            _products = _context.Products
+                .Include(x => x.LinkToProductParameters)
+                .ThenInclude(p => p.Parameter)
+                .Where(s => !s.IsDeleted).ToList();
 
             // загружаем лимиты для параметров
-            _products.ForEach(p =>
-            {
-                foreach (var link in p.LinkToProductParameters)
-                {
-                    link.Parameter.Limit =
-                        _context.ValueLimits.FirstOrDefault(
-                            x => x.ProductId == p.Id && x.ParameterId == link.ProductParameterId && !x.IsDeleted);
-                }
-            });
+            _products.ForEach(p => LoadProductLimits(p, _context));
 
             BuildProducts(rootFolder);
         }
@@ -138,6 +133,16 @@ namespace IGSLControlPanel.Helpers
             }
             _checkedProducts.Clear();
             context.SaveChanges();
+        }
+
+        public void LoadProductLimits(Product product, IGSLContext context)
+        {
+            foreach (var link in product.LinkToProductParameters)
+            {
+                link.Parameter.Limit =
+                    context.ValueLimits.Include(x => x.LimitListItems).FirstOrDefault(
+                        x => x.ProductId == product.Id && x.ParameterId == link.ProductParameterId && !x.IsDeleted);
+            }
         }
     }
 }
