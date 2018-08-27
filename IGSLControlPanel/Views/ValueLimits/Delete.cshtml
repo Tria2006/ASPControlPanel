@@ -11,7 +11,6 @@
 
     <h3>Вы действительно хотите удалить эту запись?</h3>
     <div>
-        <h4>Ограничение значений параметра</h4>
         <hr />
         <div style="margin-top: 20px; margin-bottom: 20px">
             <div class="form-group">
@@ -69,7 +68,7 @@
 
         <form asp-action="Delete" style="margin-top: 50px">
             <input type="hidden" asp-for="Id" />
-            <input type="submit" value="Delete" class="btn btn-default" />
+            <input type="submit" value="Удалить" class="btn btn-default" />
             <input type="button" class="btn btn-default" onclick="GoBack()" value="Отменить и выйти" />
         </form>
     </div>

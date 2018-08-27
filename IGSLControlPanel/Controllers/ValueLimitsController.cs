@@ -45,6 +45,7 @@ namespace IGSLControlPanel.Controllers
             else
             {
                 _productsHelper.CurrentParameter.Limit = limit;
+                _stateHelper.LimitWOChanges = null;
                 _stateHelper.IsValueLimitCreateInProgress = true;
             }
 
@@ -79,6 +80,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Edit(Guid id)
         {
+            _stateHelper.LimitWOChanges = _productsHelper.CurrentParameter.Limit;
             return View(_productsHelper.CurrentParameter.Limit);
         }
 
@@ -149,6 +151,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult GoBack()
         {
+            _productsHelper.CurrentParameter.Limit = _stateHelper.LimitWOChanges;
             return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
     }

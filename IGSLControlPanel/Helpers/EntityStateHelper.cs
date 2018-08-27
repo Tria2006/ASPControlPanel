@@ -1,4 +1,6 @@
-﻿namespace IGSLControlPanel.Helpers
+﻿using DBModels.Models;
+
+namespace IGSLControlPanel.Helpers
 {
     public class EntityStateHelper
     {
@@ -8,5 +10,7 @@
         public bool IsInsRuleCreateInProgress { get; set; }
         public bool IsRiskCreateInProgress { get; set; }
         public bool IsValueLimitCreateInProgress { get; set; }
+
+        public ValueLimit LimitWOChanges { get; set; }
     }
 }
