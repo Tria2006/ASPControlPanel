@@ -52,6 +52,7 @@ namespace IGSLControlPanel.Controllers
             {
                 _context.Add(limitListItem);
                 await _context.SaveChangesAsync();
+                _productsHelper.CurrentParameter.Limit.LimitListItems.Add(limitListItem);
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created LimitListItem (id={limitListItem.Id})");
             }
             return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);

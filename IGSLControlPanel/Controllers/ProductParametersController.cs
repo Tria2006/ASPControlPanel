@@ -69,8 +69,11 @@ namespace IGSLControlPanel.Controllers
                 _context.Add(productParameter);
                 _context.SaveChanges();
                 productParameter.Limit = _productsHelper.CurrentParameter.Limit;
-                productParameter.Limit.ParameterId = productParameter.Id;
-                productParameter.Limit.ProductId = _productsHelper.CurrentProduct.Id;
+                if (productParameter.Limit != null)
+                {
+                    productParameter.Limit.ParameterId = productParameter.Id;
+                    productParameter.Limit.ProductId = _productsHelper.CurrentProduct.Id;
+                }
                 var link = new ProductLinkToProductParameter
                 {
                     ProductId = _productsHelper.CurrentProduct.Id,
