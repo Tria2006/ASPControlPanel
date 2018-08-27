@@ -15,23 +15,23 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label class="control-label">Название</label>
-            <input asp-for="Name" class="form-control" />
+            <input id="name" asp-for="Name" class="form-control" onchange="SaveProductData()" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label class="control-label">Тип данных</label>
-            <select asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
+            <select id="dataType" asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
         </div>
         @if (Model.ParameterDataType == (int)DataTypes.Date)
         {
             <div class="form-group">
                 <label asp-for="DateValueFrom" class="control-label"></label>
-                <input asp-for="DateValueFrom" class="form-control" style="width: 150px" />
+                <input id="dateMin" asp-for="DateValueFrom" class="form-control" style="width: 150px" onchange="SaveProductData()" />
                 <span asp-validation-for="DateValueFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DateValueTo" class="control-label"></label>
-                <input asp-for="DateValueTo" class="form-control" style="width: 150px" />
+                <input id="dateMax" asp-for="DateValueTo" class="form-control" style="width: 150px" onchange="SaveProductData()" />
                 <span asp-validation-for="DateValueTo" class="text-danger"></span>
             </div>
         }
@@ -39,12 +39,12 @@
         {
             <div class="form-group">
                 <label class="control-label">Конечное значение</label>
-                <input asp-for="IntValueFrom" class="form-control" style="width: 80px" />
+                <input id="intMin" asp-for="IntValueFrom" class="form-control" style="width: 80px" onchange="SaveProductData()" />
                 <span asp-validation-for="IntValueFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label">Начальное значение</label>
-                <input asp-for="IntValueTo" class="form-control" style="width: 80px" />
+                <input id="intMax" asp-for="IntValueTo" class="form-control" style="width: 80px" onchange="SaveProductData()" />
                 <span asp-validation-for="IntValueTo" class="text-danger"></span>
             </div>
         }
@@ -62,13 +62,27 @@
         @Html.HiddenFor(x => x.ProductId)
         <div class="form-group" style="margin-top: 50px">
             <input type="submit" value="Сохранить" class="btn btn-default" />
-            <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Отменить и выйти" />
+            <a asp-action="GoBack">
+                <input class="btn btn-default" value="Отменить и выйти" />
+            </a>
         </div>
     </form>
 </body>
 </html>
 <script>
-    function GoBack() {
-        javascript: history.go(-1);
+    function SaveTempData() {
+        $.ajax({
+            url: "/ValueLimits/SaveTempData",
+            type: "post",
+            data: {
+                dataType: $("#dataType").val(),
+                name: $("#name").val(),
+                dateMin: $("#dateMin").val(),
+                dateMax: $("#dateMax").val(),
+                intMin: $("#intMin").val(),
+                intMax: $("#intMax").val()
+            },
+            success: function () { }
+        });
     }
 </script>

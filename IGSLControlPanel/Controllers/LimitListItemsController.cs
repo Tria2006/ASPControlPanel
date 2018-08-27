@@ -125,7 +125,7 @@ namespace IGSLControlPanel.Controllers
             await _context.SaveChangesAsync();
             _productsHelper.CurrentParameter.Limit.LimitListItems.RemoveAll(x => x.Id == id);
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) LimitItem (id={id})");
-            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
         }
 
         private bool LimitListItemExists(Guid id)
