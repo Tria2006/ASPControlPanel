@@ -15,23 +15,23 @@
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <div class="form-group">
             <label class="control-label">Название</label>
-            <input id="name" asp-for="Name" class="form-control" onchange="SaveProductData()" />
+            <input id="name" asp-for="Name" class="form-control" onchange="SaveTempData()" />
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label class="control-label">Тип данных</label>
-            <select id="dataType" asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
+            <select id="dataType" onchange="SaveTempData()" asp-for="ParameterDataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
         </div>
         @if (Model.ParameterDataType == (int)DataTypes.Date)
         {
             <div class="form-group">
                 <label asp-for="DateValueFrom" class="control-label"></label>
-                <input id="dateMin" asp-for="DateValueFrom" class="form-control" style="width: 150px" onchange="SaveProductData()" />
+                <input id="dateMin" asp-for="DateValueFrom" class="form-control" style="width: 150px" onchange="SaveTempData()" />
                 <span asp-validation-for="DateValueFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="DateValueTo" class="control-label"></label>
-                <input id="dateMax" asp-for="DateValueTo" class="form-control" style="width: 150px" onchange="SaveProductData()" />
+                <input id="dateMax" asp-for="DateValueTo" class="form-control" style="width: 150px" onchange="SaveTempData()" />
                 <span asp-validation-for="DateValueTo" class="text-danger"></span>
             </div>
         }
@@ -39,12 +39,12 @@
         {
             <div class="form-group">
                 <label class="control-label">Конечное значение</label>
-                <input id="intMin" asp-for="IntValueFrom" class="form-control" style="width: 80px" onchange="SaveProductData()" />
+                <input id="intMin" asp-for="IntValueFrom" class="form-control" style="width: 80px" onchange="SaveTempData()" />
                 <span asp-validation-for="IntValueFrom" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label class="control-label">Начальное значение</label>
-                <input id="intMax" asp-for="IntValueTo" class="form-control" style="width: 80px" onchange="SaveProductData()" />
+                <input id="intMax" asp-for="IntValueTo" class="form-control" style="width: 80px" onchange="SaveTempData()" />
                 <span asp-validation-for="IntValueTo" class="text-danger"></span>
             </div>
         }
@@ -52,7 +52,7 @@
         {
             @Html.LabelFor(x => Model.LimitListItems, new { style = "margin-right: 50px; margin-top: 20px; vertical-align: bottom" })
 
-            <a asp-controller="LimitListItems" asp-action="Create" asp-route-limitId="@Model.Id" onclick="SaveProductData()">
+            <a asp-controller="LimitListItems" asp-action="Create" asp-route-limitId="@Model.Id" onclick="SaveTempData()">
                 <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
             </a>
 

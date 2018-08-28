@@ -57,7 +57,7 @@
 
             <h3>Правила страхования</h3>
             <div style="float: left">
-                <a asp-controller="InsuranceRules" asp-action="Create" onclick="SaveProductData()">
+                <a asp-controller="InsuranceRules" asp-action="Create" onclick="SaveTempData()">
                     <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
                 </a>
             </div>
@@ -83,7 +83,7 @@
 <script>
     $(document).ready(function () {
         $("#selectInsRuleBtn").click(function () {
-            SaveProductData();
+            SaveTempData();
             $("#moveItemModal").modal('show');
         });
         $("#moveOkBtn").click(function () {
@@ -94,7 +94,7 @@
         });
     });
 
-    function SaveProductData() {
+    function SaveTempData() {
         $.ajax({
             url: "/Tariffs/SaveTempData",
             type: "post",
