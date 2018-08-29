@@ -29,12 +29,14 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ParameterGroup parameterGroup)
+        public async Task<IActionResult> Create(ParameterGroup parameterGroup, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(parameterGroup);
             _context.Add(parameterGroup);
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(nameof(Index));
+            return RedirectToAction("Edit", new { parameterGroup.Id });
         }
 
         public async Task<IActionResult> Edit(Guid id)
@@ -49,7 +51,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ParameterGroup parameterGroup)
+        public async Task<IActionResult> Edit(Guid id, ParameterGroup parameterGroup, string save, string saveAndExit)
         {
             if (id != parameterGroup.Id)
             {
@@ -73,7 +75,9 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index));
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(nameof(Index));
+            return RedirectToAction("Edit", new { id });
         }
 
         public async Task<IActionResult> Delete(Guid? id)

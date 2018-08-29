@@ -46,7 +46,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(RiskFactor riskFactor)
+        public async Task<IActionResult> Create(RiskFactor riskFactor, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(riskFactor);
             if (_stateHelper.IsTariffCreateInProgress)
@@ -72,8 +72,10 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsInsRuleCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
             }
-
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", new { riskFactor.Id });
         }
 
         public IActionResult Edit(Guid id)
@@ -103,7 +105,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, RiskFactor riskFactor)
+        public async Task<IActionResult> Edit(Guid id, RiskFactor riskFactor, string save, string saveAndExit)
         {
             if (id != riskFactor.Id)
             {
@@ -129,7 +131,9 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", new { id });
         }
 
         public IActionResult Delete(Guid id)

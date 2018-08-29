@@ -45,7 +45,8 @@
         @await Html.PartialAsync("_RequirementBlock", Requirement)
     }
     <div class="form-group" style="margin-top: 50px">
-        <input type="submit" value="Сохранить" class="btn btn-default" />
+        <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+        <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
         <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
     </div>
 </form>

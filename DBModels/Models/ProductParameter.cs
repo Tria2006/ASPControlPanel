@@ -1,12 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.ComponentModel.DataAnnotations;
 using DBModels.Models.ManyToManyLinks;
 
 namespace DBModels.Models
 {
     public class ProductParameter : BaseModel
     {
+        [Range(1, int.MaxValue)]
         [DisplayName("Тип данных")]
         public int DataType { get; set; }
 

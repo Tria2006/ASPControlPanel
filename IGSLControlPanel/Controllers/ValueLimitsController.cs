@@ -54,7 +54,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ValueLimit valueLimit)
+        public async Task<IActionResult> Create(ValueLimit valueLimit, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(valueLimit);
             valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
@@ -75,7 +75,9 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsValueLimitCreateInProgress = false;
             }
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ValueLimit (id={valueLimit.Id})");
-            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction("Edit", new { valueLimit.Id });
         }
 
         public IActionResult Edit(Guid id)
@@ -86,7 +88,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ValueLimit valueLimit)
+        public async Task<IActionResult> Edit(Guid id, ValueLimit valueLimit, string save, string saveAndExit)
         {
             if (id != valueLimit.Id)
             {
@@ -114,7 +116,9 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction("Edit", new { id });
         }
 
         public IActionResult Delete(Guid id)

@@ -61,7 +61,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProduct(Product product)
+        public async Task<IActionResult> CreateProduct(Product product, string create, string createAndExit)
         {
             await _productsHelper.AddProduct(product, _context);
             _stateHelper.IsProductCreateInProgress = false;
@@ -78,7 +78,9 @@ namespace IGSLControlPanel.Controllers
                 await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             }
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Product (id={product.Id})");
-            return RedirectToAction("Index", new { id = product.FolderId });
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction("Index", new { id = product.FolderId });
+            return RedirectToAction("Edit", new { product.Id });
         }
 
         public async Task<IActionResult> Edit(Guid id)
@@ -97,11 +99,13 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Product product)
+        public async Task<IActionResult> Edit(Product product, string save, string saveAndExit)
         {
             await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Product (id={product.Id})");
-            return RedirectToAction("Index", new { id = product.FolderId });
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction("Index", new { id = product.FolderId });
+            return RedirectToAction("Edit", new { product.Id });
         }
 
         public async Task<IActionResult> DeleteProduct(Guid id)

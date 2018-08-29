@@ -48,7 +48,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Risk risk, Guid tariffId, Guid insRuleId)
+        public async Task<IActionResult> Create(Risk risk, Guid tariffId, Guid insRuleId, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(risk);
 
@@ -88,7 +88,9 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsRiskCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Risk (id={risk.Id})");
             }
-            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+            return RedirectToAction("Edit", new { risk.Id });
         }
 
         public IActionResult Edit(Guid id, Guid tariffId)
@@ -106,7 +108,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Risk risk)
+        public async Task<IActionResult> Edit(Guid id, Risk risk, string save, string saveAndExit)
         {
             if (id != risk.Id)
             {
@@ -128,7 +130,9 @@ namespace IGSLControlPanel.Controllers
                 }
                 throw;
             }
-            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+            return RedirectToAction("Edit", new { id });
         }
 
         public async Task<IActionResult> Delete(Guid id)

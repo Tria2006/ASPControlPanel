@@ -41,7 +41,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(LimitListItem limitListItem)
+        public async Task<IActionResult> Create(LimitListItem limitListItem, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(limitListItem);
             if (_stateHelper.IsValueLimitCreateInProgress)
@@ -55,7 +55,9 @@ namespace IGSLControlPanel.Controllers
                 _productsHelper.CurrentParameter.Limit.LimitListItems.Add(limitListItem);
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created LimitListItem (id={limitListItem.Id})");
             }
-            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
+            return RedirectToAction("Edit", new { limitListItem.Id });
         }
 
         public async Task<IActionResult> Edit(Guid id)
@@ -70,7 +72,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, LimitListItem limitListItem)
+        public async Task<IActionResult> Edit(Guid id, LimitListItem limitListItem, string save, string saveAndExit)
         {
             if (id != limitListItem.Id)
             {
@@ -101,7 +103,9 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction("Edit", new { id });
         }
 
         public async Task<IActionResult> Delete(Guid id)

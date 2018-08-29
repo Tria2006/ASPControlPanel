@@ -5,7 +5,7 @@ namespace IGSLControlPanel.Enums
 {
     public enum DataTypes
     {
-        [Display(Name = "")]
+        [Display(Name = "Не выбрано")]
         empty = 0,
         [Display(Name = "Число")]
         Number = 1,

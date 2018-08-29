@@ -59,7 +59,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ProductParameter productParameter)
+        public async Task<IActionResult> Create(ProductParameter productParameter, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(productParameter);
             if (productParameter.GroupId == Guid.Empty) productParameter.GroupId = null;
@@ -101,7 +101,9 @@ namespace IGSLControlPanel.Controllers
                     Parameter = productParameter
                 });
             }
-            return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            return RedirectToAction("Edit", new { productParameter.Id });
         }
 
         public IActionResult Edit(Guid id)
@@ -124,7 +126,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ProductParameter productParameter)
+        public async Task<IActionResult> Edit(Guid id, ProductParameter productParameter, string save, string saveAndExit)
         {
             if (id != productParameter.Id)
             {
@@ -152,7 +154,10 @@ namespace IGSLControlPanel.Controllers
             }
             await CheckParameterOrders(productParameter);
             _productsHelper.CurrentParameter = null;
-            return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products",
+                    _productsHelper.CurrentProduct);
+            return RedirectToAction("Edit", new {id});
         }
 
         public async Task<IActionResult> Delete(Guid id)

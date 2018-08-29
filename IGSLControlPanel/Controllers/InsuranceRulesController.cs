@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DBModels.Models;
+﻿using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -22,7 +22,7 @@ namespace IGSLControlPanel.Controllers
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
-        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper, 
+        public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper,
             InsuranceRulesHelper insRulesHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
         {
             _context = context;
@@ -36,7 +36,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create()
         {
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
-            var tempRule = new InsuranceRule{ ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
+            var tempRule = new InsuranceRule { ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
             if (_stateHelper.IsInsRuleCreateInProgress)
             {
                 tempRule = _insRulesHelper.CurrentRule;
@@ -51,7 +51,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(InsuranceRule insuranceRule)
+        public async Task<IActionResult> Create(InsuranceRule insuranceRule, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(insuranceRule);
 
@@ -78,7 +78,9 @@ namespace IGSLControlPanel.Controllers
                 _stateHelper.IsInsRuleCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created InsuranceRule (id={insuranceRule.Id})");
             }
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", new { insuranceRule.Id });
         }
 
         public IActionResult Edit(Guid id)
@@ -98,7 +100,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, InsuranceRule insuranceRule)
+        public async Task<IActionResult> Edit(Guid id, InsuranceRule insuranceRule, string save, string saveAndExit)
         {
             if (id != insuranceRule.Id)
             {
@@ -123,9 +125,11 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", new { id });
         }
-        
+
         public IActionResult Delete(Guid id)
         {
             var insuranceRule = _context.InsuranceRules
@@ -180,7 +184,7 @@ namespace IGSLControlPanel.Controllers
             if (insRuleId != null)
             {
                 var rule = await _context.InsuranceRules.FindAsync(insRuleId);
-                if(rule == null) return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                if (rule == null) return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
                 rules.Add(new InsRuleTariffLink
                 {
                     InsRuleId = rule.Id,

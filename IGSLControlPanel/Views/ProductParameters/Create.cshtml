@@ -55,11 +55,11 @@
                 <div class="form-group">
                     <label>
                         Лимиты значений
-                        <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
-                            <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
-                        </a>
                         @if (Model.Limit != null)
                         {
+                            <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
+                                <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
+                            </a>
                             <a asp-controller="ValueLimits" asp-action="Edit">
                                 <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
                             </a>
@@ -69,6 +69,9 @@
                         }
                         else
                         {
+                            <a>
+                                <img src="~/images/Icons/add_gray.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
+                            </a>
                             <a>
                                 <img src="~/images/Icons/edit_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
                             </a>
@@ -122,7 +125,8 @@
                     }
                 </div>
                 <div class="form-group">
-                    <input type="submit" value="Создать" class="btn btn-default" />
+                    <input type="submit" value="Создать" name="create" class="btn btn-default" />
+                    <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" />
                     <a asp-action="GoBack">
                         <input class="btn btn-default" value="Отменить и выйти" />
                     </a>

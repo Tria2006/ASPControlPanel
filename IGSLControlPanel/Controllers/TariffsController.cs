@@ -62,7 +62,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(Tariff tariff)
+        public async Task<IActionResult> Create(Tariff tariff, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(tariff);
             _context.Add(tariff);
@@ -79,7 +79,9 @@ namespace IGSLControlPanel.Controllers
             }
             _stateHelper.IsTariffCreateInProgress = false;
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Tariff (id={tariff.Id})");
-            return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
+            if (!string.IsNullOrEmpty(createAndExit))
+                return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
+            return RedirectToAction("Edit", new { tariff.Id });
         }
 
         public IActionResult Edit(Guid id)
@@ -108,7 +110,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Tariff tariff)
+        public async Task<IActionResult> Edit(Guid id, Tariff tariff, string save, string saveAndExit)
         {
             if (id != tariff.Id)
             {
@@ -133,7 +135,9 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
+            return RedirectToAction("Edit", new { id });
         }
 
         public async Task<IActionResult> Delete(Guid id)
