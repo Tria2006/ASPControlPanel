@@ -12,6 +12,8 @@ namespace IGSLControlPanel.Enums
         [Display(Name = "Дата")]
         Date = 2,
         [Display(Name = "Список")]
-        List = 3
+        List = 3,
+        [Display(Name = "Строка")]
+        String = 4
     }
 }

@@ -10,6 +10,9 @@ namespace DBModels.Models
         [DisplayName("Тип данных")]
         public int ParameterDataType { get; set; }
 
+        [DisplayName("Строковое значение")]
+        public string StringValue { get; set; }
+
         [DisplayName("Начальное значение")]
         public int? IntValueFrom { get; set; }
 

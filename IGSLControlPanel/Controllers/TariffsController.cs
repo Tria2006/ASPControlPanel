@@ -76,6 +76,7 @@ namespace IGSLControlPanel.Controllers
                 });
                 _stateHelper.IsInsRuleCreateInProgress = false;
                 await _context.SaveChangesAsync();
+                if (_stateHelper.IsRiskCreateInProgress) _stateHelper.IsRiskCreateInProgress = false;
             }
             _stateHelper.IsTariffCreateInProgress = false;
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Tariff (id={tariff.Id})");

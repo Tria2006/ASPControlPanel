@@ -31,7 +31,11 @@ namespace IGSLControlPanel.Controllers
         
         public IActionResult Create(Guid tariffId, Guid insRuleId)
         {
-            var tempRisk = new Risk{ ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
+            var tempRisk = new Risk
+            {
+                ValidFrom = DateTime.Today, 
+                ValidTo = new DateTime(2100, 1, 1)
+            };
             ViewData["InsRuleId"] = insRuleId;
             ViewData["TariffId"] = tariffId;
             if (_stateHelper.IsRiskCreateInProgress)
@@ -59,6 +63,7 @@ namespace IGSLControlPanel.Controllers
                     InsRule = _insRuleHelper.CurrentRule,
                     Risk = risk
                 });
+                _insRuleHelper.CurrentRisk = risk;
             }
             else
             {
@@ -97,8 +102,8 @@ namespace IGSLControlPanel.Controllers
         {
             ViewData["TariffId"] = tariffId;
             var risk = _context.Risks.Include(x => x.LinksToInsRules)
-                .ThenInclude(x => x.InsRule)
-                .Include(x => x.Requirements).SingleOrDefault(x => x.Id == id);
+                           .ThenInclude(x => x.InsRule)
+                           .Include(x => x.Requirements).SingleOrDefault(x => x.Id == id) ?? _insRuleHelper.CurrentRisk;
             if (risk == null)
             {
                 return NotFound();

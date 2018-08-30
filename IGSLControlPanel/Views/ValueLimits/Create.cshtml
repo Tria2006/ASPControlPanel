@@ -57,6 +57,14 @@
 
             @await Html.PartialAsync("_LimitListItemsBlock", Model.LimitListItems.Where(x => !x.IsDeleted).ToList())
         }
+        else if (Model.ParameterDataType == (int)DataTypes.String)
+        {
+            <div class="form-group">
+                <label asp-for="StringValue" class="control-label"></label>
+                <input id="strValue" asp-for="StringValue" class="form-control" style="width: 600px" />
+                <span asp-validation-for="StringValue" class="text-danger"></span>
+            </div>
+        }
         @Html.HiddenFor(x => x.ParameterId)
         @Html.HiddenFor(x => x.ProductId)
         <div class="form-group" style="margin-top: 50px">
@@ -81,7 +89,8 @@
                 dateMin: $("#dateMin").val(),
                 dateMax: $("#dateMax").val(),
                 intMin: $("#intMin").val(),
-                intMax: $("#intMax").val()
+                intMax: $("#intMax").val(),
+                strValue: $("#strValue").val()
             },
             success: function () { }
         });

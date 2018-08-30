@@ -57,6 +57,7 @@ namespace IGSLControlPanel.Controllers
 
             if (_stateHelper.IsTariffCreateInProgress)
             {
+                insuranceRule.LinksToRisks = _insRulesHelper.CurrentRule.LinksToRisks;
                 _tariffsHelper.CurrentTariff.InsRuleTariffLink.Add(new InsRuleTariffLink
                 {
                     Tariff = _tariffsHelper.CurrentTariff,
@@ -66,6 +67,7 @@ namespace IGSLControlPanel.Controllers
             else
             {
                 _context.Add(insuranceRule);
+                insuranceRule.LinksToRisks = _insRulesHelper.CurrentRule.LinksToRisks;
                 await _context.SaveChangesAsync();
                 insuranceRule.LinksToTariff.Add(new InsRuleTariffLink
                 {
@@ -88,7 +90,7 @@ namespace IGSLControlPanel.Controllers
             var insuranceRule = _context.InsuranceRules
                 .Include(x => x.LinksToRisks)
                 .ThenInclude(x => x.Risk)
-                .ThenInclude(x => x.Requirements).SingleOrDefault(x => x.Id == id);
+                .ThenInclude(x => x.Requirements).SingleOrDefault(x => x.Id == id) ?? _insRulesHelper.CurrentRule;
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff?.Id;
             if (insuranceRule == null)
             {

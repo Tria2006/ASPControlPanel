@@ -143,7 +143,7 @@ namespace IGSLControlPanel.Controllers
             return _context.ValueLimits.Any(e => e.Id == id);
         }
 
-        public void SaveTempData(string name, int dataType, DateTime? dateMin, DateTime? dateMax, int? intMin, int? intMax)
+        public void SaveTempData(string name, int dataType, DateTime? dateMin, DateTime? dateMax, int? intMin, int? intMax, string strValue)
         {
             _productsHelper.CurrentParameter.Limit.Name = name;
             _productsHelper.CurrentParameter.Limit.ParameterDataType = dataType;
@@ -151,6 +151,7 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.Limit.DateValueTo = dateMax;
             _productsHelper.CurrentParameter.Limit.IntValueFrom = intMin;
             _productsHelper.CurrentParameter.Limit.IntValueTo = intMax;
+            _productsHelper.CurrentParameter.Limit.StringValue = strValue;
         }
 
         public IActionResult GoBack()

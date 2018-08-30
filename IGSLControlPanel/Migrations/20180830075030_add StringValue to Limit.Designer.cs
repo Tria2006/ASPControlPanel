@@ -4,14 +4,16 @@ using IGSLControlPanel.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    partial class IGSLContextModelSnapshot : ModelSnapshot
+    [Migration("20180830075030_add StringValue to Limit")]
+    partial class addStringValuetoLimit
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
