@@ -13,86 +13,40 @@
 </head>
 
 <h2>Новый тариф</h2>
-<div id="moveItemModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 class="modal-title">Выберите правила страхования</h4>
-            </div>
-            <form asp-controller="InsuranceRules" asp-action="AddRulesToTariff">
-                @await Html.PartialAsync("_InsuranceRulesSelectView", ViewData["InsRulesList"], ViewData)
-
-                <div class="form-group" style="margin-left: 18px;">
-                    <button id="moveOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
-                    <button id="moveCancelBtn" type="button" class="btn btn-primary">
-                        Отмена
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-</div>
 <div class="row">
-        <form asp-action="Create" class="create_update_form">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input id="folderId" asp-for="FolderId" type="hidden" />
-            <div class="form-group" style="width: 600px" >
-                <label asp-for="Name" class="control-label"></label>
-                <input id="name" asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ValidFrom" class="control-label"></label>
-                <input id="validFromDt" asp-for="ValidFrom" class="form-control" style="width: 160px" />
-                <span asp-validation-for="ValidFrom" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ValidTo" class="control-label"></label>
-                <input id="validToDt" asp-for="ValidTo" class="form-control" style="width: 160px" />
-                <span asp-validation-for="ValidTo" class="text-danger"></span>
-            </div>
+    <form asp-action="Create" class="create_update_form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input id="folderId" asp-for="FolderId" type="hidden" />
+        <div class="form-group" style="width: 600px">
+            <label asp-for="Name" class="control-label"></label>
+            <input id="name" asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidFrom" class="control-label"></label>
+            <input id="validFromDt" asp-for="ValidFrom" class="form-control" style="width: 160px" />
+            <span asp-validation-for="ValidFrom" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidTo" class="control-label"></label>
+            <input id="validToDt" asp-for="ValidTo" class="form-control" style="width: 160px" />
+            <span asp-validation-for="ValidTo" class="text-danger"></span>
+        </div>
+        <h4 style="margin-top: 50px; color: red">
+            Добавление правил страхования будет доступно после сохранения тарифа
+        </h4>
 
-            <h3>Правила страхования</h3>
-            <div style="float: left">
-                <a asp-controller="InsuranceRules" asp-action="Create" onclick="SaveTempData()">
-                    <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-                </a>
-            </div>
+        <div class="form-group" style="margin-top: 50px">
+            <input type="submit" value="Создать" name="create" class="btn btn-default" style="float: left" />
+            <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
             <div>
-                <!-- кнопка выбора правила -->
-                <a id="selectInsRuleBtn">
-                    <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; margin-top: -3px; width: 40px; height: 40px" />
-                </a>
+                <button class="btn btn-default" asp-controller="Tariffs" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
             </div>
-            @await Html.PartialAsync("_InsuranceRulesBlock", Model.InsRuleTariffLink ?? new List<InsRuleTariffLink>())
-
-            <div class="form-group" style="margin-top: 50px">
-                <input type="submit" value="Создать" name="create" class="btn btn-default" style="float: left" />
-                <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
-                <div>
-                    <button class="btn btn-default" asp-controller="Tariffs" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
-                </div>
-            </div>
-        </form>
+        </div>
+    </form>
 </div>
 
 <script>
-    $(document).ready(function () {
-        $("#selectInsRuleBtn").click(function () {
-            SaveTempData();
-            $("#moveItemModal").modal('show');
-        });
-        $("#moveOkBtn").click(function () {
-            $("#moveItemModal").modal('hide');
-        });
-        $("#moveCancelBtn").click(function () {
-            $("#moveItemModal").modal('hide');
-        });
-    });
-
     function SaveTempData() {
         $.ajax({
             url: "/Tariffs/SaveTempData",

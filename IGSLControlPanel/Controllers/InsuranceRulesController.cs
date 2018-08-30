@@ -18,34 +18,24 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
         private readonly InsuranceRulesHelper _insRulesHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
         public InsuranceRulesController(IGSLContext context, TariffsHelper tariffsHelper,
-            InsuranceRulesHelper insRulesHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
+            InsuranceRulesHelper insRulesHelper, IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
             logger = LogManager.GetLogger(typeof(InsuranceRulesController));
             _tariffsHelper = tariffsHelper;
             _insRulesHelper = insRulesHelper;
-            _stateHelper = stateHelper;
         }
 
         public IActionResult Create()
         {
             ViewData["TariffId"] = _tariffsHelper.CurrentTariff.Id;
             var tempRule = new InsuranceRule { ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
-            if (_stateHelper.IsInsRuleCreateInProgress)
-            {
-                tempRule = _insRulesHelper.CurrentRule;
-            }
-            else
-            {
-                _insRulesHelper.CurrentRule = tempRule;
-                _stateHelper.IsInsRuleCreateInProgress = true;
-            }
+            _insRulesHelper.CurrentRule = tempRule;
             return View(tempRule);
         }
 
@@ -55,33 +45,19 @@ namespace IGSLControlPanel.Controllers
         {
             if (!ModelState.IsValid) return View(insuranceRule);
 
-            if (_stateHelper.IsTariffCreateInProgress)
+            _context.Add(insuranceRule);
+            insuranceRule.LinksToRisks = _insRulesHelper.CurrentRule.LinksToRisks;
+            await _context.SaveChangesAsync();
+            insuranceRule.LinksToTariff.Add(new InsRuleTariffLink
             {
-                insuranceRule.LinksToRisks = _insRulesHelper.CurrentRule.LinksToRisks;
-                _tariffsHelper.CurrentTariff.InsRuleTariffLink.Add(new InsRuleTariffLink
-                {
-                    Tariff = _tariffsHelper.CurrentTariff,
-                    InsRule = insuranceRule
-                });
-            }
-            else
-            {
-                _context.Add(insuranceRule);
-                insuranceRule.LinksToRisks = _insRulesHelper.CurrentRule.LinksToRisks;
-                await _context.SaveChangesAsync();
-                insuranceRule.LinksToTariff.Add(new InsRuleTariffLink
-                {
-                    TariffId = _tariffsHelper.CurrentTariff.Id,
-                    InsRuleId = insuranceRule.Id,
-                    InsRule = insuranceRule
-                });
-                await _context.SaveChangesAsync();
-                _stateHelper.IsRiskCreateInProgress = false;
-                _stateHelper.IsInsRuleCreateInProgress = false;
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created InsuranceRule (id={insuranceRule.Id})");
-            }
+                TariffId = _tariffsHelper.CurrentTariff.Id,
+                InsRuleId = insuranceRule.Id,
+                InsRule = insuranceRule
+            });
+            await _context.SaveChangesAsync();
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created InsuranceRule (id={insuranceRule.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
             return RedirectToAction("Edit", new { insuranceRule.Id });
         }
 
@@ -128,7 +104,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
             return RedirectToAction("Edit", new { id });
         }
 
@@ -162,7 +138,7 @@ namespace IGSLControlPanel.Controllers
             _tariffsHelper.CurrentTariff.InsRuleTariffLink.RemoveAll(x => x.InsRuleId == id);
             await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) InsuranceRule (id={id})");
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         private bool InsuranceRuleExists(Guid id)
@@ -186,7 +162,7 @@ namespace IGSLControlPanel.Controllers
             if (insRuleId != null)
             {
                 var rule = await _context.InsuranceRules.FindAsync(insRuleId);
-                if (rule == null) return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                if (rule == null) return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
                 rules.Add(new InsRuleTariffLink
                 {
                     InsRuleId = rule.Id,
@@ -205,30 +181,19 @@ namespace IGSLControlPanel.Controllers
                 }
             }
 
-            if (!_stateHelper.IsTariffCreateInProgress)
+            var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
+            if (contextTariff != null)
             {
-                var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
-                if (contextTariff != null)
-                {
-                    contextTariff.InsRuleTariffLink.AddRange(rules);
-                    await _context.SaveChangesAsync();
-                    _insRulesHelper.SelectedRules.Clear();
-                }
+                contextTariff.InsRuleTariffLink.AddRange(rules);
+                await _context.SaveChangesAsync();
+                _insRulesHelper.SelectedRules.Clear();
             }
-            else
-            {
-                foreach (var link in rules)
-                {
-                    link.InsRule = await _context.InsuranceRules.FindAsync(link.InsRuleId);
-                }
-                _tariffsHelper.CurrentTariff.InsRuleTariffLink.AddRange(rules);
-            }
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         public IActionResult GoBack()
         {
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         public void SaveTempData(string name)

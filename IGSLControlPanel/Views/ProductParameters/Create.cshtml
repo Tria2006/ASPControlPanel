@@ -52,78 +52,9 @@
                     <label asp-for="GroupId" class="control-label" style="width: 220px"></label>
                     <select asp-for="GroupId" id="groupId" asp-items="@ViewData["ParamGroups"] as SelectList" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
                 </div>
-                <div class="form-group">
-                    <label>
-                        Лимиты значений
-                        @if (Model.Limit != null)
-                        {
-                            <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
-                                <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
-                            </a>
-                            <a asp-controller="ValueLimits" asp-action="Edit">
-                                <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
-                            </a>
-                            <a asp-controller="ValueLimits" asp-action="Delete">
-                                <img src="~/images/Icons/del_param.png" class="small-button-img" style="margin: 2px" alt="" />
-                            </a>
-                        }
-                        else
-                        {
-                            <a>
-                                <img src="~/images/Icons/add_gray.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
-                            </a>
-                            <a>
-                                <img src="~/images/Icons/edit_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
-                            </a>
-                            <a>
-                                <img src="~/images/Icons/del_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
-                            </a>
-                        }
-                    </label>
-                    @if (Model.Limit == null)
-                    {
-                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
-                            <label>Нет ограничений по значению</label>
-                        </div>
-                    }
-                    else
-                    {
-                        <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
-                            <div>
-                                <label asp-for="Limit.Name" class="control-label" style="width: 180px"></label>
-                                <label>@Model.Limit.Name</label>
-                            </div>
-                            <div>
-                                <label asp-for="DataType" class="control-label" style="width: 180px"></label>
-                                <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
-                            </div>
-                            <div>
-                                @if (Model.Limit.ParameterDataType == (int)DataTypes.Date)
-                                {
-                                    <div>
-                                        <label asp-for="Limit.DateValueFrom" class="control-label" style="width: 180px"></label>
-                                        <label>@Model.Limit.DateValueFrom</label>
-                                    </div>
-                                    <div>
-                                        <label asp-for="Limit.DateValueTo" class="control-label" style="width: 180px"></label>
-                                        <label>@Model.Limit.DateValueTo</label>
-                                    </div>
-                                }
-                                else if (Model.Limit.ParameterDataType == (int)DataTypes.Number)
-                                {
-                                    <div>
-                                        <label asp-for="Limit.IntValueFrom" class="control-label" style="width: 180px"></label>
-                                        <label>@Model.Limit.IntValueFrom</label>
-                                    </div>
-                                    <div>
-                                        <label asp-for="Limit.IntValueTo" class="control-label" style="width: 180px"></label>
-                                        <label>@Model.Limit.IntValueTo</label>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                    }
-                </div>
+                <h4 style="margin-top: 50px; color: red">
+                    Добавление лимита будет доступно после сохранения параметра продукта
+                </h4>
                 <div class="form-group">
                     <input type="submit" value="Создать" name="create" class="btn btn-default" style="float: left" />
                     <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />

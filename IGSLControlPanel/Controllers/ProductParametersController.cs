@@ -18,17 +18,15 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
-        public ProductParametersController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
+        public ProductParametersController(IGSLContext context, ProductsHelper productsHelper, IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
             logger = LogManager.GetLogger(typeof(ProductParametersController));
             _productsHelper = productsHelper;
-            _stateHelper = stateHelper;
         }
 
         public IActionResult Create(Guid? groupId)
@@ -45,15 +43,7 @@ namespace IGSLControlPanel.Controllers
                 ValidFrom = DateTime.Today,
                 ValidTo = new DateTime(2100, 1, 1)
             };
-            if (_stateHelper.IsParameterCreateInProgress)
-            {
-                tempParam = _productsHelper.CurrentParameter;
-            }
-            else
-            {
                 _productsHelper.CurrentParameter = tempParam;
-                _stateHelper.IsParameterCreateInProgress = true;
-            }
             return View(tempParam);
         }
 
@@ -64,8 +54,6 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(productParameter);
             if (productParameter.GroupId == Guid.Empty) productParameter.GroupId = null;
 
-            if (!_stateHelper.IsProductCreateInProgress)
-            {
                 _context.Add(productParameter);
                 _context.SaveChanges();
                 productParameter.Limit = _productsHelper.CurrentParameter.Limit;
@@ -89,20 +77,9 @@ namespace IGSLControlPanel.Controllers
                 await CheckParameterOrders(productParameter);
                 _productsHelper.LoadProductLimits(_productsHelper.CurrentProduct, _context);
                 _productsHelper.CurrentParameter = null;
-                _stateHelper.IsParameterCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ProductParameter (id={productParameter.Id})");
-            }
-            else
-            {
-                // если попадаем сюда, то продукт еще не был сохранен и считаем, что добавление параметра не завершено
-                _productsHelper.CurrentProduct.LinkToProductParameters.Add(new ProductLinkToProductParameter
-                {
-                    Product = _productsHelper.CurrentProduct,
-                    Parameter = productParameter
-                });
-            }
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products", _productsHelper.CurrentProduct);
+                return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
             return RedirectToAction("Edit", new { productParameter.Id });
         }
 
@@ -155,7 +132,7 @@ namespace IGSLControlPanel.Controllers
             await CheckParameterOrders(productParameter);
             _productsHelper.CurrentParameter = null;
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "CreateProduct" : "Edit", "Products",
+                return RedirectToAction("Edit", "Products",
                     _productsHelper.CurrentProduct);
             return RedirectToAction("Edit", new {id});
         }
@@ -351,7 +328,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult GoBack()
         {
-            return RedirectToAction(_stateHelper.IsProductCreateInProgress ? "Create" : "Edit", "Products", _productsHelper.CurrentProduct);
+            return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
         }
     }
 }

@@ -16,17 +16,15 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly InsuranceRulesHelper _insRuleHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
-        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
+        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
             logger = LogManager.GetLogger(typeof(RisksController));
             _insRuleHelper = insRuleHelper;
-            _stateHelper = stateHelper;
         }
         
         public IActionResult Create(Guid tariffId, Guid insRuleId)
@@ -38,15 +36,7 @@ namespace IGSLControlPanel.Controllers
             };
             ViewData["InsRuleId"] = insRuleId;
             ViewData["TariffId"] = tariffId;
-            if (_stateHelper.IsRiskCreateInProgress)
-            {
-                tempRisk = _insRuleHelper.CurrentRisk;
-            }
-            else
-            {
                 _insRuleHelper.CurrentRisk = tempRisk;
-                _stateHelper.IsRiskCreateInProgress = true;
-            }
             return View(tempRisk);
         }
 
@@ -56,17 +46,6 @@ namespace IGSLControlPanel.Controllers
         {
             if (!ModelState.IsValid) return View(risk);
 
-            if (_stateHelper.IsInsRuleCreateInProgress)
-            {
-                _insRuleHelper.CurrentRule.LinksToRisks.Add(new RiskInsRuleLink
-                {
-                    InsRule = _insRuleHelper.CurrentRule,
-                    Risk = risk
-                });
-                _insRuleHelper.CurrentRisk = risk;
-            }
-            else
-            {
                 _context.Add(risk);
                 await _context.SaveChangesAsync();
 
@@ -90,11 +69,9 @@ namespace IGSLControlPanel.Controllers
                 });
 
                 await _context.SaveChangesAsync();
-                _stateHelper.IsRiskCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Risk (id={risk.Id})");
-            }
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+                return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
             return RedirectToAction("Edit", new { risk.Id });
         }
 
@@ -136,7 +113,7 @@ namespace IGSLControlPanel.Controllers
                 throw;
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+                return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
             return RedirectToAction("Edit", new { id });
         }
 
@@ -167,7 +144,7 @@ namespace IGSLControlPanel.Controllers
 
             await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Risk (id={id})");
-            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+            return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
 
         private bool RiskExists(Guid id)
@@ -186,7 +163,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult GoBack()
         {
-            return RedirectToAction(_stateHelper.IsInsRuleCreateInProgress ? "Create" : "Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
+            return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }
     }
 }

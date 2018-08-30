@@ -49,13 +49,9 @@
         }
         else if (Model.ParameterDataType == (int)DataTypes.List)
         {
-            @Html.LabelFor(x => Model.LimitListItems, new { style = "margin-right: 50px; margin-top: 20px; vertical-align: bottom" })
-
-            <a asp-controller="LimitListItems" asp-action="Create" onclick="SaveTempData()">
-                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-            </a>
-
-            @await Html.PartialAsync("_LimitListItemsBlock", Model.LimitListItems.Where(x => !x.IsDeleted).ToList())
+            <h4 style="margin-top: 50px; color: red">
+                Добавление элементов в список будет доступно после сохранения лимита
+            </h4>
         }
         else if (Model.ParameterDataType == (int)DataTypes.String)
         {

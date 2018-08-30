@@ -17,19 +17,17 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly RiskFactorHelper _factorHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
         public RiskFactorsController(IGSLContext context, RiskFactorHelper factorHelper, TariffsHelper tariffsHelper,
-            EntityStateHelper stateHelper, IHttpContextAccessor accessor)
+            IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
             logger = LogManager.GetLogger(typeof(RiskFactorsController));
             _tariffsHelper = tariffsHelper;
-            _stateHelper = stateHelper;
             _factorHelper = factorHelper;
         }
 
@@ -49,16 +47,6 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(RiskFactor riskFactor, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(riskFactor);
-            if (_stateHelper.IsTariffCreateInProgress)
-            {
-                _tariffsHelper.CurrentTariff.RiskFactorsTariffLinks.Add(new RiskFactorTariffLink
-                {
-                    Tariff = _tariffsHelper.CurrentTariff,
-                    RiskFactor = riskFactor
-                });
-            }
-            else
-            {
                 _context.Add(riskFactor);
                 await _context.SaveChangesAsync();
                 riskFactor.RiskFactorsTariffLinks.Add(new RiskFactorTariffLink
@@ -68,13 +56,9 @@ namespace IGSLControlPanel.Controllers
                     RiskFactor = riskFactor
                 });
                 await _context.SaveChangesAsync();
-                _stateHelper.IsRiskCreateInProgress = false;
-                _stateHelper.IsInsRuleCreateInProgress = false;
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
-            }
-            
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
             return RedirectToAction("Edit", new { riskFactor.Id });
         }
 
@@ -132,7 +116,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
             return RedirectToAction("Edit", new { id });
         }
 
@@ -165,7 +149,7 @@ namespace IGSLControlPanel.Controllers
             _tariffsHelper.CurrentTariff.RiskFactorsTariffLinks.RemoveAll(x => x.RiskFactorId == id);
             await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) RiskFactor (id={id})");
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         private bool RiskFactorExists(Guid id)
@@ -179,7 +163,7 @@ namespace IGSLControlPanel.Controllers
             if (factorId != null)
             {
                 var factor = await _context.RiskFactors.FindAsync(factorId);
-                if (factor == null) return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+                if (factor == null) return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
                 factors.Add(new RiskFactorTariffLink
                 {
                     RiskFactorId = factor.Id,
@@ -198,8 +182,6 @@ namespace IGSLControlPanel.Controllers
                 }
             }
 
-            if (!_stateHelper.IsTariffCreateInProgress)
-            {
                 var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
                 if (contextTariff != null)
                 {
@@ -207,16 +189,7 @@ namespace IGSLControlPanel.Controllers
                     await _context.SaveChangesAsync();
                     _factorHelper.SelectedFactors.Clear();
                 }
-            }
-            else
-            {
-                foreach (var link in factors)
-                {
-                    link.RiskFactor = await _context.RiskFactors.FindAsync(link.RiskFactorId);
-                }
-                _tariffsHelper.CurrentTariff.RiskFactorsTariffLinks.AddRange(factors);
-            }
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         public async Task FactorCheckBoxClick(Guid id)
@@ -228,7 +201,7 @@ namespace IGSLControlPanel.Controllers
         {
             var factor = _context.RiskFactors.Find(_factorHelper.CurrentFactor.Id);
             if (factor != null) _factorHelper.CurrentFactor = factor;
-            return RedirectToAction(_stateHelper.IsTariffCreateInProgress ? "Create" : "Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+            return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
         public void UpdateFactorValue(Guid id, double factorValue)

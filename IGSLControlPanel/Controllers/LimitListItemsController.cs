@@ -15,17 +15,15 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
-        public LimitListItemsController(IGSLContext context, ProductsHelper productsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
+        public LimitListItemsController(IGSLContext context, ProductsHelper productsHelper, IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
             logger = LogManager.GetLogger(typeof(ProductParametersController));
             _productsHelper = productsHelper;
-            _stateHelper = stateHelper;
         }
 
         public IActionResult Create(Guid limitId)
@@ -44,19 +42,13 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(LimitListItem limitListItem, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(limitListItem);
-            if (_stateHelper.IsValueLimitCreateInProgress)
-            {
-                _productsHelper.CurrentParameter.Limit.LimitListItems.Add(limitListItem);
-            }
-            else
-            {
                 _context.Add(limitListItem);
                 await _context.SaveChangesAsync();
                 _productsHelper.CurrentParameter.Limit.LimitListItems.Add(limitListItem);
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created LimitListItem (id={limitListItem.Id})");
-            }
+
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
+                return RedirectToAction("Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
             return RedirectToAction("Edit", new { limitListItem.Id });
         }
 
@@ -104,7 +96,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ProductParameters", _productsHelper.CurrentParameter);
+                return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
             return RedirectToAction("Edit", new { id });
         }
 
@@ -129,7 +121,7 @@ namespace IGSLControlPanel.Controllers
             await _context.SaveChangesAsync();
             _productsHelper.CurrentParameter.Limit.LimitListItems.RemoveAll(x => x.Id == id);
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) LimitItem (id={id})");
-            return RedirectToAction(_stateHelper.IsParameterCreateInProgress ? "Create" : "Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
+            return RedirectToAction("Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
         }
 
         private bool LimitListItemExists(Guid id)

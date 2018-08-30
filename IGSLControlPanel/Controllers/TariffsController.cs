@@ -17,11 +17,10 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
-        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor)
+        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, IHttpContextAccessor accessor)
             : base(context, helper)
         {
             _context = context;
@@ -29,7 +28,6 @@ namespace IGSLControlPanel.Controllers
             logger = LogManager.GetLogger(typeof(TariffsController));
             BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
-            _stateHelper = stateHelper;
         }
 
         public IActionResult Index(Guid parentid)
@@ -41,15 +39,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create(Guid folderId)
         {
             var tempTariff = new Tariff { FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
-            if (_stateHelper.IsTariffCreateInProgress)
-            {
-                tempTariff = _tariffsHelper.CurrentTariff;
-            }
-            else
-            {
                 _tariffsHelper.CurrentTariff = tempTariff;
-                _stateHelper.IsTariffCreateInProgress = true;
-            }
             ViewData["ParentFolderId"] = folderId;
             var rules = _context.InsuranceRules.Where(x => !x.IsDeleted).ToList();
             ViewData["InsRulesList"] = rules.Where(x => tempTariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id));
@@ -67,18 +57,6 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(tariff);
             _context.Add(tariff);
             await _context.SaveChangesAsync();
-            if (_stateHelper.IsInsRuleCreateInProgress)
-            {
-                tariff.InsRuleTariffLink = _tariffsHelper.CurrentTariff.InsRuleTariffLink;
-                tariff.InsRuleTariffLink.ForEach(p =>
-                {
-                    p.TariffId = tariff.Id;
-                });
-                _stateHelper.IsInsRuleCreateInProgress = false;
-                await _context.SaveChangesAsync();
-                if (_stateHelper.IsRiskCreateInProgress) _stateHelper.IsRiskCreateInProgress = false;
-            }
-            _stateHelper.IsTariffCreateInProgress = false;
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Tariff (id={tariff.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));

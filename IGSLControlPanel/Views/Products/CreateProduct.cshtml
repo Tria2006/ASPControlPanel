@@ -30,74 +30,10 @@
                 <span asp-validation-for="ValidTo" class="text-danger"></span>
             </div>
             <hr />
-            <h3 class="control-label" style="margin-bottom: 20px">Параметры продукта</h3>
-            @{
-                var groupsList = ViewData["ParamGroups"] as SelectList;
-            }
-            @if (groupsList != null)
-            {
-                foreach (var p in groupsList)
-                {
-                    if (Model.LinkToProductParameters.All(x => x.Parameter.GroupId != Guid.Parse(p.Value)))
-                    {
-                        continue;
-                    }
-                    @Html.LabelFor(x => p.Text, new { style = "margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium" })
-
-                    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveProductData()">
-                        <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-                    </a>
-                    <a id="@p.Value" onclick="ParameterUpClick(this)">
-                        <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-                    </a>
-                    <a id="@p.Value" onclick="ParameterDownClick(this)">
-                        <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-                    </a>
-
-                    <div id="@p.Value-partial">
-                        @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == Guid.Parse(p.Value)).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
-                    </div>
-                }
-            }
-
-            @if (Model.LinkToProductParameters.Any(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty))
-            {
-                <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
-
-                <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveProductData()">
-                    <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-                </a>
-                <a onclick="ParameterUpClick(this)">
-                    <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-                </a>
-                <a onclick="ParameterDownClick(this)">
-                    <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-                </a>
-
-                <div id="partialNoGroup">
-                    @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
-                </div>
-            }
-
-            @if (!Model.LinkToProductParameters.Any())
-            {
-                <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
-
-                <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveProductData()">
-                    <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-                </a>
-                <a onclick="ParameterUpClick(this)">
-                    <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-                </a>
-                <a onclick="ParameterDownClick(this)">
-                    <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-                </a>
-
-                <div id="partialNoGroup">
-                    @await Html.PartialAsync("_ProductParametersBlock", new List<ProductParameter>())
-                </div>
-            }
-
+            <h4 style="margin-top: 50px; color: red">
+                Добавление параметров продукта будет доступно после сохранения продукта.
+            </h4>
+            
                 <div class="form-group">
                     <input type="submit" value="Создать" name="create" class="btn btn-default" />
                     <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" />

@@ -16,6 +16,7 @@ namespace IGSLControlPanel.Helpers
         public Product CurrentProduct { get; set; }
         public ProductParameter CurrentParameter { get; set; }
         private List<Product> _checkedProducts { get; } = new List<Product>();
+        public ValueLimit LimitWOChanges { get; set; }
         public bool HasSelectedProducts => _checkedProducts.Any();
 
         public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)

@@ -18,11 +18,10 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
-        private readonly EntityStateHelper _stateHelper;
         private readonly IHttpContextAccessor _httpAccessor;
         private readonly ILog logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, EntityStateHelper stateHelper, IHttpContextAccessor accessor) 
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, IHttpContextAccessor accessor) 
             : base(context, helper)
         {
             _context = context;
@@ -30,7 +29,6 @@ namespace IGSLControlPanel.Controllers
             logger = LogManager.GetLogger(typeof(ProductsController));
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
-            _stateHelper = stateHelper;
         }
 
         public IActionResult Index(Guid id)
@@ -42,17 +40,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult CreateProduct(Guid folderId)
         {
             var tempProduct = new Product {FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1)};
-            // такое может быть если возвращаемся с экрана создания нового параметра
-            if (_stateHelper.IsProductCreateInProgress)
-            {
-                // возвращаемся к заполнению нового продукта
-                tempProduct = _productsHelper.CurrentProduct;
-            }
-            else
-            {
                 _productsHelper.CurrentProduct = tempProduct;
-                _stateHelper.IsProductCreateInProgress = true;
-            }
             var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
             ViewData["ParentFolderId"] = folderId;
@@ -64,19 +52,6 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> CreateProduct(Product product, string create, string createAndExit)
         {
             await _productsHelper.AddProduct(product, _context);
-            _stateHelper.IsProductCreateInProgress = false;
-            // такое может быть если создавали новый продукт и сразу добавляли туда параметры
-            if (_stateHelper.IsParameterCreateInProgress)
-            {
-                product.LinkToProductParameters = _productsHelper.CurrentProduct.LinkToProductParameters;
-                // нужно проставить ProductId в линки созданных параметров
-                product.LinkToProductParameters.ForEach(p =>
-                {
-                    p.ProductId = product.Id;
-                });
-                _stateHelper.IsParameterCreateInProgress = false;
-                await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
-            }
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Product (id={product.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Index", new { id = product.FolderId });
