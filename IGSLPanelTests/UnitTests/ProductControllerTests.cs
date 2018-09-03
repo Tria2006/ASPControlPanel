@@ -10,11 +10,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
 
-namespace IGSLPanelTests
+namespace IGSLPanelTests.UnitTests
 {
 	public class ProductControllerTests
 	{
-	    private IGSLContext _context;
+	    private readonly IGSLContext _context;
 
         public ProductControllerTests()
 		{
@@ -36,8 +36,7 @@ namespace IGSLPanelTests
             _context.FolderTreeEntries.AddRange(folders);
 		    _context.SaveChanges();
 
-		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(),
-		        new EntityStateHelper(), new HttpContextAccessor());
+		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor());
 
             // act
 		    var result = controller.Index(rootFolder.Id) as ViewResult;

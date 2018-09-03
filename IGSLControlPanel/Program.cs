@@ -8,17 +8,15 @@ namespace IGSLControlPanel
     {
         public static void Main(string[] args)
         {
-            BuildWebHost(args).Run();
+            CreateWebHostBuilder(args).Build().Run();
         }
 
-        public static IWebHost BuildWebHost(string[] args) =>
-            WebHost.CreateDefaultBuilder(args)
-                .UseStartup<Startup>()
+        public static IWebHostBuilder CreateWebHostBuilder(string[] args) =>
+            WebHost.CreateDefaultBuilder(args).UseStartup<Startup>()
                 .ConfigureLogging((hostingContext, logging) =>
                 {
                     logging.AddLog4Net();
                     logging.SetMinimumLevel(LogLevel.Debug);
-                })
-                .Build();
+                });
     }
 }
