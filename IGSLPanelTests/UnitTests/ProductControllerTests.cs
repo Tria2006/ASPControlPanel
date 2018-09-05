@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using DBModels.Models;
 using IGSLControlPanel.Controllers;
 using IGSLControlPanel.Data;
@@ -24,27 +24,180 @@ namespace IGSLPanelTests.UnitTests
 		    _context = new IGSLContext(options);
         }
 
+	    [Fact]
+	    public void GetIndexViewFromController()
+	    {
+	        // arrange
+	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor());
+
+	        // act
+	        var result = controller.Index(Guid.Empty) as ViewResult;
+
+	        // assert
+	        Assert.NotNull(result);
+	        Assert.Equal(typeof(FolderTreeEntry), result.Model.GetType());
+	    }
+
 		[Fact]
-		public void GetIndexViewFromController()
+		public void GetAddViewWithNewProduct()
 		{
             // arrange
-		    var rootFolder = new FolderTreeEntry
+		    var products = new List<Product>
 		    {
-		        Name = "RootFolder"
+                new Product
+                {
+                    Name = "Product 1",
+                    FolderId = Guid.Empty
+                },
+		        new Product
+		        {
+		            Name = "Product 2",
+		            FolderId = Guid.Empty
+		        }
 		    };
-            var folders = new List<FolderTreeEntry> {rootFolder}.AsQueryable();
-            _context.FolderTreeEntries.AddRange(folders);
+		    _context.Products.AddRange(products);
 		    _context.SaveChanges();
 
 		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor());
 
             // act
-		    var result = controller.Index(rootFolder.Id) as ViewResult;
+		    var result = controller.CreateProduct(Guid.Empty) as ViewResult;
 
             // assert
 			Assert.NotNull(result);
-            Assert.Equal(typeof(FolderTreeEntry), result.Model.GetType());
-            Assert.Equal("RootFolder", (result.Model as FolderTreeEntry)?.Name);
+            Assert.Equal(typeof(Product), result.Model.GetType());
+            Assert.Equal(Guid.Empty, (result.Model as Product)?.Id);
 		}
+
+	    [Theory]
+        [InlineData("create")]
+        [InlineData("createAndExit")]
+	    public async Task ConfirmCreateProductMustAddProductToContext(string createMethod)
+	    {
+	        // arrange
+	        var product = new Product
+	        {
+                Id = Guid.NewGuid(),
+                Name = "Product 1"
+	        };
+            
+	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+	            {
+                    HttpContext = new DefaultHttpContext()
+	            });
+
+	        // act
+	        RedirectToActionResult result;
+
+	        if (createMethod == "create")
+	            result = await controller.CreateProduct(product, createMethod, null) as RedirectToActionResult;
+	        else
+	            result = await controller.CreateProduct(product, null, createMethod) as RedirectToActionResult;
+
+	        // assert
+            Assert.NotNull(await _context.Products.FindAsync(product.Id));
+            Assert.NotNull(result);
+	        Assert.Equal(createMethod == "create" ? "Edit" : "Index", result.ActionName);
+	    }
+
+		[Fact]
+		public async Task GetEditView()
+		{
+            // arrange
+		    var product = new Product
+		    {
+		        Id = Guid.NewGuid(),
+		        Name = "Product 1"
+		    };
+		    _context.Products.Add(product);
+		    _context.SaveChanges();
+            
+		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+		    {
+		        HttpContext = new DefaultHttpContext()
+		    });
+
+            // act
+		    var result = await controller.Edit(product.Id) as ViewResult;
+
+            // assert
+			Assert.NotNull(result);
+            Assert.Equal(typeof(Product), result.Model.GetType());
+            Assert.Equal(product.Id, (result.Model as Product)?.Id);
+		}
+
+	    [Theory]
+        [InlineData("save")]
+        [InlineData("saveAndExit")]
+	    public async Task ConfirmEditProduct(string createMethod)
+	    {
+	        // arrange
+	        var product = new Product
+	        {
+                Id = Guid.NewGuid(),
+                Name = "Product 1"
+	        };
+            
+	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+	            {
+                    HttpContext = new DefaultHttpContext()
+	            });
+
+	        // act
+	        RedirectToActionResult result;
+
+	        product.Name = "Edited Product";
+
+	        if (createMethod == "create")
+	            result = await controller.CreateProduct(product, createMethod, null) as RedirectToActionResult;
+	        else
+	            result = await controller.CreateProduct(product, null, createMethod) as RedirectToActionResult;
+
+	        // assert
+            Assert.NotNull(await _context.Products.FindAsync(product.Id));
+            Assert.NotNull(result);
+            Assert.Equal("Edited Product", _context.Products.Find(product.Id)?.Name);
+	        Assert.Equal(createMethod == "create" ? "Edit" : "Index", result.ActionName);
+	    }
+
+	    [Fact]
+	    public async Task ClearFolderItemsMustSetFolderAllProductsFolderIdToEmpty()
+	    {
+            var folder = new FolderTreeEntry
+            {
+                Id = Guid.NewGuid(),
+                Name = "Test Folder"
+            };
+            //arrange
+            var product1 = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Product 1",
+                FolderId = folder.Id
+            };
+            var product2 = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Product 2",
+                FolderId = folder.Id
+            };
+
+            _context.Products.AddRange(new List<Product>{product1, product2});
+	        await _context.SaveChangesAsync();
+            
+	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+	        {
+	            HttpContext = new DefaultHttpContext()
+	        });
+	        //act
+	        controller.Index(Guid.Empty);
+	        await controller.ClearFolderItems(new List<FolderTreeEntry> {folder});
+
+	        //assert
+            Assert.NotNull(await _context.Products.FindAsync(product1.Id));
+            Assert.NotNull(await _context.Products.FindAsync(product2.Id));
+            Assert.Equal(Guid.Empty, _context.Products.Find(product1.Id).FolderId);
+            Assert.Equal(Guid.Empty, _context.Products.Find(product2.Id).FolderId);
+	    }
 	}
 }

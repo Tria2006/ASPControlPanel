@@ -63,12 +63,12 @@ namespace IGSLControlPanel.Controllers
             var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
             var product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == id);
-            _productsHelper.LoadProductLimits(product, _context);
-            _productsHelper.CurrentProduct = product;
             if (product == null)
             {
                 return NotFound();
             }
+            _productsHelper.LoadProductLimits(product, _context);
+            _productsHelper.CurrentProduct = product;
             return View(product);
         }
 

@@ -1,0 +1,35 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippet Format="1.0.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>xUnit Fact</Title>
+    <Author>Anton Ageev</Author>
+    <Shortcut>xunitfact</Shortcut>
+    <Description>Fact xUnit test</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>name</ID>
+        <Default>TestMethod</Default>
+      </Literal>
+      <Literal>
+        <ID>type</ID>
+        <Default>void</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="csharp">
+      <![CDATA[[Fact]
+	    public $type$ $name$()
+	    {
+            //arrange
+
+            //act
+
+            //assert
+	    }]]>
+    </Code>
+  </Snippet>
+</CodeSnippet>
