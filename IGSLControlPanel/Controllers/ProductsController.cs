@@ -83,13 +83,13 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Edit", new { product.Id });
         }
 
-        public async Task<IActionResult> DeleteProduct(Guid id)
+        public async Task<IActionResult> DeleteProduct(Guid folderId)
         {
             if (_productsHelper.HasSelectedProducts)
             {
-                await _productsHelper.RemoveProducts(_context, GetFolderById(id), logger, _httpAccessor);
+                await _productsHelper.RemoveProducts(_context, GetFolderById(folderId), logger, _httpAccessor);
             }
-            return RedirectToAction("Index", new { id });
+            return RedirectToAction("Index", new { folderId });
         }
 
         public bool ProductCheckBoxClick(Guid id)
