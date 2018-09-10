@@ -84,10 +84,5 @@ namespace IGSLControlPanel.Controllers
         {
             _folderDataHelper.BuildFolderTree(modelType);
         }
-
-        public FolderTreeEntry GetRootFolder()
-        {
-            return _folderDataHelper.FoldersTree;
-        }
     }
 }

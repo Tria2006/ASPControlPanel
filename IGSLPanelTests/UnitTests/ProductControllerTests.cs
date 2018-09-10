@@ -9,7 +9,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Xunit;
-using Xunit.Sdk;
 
 namespace IGSLPanelTests.UnitTests
 {
@@ -29,7 +28,10 @@ namespace IGSLPanelTests.UnitTests
 	    public void GetIndexViewFromController()
 	    {
 	        // arrange
-	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor());
+	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+	        {
+	            HttpContext = new DefaultHttpContext()
+	        });
 
 	        // act
 	        var result = controller.Index(Guid.Empty) as ViewResult;
@@ -59,7 +61,10 @@ namespace IGSLPanelTests.UnitTests
 		    _context.Products.AddRange(products);
 		    _context.SaveChanges();
 
-		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor());
+		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+		    {
+		        HttpContext = new DefaultHttpContext()
+		    });
 
             // act
 		    var result = controller.CreateProduct(Guid.Empty) as ViewResult;
@@ -187,6 +192,7 @@ namespace IGSLPanelTests.UnitTests
             };
 
             _context.Products.AddRange(new List<Product>{product1, product2});
+	        _context.FolderTreeEntries.Add(folder);
 	        await _context.SaveChangesAsync();
             
 	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
