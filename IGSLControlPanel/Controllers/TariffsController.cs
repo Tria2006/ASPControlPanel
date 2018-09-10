@@ -41,12 +41,6 @@ namespace IGSLControlPanel.Controllers
             var tempTariff = new Tariff { FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
                 _tariffsHelper.CurrentTariff = tempTariff;
             ViewData["ParentFolderId"] = folderId;
-            var rules = _context.InsuranceRules.Where(x => !x.IsDeleted).ToList();
-            ViewData["InsRulesList"] = rules.Where(x => tempTariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id));
-
-            var factors = _context.RiskFactors.Where(x => !x.IsDeleted).ToList();
-            ViewData["RiskFactorsList"] =
-                factors.Where(x => tempTariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id));
             return View(tempTariff);
         }
 
