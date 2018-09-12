@@ -1,0 +1,42 @@
+﻿@model DBModels.Models.FactorValue
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title></title>
+</head>
+<body>
+
+<h4 style="margin-top: 50px">Значение фактора риска</h4>
+<hr />
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="Name" class="control-label"></label>
+                <input asp-for="Name" class="form-control" style="width: 600px" />
+                <span asp-validation-for="Name" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ValidFrom" class="control-label"></label>
+                <input asp-for="ValidFrom" class="form-control" style="width: 180px" />
+                <span asp-validation-for="ValidFrom" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ValidTo" class="control-label"></label>
+                <input asp-for="ValidTo" class="form-control" style="width: 180px" />
+                <span asp-validation-for="ValidTo" class="text-danger"></span>
+            </div>
+            @Html.HiddenFor(x => x.RiskFactorId)
+            @Html.HiddenFor(x => x.TariffId)
+            @Html.HiddenFor(x => x.RiskId)
+            <div class="form-group" style="margin-top: 50px">
+                <input type="submit" value="Создать" name="create" class="btn btn-default" style="float: left" />
+                <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
+                <a asp-action="GoBack">
+                    <input class="btn btn-default" value="Отменить и выйти" />
+                </a>
+            </div>
+        </form>
+
+</body>
+</html>

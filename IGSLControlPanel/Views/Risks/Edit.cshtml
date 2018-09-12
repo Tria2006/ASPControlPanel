@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Редактирование риска";
-    var Requirement = Model.Requirements.SingleOrDefault(x => x.TariffId == (Guid)ViewData["TariffId"]);
+    var requirement = Model.Requirements.SingleOrDefault(x => x.TariffId == (Guid)ViewData["TariffId"]);
 }
 
 <head>
@@ -38,11 +38,11 @@
         <input asp-for="BaseTariffValue" class="form-control" style="width: 100px" />
         <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
     </div>
-    @if (Requirement != null)
+    @if (requirement != null)
     {
-        <input id="reqStartValue" type="hidden" asp-for="@Requirement.IsRequired"/>
-        <input id="reqId" type="hidden" asp-for="@Requirement.Id"/>
-        @await Html.PartialAsync("_RequirementBlock", Requirement)
+        <input id="reqStartValue" type="hidden" asp-for="@requirement.IsRequired"/>
+        <input id="reqId" type="hidden" asp-for="@requirement.Id"/>
+        @await Html.PartialAsync("_RequirementBlock", requirement)
     }
     <div class="form-group" style="margin-top: 50px">
         <input type="submit" value="Сохранить" name="save" class="btn btn-default" />

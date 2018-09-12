@@ -36,7 +36,7 @@ namespace IGSLControlPanel.Controllers
             };
             ViewData["InsRuleId"] = insRuleId;
             ViewData["TariffId"] = tariffId;
-                _insRuleHelper.CurrentRisk = tempRisk;
+            _insRuleHelper.CurrentRisk = tempRisk;
             return View(tempRisk);
         }
 
@@ -85,6 +85,7 @@ namespace IGSLControlPanel.Controllers
             {
                 return NotFound();
             }
+            _insRuleHelper.CurrentRisk = risk;
             return View(risk);
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DBModels.Models;
@@ -19,14 +20,14 @@ namespace IGSLControlPanel.Controllers
         private readonly TariffsHelper _tariffsHelper;
         private readonly RiskFactorHelper _factorHelper;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly ILog logger;
+        private readonly ILog _logger;
 
         public RiskFactorsController(IGSLContext context, RiskFactorHelper factorHelper, TariffsHelper tariffsHelper,
             IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(RiskFactorsController));
+            _logger = LogManager.GetLogger(typeof(RiskFactorsController));
             _tariffsHelper = tariffsHelper;
             _factorHelper = factorHelper;
         }
@@ -56,7 +57,7 @@ namespace IGSLControlPanel.Controllers
                     RiskFactor = riskFactor
                 });
                 await _context.SaveChangesAsync();
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
+                _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
             return RedirectToAction("Edit", new { riskFactor.Id });
@@ -66,12 +67,14 @@ namespace IGSLControlPanel.Controllers
         {
             var riskFactor = _context.RiskFactors
                 .Include(x => x.RiskFactorsTariffLinks)
-                .Include(x => x.FactorValues)
                 .SingleOrDefault(x => x.Id == id);
             if (riskFactor == null)
             {
                 return NotFound();
             }
+
+            riskFactor.FactorValues = _context.FactorValues
+                .Where(x => x.RiskFactorId == id && x.TariffId == _tariffsHelper.CurrentTariff.Id && !x.IsDeleted).ToList();
             var contextTariff = _context.Tariffs
                 .Include(x => x.InsRuleTariffLink)
                 .ThenInclude(x => x.InsRule)
@@ -83,7 +86,7 @@ namespace IGSLControlPanel.Controllers
                 riskFactor.InsuranceRulesLinks = contextTariff.InsRuleTariffLink;
             }
             _factorHelper.CurrentFactor = riskFactor;
-            _factorHelper.PrepareFactorData(_context);
+            //_factorHelper.PrepareFactorData(_context);
             return View(riskFactor);
         }
 
@@ -102,7 +105,7 @@ namespace IGSLControlPanel.Controllers
                 riskFactor.FactorValues = _factorHelper.CurrentFactor.FactorValues;
                 _context.Update(riskFactor);
                 await _context.SaveChangesAsync();
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated RiskFactor (id={riskFactor.Id})");
+                _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated RiskFactor (id={riskFactor.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -148,7 +151,7 @@ namespace IGSLControlPanel.Controllers
             contextTariff?.RiskFactorsTariffLinks.RemoveAll(x => x.RiskFactorId == id);
             _tariffsHelper.CurrentTariff.RiskFactorsTariffLinks.RemoveAll(x => x.RiskFactorId == id);
             await _context.SaveChangesAsync();
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) RiskFactor (id={id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) RiskFactor (id={id})");
             return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
@@ -209,6 +212,17 @@ namespace IGSLControlPanel.Controllers
             var factor = _factorHelper.CurrentFactor.FactorValues.SingleOrDefault(x => x.Id == id && x.TariffId == _tariffsHelper.CurrentTariff.Id);
             if(factor == null) return;
             factor.Value = factorValue;
+        }
+
+        public void CreateExcel()
+        {
+            using (var workbook = new XLWorkbook())
+            {
+                var worksheet = workbook.Worksheets.Add("Sample Sheet");
+                worksheet.Cell("A1").Value = "Hello World!";
+                worksheet.Cell("A2").FormulaA1 = "=MID(A1, 7, 5)";
+                workbook.SaveAs("D:\\Excel\\HelloWorld.xlsx");
+            }
         }
     }
 }
