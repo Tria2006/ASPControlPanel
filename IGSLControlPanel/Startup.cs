@@ -1,4 +1,5 @@
-﻿using IGSLControlPanel.Data;
+﻿using System.IO;
+using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -6,6 +7,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.FileProviders;
 
 namespace IGSLControlPanel
 {
@@ -27,7 +29,12 @@ namespace IGSLControlPanel
             services.AddSingleton<TariffsHelper>();
             services.AddSingleton<InsuranceRulesHelper>();
             services.AddSingleton<RiskFactorHelper>();
+            services.AddSingleton<FilesHelper>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
+            services.AddSingleton<IFileProvider>(
+                new PhysicalFileProvider(
+                    Path.Combine(Directory.GetCurrentDirectory(), "ExcelFiles")));
             services.AddMvc();
         }
 

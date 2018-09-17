@@ -6,12 +6,16 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="ExcelFiles\**" />
     <Compile Remove="Logs\**" />
     <Compile Remove="Models\**" />
+    <Content Remove="ExcelFiles\**" />
     <Content Remove="Logs\**" />
     <Content Remove="Models\**" />
+    <EmbeddedResource Remove="ExcelFiles\**" />
     <EmbeddedResource Remove="Logs\**" />
     <EmbeddedResource Remove="Models\**" />
+    <None Remove="ExcelFiles\**" />
     <None Remove="Logs\**" />
     <None Remove="Models\**" />
   </ItemGroup>

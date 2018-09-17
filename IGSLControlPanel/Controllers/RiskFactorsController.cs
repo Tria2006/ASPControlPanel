@@ -20,16 +20,18 @@ namespace IGSLControlPanel.Controllers
         private readonly TariffsHelper _tariffsHelper;
         private readonly RiskFactorHelper _factorHelper;
         private readonly IHttpContextAccessor _httpAccessor;
+        private readonly FilesHelper _filesHelper;
         private readonly ILog _logger;
 
         public RiskFactorsController(IGSLContext context, RiskFactorHelper factorHelper, TariffsHelper tariffsHelper,
-            IHttpContextAccessor accessor)
+            IHttpContextAccessor accessor, FilesHelper filesHelper)
         {
             _context = context;
             _httpAccessor = accessor;
             _logger = LogManager.GetLogger(typeof(RiskFactorsController));
             _tariffsHelper = tariffsHelper;
             _factorHelper = factorHelper;
+            _filesHelper = filesHelper;
         }
 
         public IActionResult Create()
@@ -214,15 +216,10 @@ namespace IGSLControlPanel.Controllers
             factor.Value = factorValue;
         }
 
-        public void CreateExcel()
+        public IActionResult CreateExcelFile()
         {
-            using (var workbook = new XLWorkbook())
-            {
-                var worksheet = workbook.Worksheets.Add("Sample Sheet");
-                worksheet.Cell("A1").Value = "Hello World!";
-                worksheet.Cell("A2").FormulaA1 = "=MID(A1, 7, 5)";
-                workbook.SaveAs("D:\\Excel\\HelloWorld.xlsx");
-            }
+            var path = _filesHelper.CreateExcel(_tariffsHelper.CurrentTariff, _factorHelper.CurrentFactor);
+            return File(System.IO.File.ReadAllBytes(path), "application/octet-stream", "tempFile.xlsx");
         }
     }
 }
