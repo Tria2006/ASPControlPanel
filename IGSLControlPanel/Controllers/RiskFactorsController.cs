@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
-using ClosedXML.Excel;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using DBModels.Models;
@@ -220,6 +219,23 @@ namespace IGSLControlPanel.Controllers
         {
             var path = _filesHelper.CreateExcel(_tariffsHelper.CurrentTariff, _factorHelper.CurrentFactor);
             return File(System.IO.File.ReadAllBytes(path), "application/octet-stream", "tempFile.xlsx");
+        }
+
+        public IActionResult GoToUploadPage()
+        {
+            return View("UploadFileView");
+        }
+
+        public IActionResult ReturnFromUploadForm()
+        {
+            return RedirectToAction("Edit", new { _factorHelper.CurrentFactor.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFile(IFormFile file)
+        {
+            await _filesHelper.UploadFile(file);
+            return RedirectToAction("Edit", new { _factorHelper.CurrentFactor.Id });
         }
     }
 }

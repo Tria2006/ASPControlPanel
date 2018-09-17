@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
 using ClosedXML.Excel;
@@ -11,15 +10,6 @@ namespace IGSLControlPanel.Helpers
     public class FilesHelper
     {
         private const string PathToExcelFiles = "ExcelFiles";
-        private Dictionary<string, string> GetMimeTypes()
-        {
-            return new Dictionary<string, string>
-            {
-                {".xls", "application/vnd.ms-excel"},
-                {".xlsx", "application/vnd.openxmlformats officedocument.spreadsheetml.sheet"},
-                {".csv", "text/csv"}
-            };
-        }
 
         public async Task UploadFile(IFormFile file)
         {
@@ -28,37 +18,12 @@ namespace IGSLControlPanel.Helpers
 
             var path = Path.Combine(
                 Directory.GetCurrentDirectory(), PathToExcelFiles,
-                file.Name);
+                file.FileName);
 
             using (var stream = new FileStream(path, FileMode.Create))
             {
                 await file.CopyToAsync(stream);
             }
-        }
-
-        public async Task DownloadFile(string fileName)
-        {
-            if (fileName == null)
-                return;
-
-            var path = Path.Combine(
-                Directory.GetCurrentDirectory(),
-                PathToExcelFiles, fileName);
-
-            var memory = new MemoryStream();
-            using (var stream = new FileStream(path, FileMode.Open))
-            {
-                await stream.CopyToAsync(memory);
-            }
-            memory.Position = 0;
-            //return File(memory, GetContentType(path), Path.GetFileName(path));
-        }
-
-        public string GetContentType(string path)
-        {
-            var types = GetMimeTypes();
-            var ext = Path.GetExtension(path).ToLowerInvariant();
-            return types[ext];
         }
 
         public string CreateExcel(Tariff tariff, RiskFactor factor)
