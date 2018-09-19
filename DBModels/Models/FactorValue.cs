@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace DBModels.Models
 {
@@ -10,6 +11,6 @@ namespace DBModels.Models
 
         public Guid RiskFactorId { get; set; }
 
-        public double Value { get; set; }
+        public List<Coefficient> Values { get; set; } = new List<Coefficient>();
     }
 }

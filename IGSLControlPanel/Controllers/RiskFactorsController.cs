@@ -58,6 +58,7 @@ namespace IGSLControlPanel.Controllers
                     RiskFactor = riskFactor
                 });
                 await _context.SaveChangesAsync();
+            _tariffsHelper.RenewCurrentTariffLinks(_context);
                 _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
@@ -208,16 +209,9 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
-        public void UpdateFactorValue(Guid id, double factorValue)
-        {
-            var factor = _factorHelper.CurrentFactor.FactorValues.SingleOrDefault(x => x.Id == id && x.TariffId == _tariffsHelper.CurrentTariff.Id);
-            if(factor == null) return;
-            factor.Value = factorValue;
-        }
-
         public IActionResult CreateExcelFile()
         {
-            var path = _filesHelper.CreateExcel(_tariffsHelper.CurrentTariff, _factorHelper.CurrentFactor);
+            var path = _filesHelper.CreateExcel(_tariffsHelper.CurrentTariff, _context);
             return File(System.IO.File.ReadAllBytes(path), "application/octet-stream", "tempFile.xlsx");
         }
 
@@ -234,7 +228,7 @@ namespace IGSLControlPanel.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            await _filesHelper.UploadFile(file);
+            await _filesHelper.UploadFile(file, _context);
             return RedirectToAction("Edit", new { _factorHelper.CurrentFactor.Id });
         }
     }

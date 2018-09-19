@@ -23,6 +23,7 @@ namespace IGSLControlPanel.Data
         public DbSet<ValueLimit> ValueLimits { get; set; }
         public DbSet<ParameterGroup> ParameterGroups { get; set; }
         public DbSet<LimitListItem> LimitListItems { get; set; }
+        public DbSet<Coefficient> Coefficients { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

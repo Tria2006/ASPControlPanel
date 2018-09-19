@@ -25,7 +25,8 @@ namespace IGSLControlPanel.Helpers
             _tariffs = _context.Tariffs.Include(x => x.InsRuleTariffLink)
                 .ThenInclude(s => s.InsRule)
                 .Include(x => x.RiskFactorsTariffLinks)
-                .ThenInclude(x => x.RiskFactor)
+                .ThenInclude(x => x.RiskFactor).
+                ThenInclude(x => x.FactorValues)
                 .Where(s => !s.IsDeleted).ToList();
 
             // продукты, не привязанные ни к какой папке
@@ -123,6 +124,20 @@ namespace IGSLControlPanel.Helpers
             CurrentRule = CurrentTariff.InsRuleTariffLink
                 .SingleOrDefault(s => s.InsRuleId == ruleId)
                 ?.InsRule;
+        }
+
+        public void RenewCurrentTariffLinks(IGSLContext context)
+        {
+            var tempTariff = context.Tariffs.Include(x => x.InsRuleTariffLink)
+                .ThenInclude(s => s.InsRule)
+                .Include(x => x.RiskFactorsTariffLinks)
+                .ThenInclude(x => x.RiskFactor).
+                ThenInclude(x => x.FactorValues)
+                .SingleOrDefault(s => !s.IsDeleted && s.Id == CurrentTariff.Id);
+
+            if(tempTariff == null) return;
+            CurrentTariff.RiskFactorsTariffLinks = tempTariff.RiskFactorsTariffLinks;
+            CurrentTariff.InsRuleTariffLink = tempTariff.InsRuleTariffLink;
         }
     }
 }
