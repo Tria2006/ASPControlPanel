@@ -118,7 +118,7 @@ namespace IGSLControlPanel.Helpers
             // проверим удалял ли пользователь в загружаемом файле столбцы
             await CheckDeletedColumns(worksheet, tariff, factorId, context);
             // проверим удалял ли пользователь в загружаемом файле строки
-            await CheckDeletedRows(worksheet, tariff, factorId, context);
+            await CheckDeletedRows(worksheet, tariff, context);
 
             for (var i = StartRowAndColumnIndex; i < worksheet.RowCount(); i++)
             {
@@ -261,7 +261,7 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        private async Task CheckDeletedRows(IXLWorksheet worksheet, Tariff tariff, Guid riskFactorId, IGSLContext context)
+        private async Task CheckDeletedRows(IXLWorksheet worksheet, Tariff tariff, IGSLContext context)
         {
             var rowIds = new List<Guid>();
             // пытаемся поучить id рисков(строк) из файла
