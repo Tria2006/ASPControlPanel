@@ -268,7 +268,7 @@ namespace IGSLControlPanel.Helpers
             for (var i = StartRowAndColumnIndex; i < 10000; i++)
             {
                 // если не смогли распарсить, то останавливаем обработку
-                if (!Guid.TryParse(worksheet.Cell(1, i).Value.ToString(), out var id)) break;
+                if (!Guid.TryParse(worksheet.Cell(i, 1).Value.ToString(), out var id)) break;
                 if (!rowIds.Contains(id)) rowIds.Add(id);
             }
 
@@ -292,11 +292,6 @@ namespace IGSLControlPanel.Helpers
                 var riskToDelete = await context.Risks.FindAsync(deletedId);
                 if (riskToDelete == null) continue;
                 riskToDelete.IsDeleted = true;
-                var links = context.InsuranceRules.Where(x => x.LinksToRisks.Any(s => s.RiskId == deletedId));
-                foreach (var link in links)
-                {
-                    link.LinksToRisks.RemoveAll(x => x.RiskId == deletedId);
-                }
                 
                 await context.SaveChangesAsync();
             }
