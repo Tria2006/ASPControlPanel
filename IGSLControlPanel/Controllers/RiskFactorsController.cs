@@ -228,7 +228,7 @@ namespace IGSLControlPanel.Controllers
         [HttpPost]
         public async Task<IActionResult> UploadFile(IFormFile file)
         {
-            await _filesHelper.UploadFile(file, _context);
+            await _filesHelper.UploadFile(file, _tariffsHelper.CurrentTariff, _context);
             return RedirectToAction("Edit", new { _factorHelper.CurrentFactor.Id });
         }
     }
