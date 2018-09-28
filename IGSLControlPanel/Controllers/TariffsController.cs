@@ -18,16 +18,18 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly TariffsHelper _tariffsHelper;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly ILog logger;
+        private readonly ILog _logger;
+        private readonly FilesHelper _filesHelper;
 
-        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, IHttpContextAccessor accessor)
+        public TariffsController(IGSLContext context, FolderDataHelper helper, TariffsHelper tariffsHelper, IHttpContextAccessor accessor, FilesHelper filesHelper)
             : base(context, helper)
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(TariffsController));
+            _logger = LogManager.GetLogger(typeof(TariffsController));
             BuildFolderTree(ModelTypes.Tariffs);
             _tariffsHelper = tariffsHelper;
+            _filesHelper = filesHelper;
         }
 
         public IActionResult Index(Guid parentid)
@@ -51,7 +53,7 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(tariff);
             _context.Add(tariff);
             await _context.SaveChangesAsync();
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Tariff (id={tariff.Id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Tariff (id={tariff.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
             return RedirectToAction("Edit", new { tariff.Id });
@@ -95,7 +97,7 @@ namespace IGSLControlPanel.Controllers
             {
                 _context.Update(tariff);
                 await _context.SaveChangesAsync();
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Tariff (id={tariff.Id})");
+                _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Tariff (id={tariff.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -117,7 +119,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (_tariffsHelper.HasSelectedTariffs)
             {
-                await _tariffsHelper.RemoveTariffs(_context, GetFolderById(id), logger, _httpAccessor);
+                await _tariffsHelper.RemoveTariffs(_context, GetFolderById(id), _logger, _httpAccessor);
             }
             return RedirectToAction("Index", new { id });
         }
@@ -165,6 +167,29 @@ namespace IGSLControlPanel.Controllers
             _tariffsHelper.CurrentTariff.FolderId = folderId;
             _tariffsHelper.CurrentTariff.ValidFrom = dateFrom;
             _tariffsHelper.CurrentTariff.ValidTo = dateTo;
+        }
+
+        public IActionResult CreateExcelFile()
+        {
+            var path = _filesHelper.CreateExcel(_tariffsHelper.CurrentTariff, _context);
+            return File(System.IO.File.ReadAllBytes(path), "application/octet-stream", "tempFile.xlsx");
+        }
+
+        public IActionResult GoToUploadPage()
+        {
+            return View("UploadFileView");
+        }
+
+        public IActionResult ReturnFromUploadForm()
+        {
+            return RedirectToAction("Edit", new { _tariffsHelper.CurrentTariff.Id });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> UploadFile(IFormFile file)
+        {
+            await _filesHelper.UploadFile(file, _tariffsHelper.CurrentTariff, _context);
+            return RedirectToAction("Edit", new { _tariffsHelper.CurrentTariff.Id });
         }
     }
 }

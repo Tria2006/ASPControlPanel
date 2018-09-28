@@ -1,0 +1,17 @@
+﻿<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Загрузка файла</title>
+</head>
+<body>
+<form asp-controller="Tariffs" asp-action="UploadFile" method="post" enctype="multipart/form-data" class="form-group" style="padding: 30px; padding-left: 0">
+    <input type="file" name="file" />
+    <div style="margin-top: 30px">
+        <button class="btn btn-default" type="submit">Загрузить на сервер</button>
+        <a asp-action="ReturnFromUploadForm">
+            <input class="btn btn-default" style="width: 250px" value="Вернуться к редактированию" />
+        </a>
+    </div>
+</form>
+</body>
+</html>

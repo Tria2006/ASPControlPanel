@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
+using log4net;
 using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Helpers
@@ -15,11 +16,21 @@ namespace IGSLControlPanel.Helpers
     {
         private const string PathToExcelFiles = "ExcelFiles";
         private const int StartRowAndColumnIndex = 3;
+        private readonly ILog _logger;
+        private readonly IHttpContextAccessor _httpAccessor;
+
+        public FilesHelper(IHttpContextAccessor accessor)
+        {
+            _logger = LogManager.GetLogger(typeof(FilesHelper));
+            _httpAccessor = accessor;
+        }
 
         public async Task UploadFile(IFormFile file, Tariff tariff, IGSLContext context)
         {
             if (file == null || file.Length == 0)
                 return;
+
+            _logger.Info($"Starting upload file {file.FileName} from {_httpAccessor.HttpContext.Connection.RemoteIpAddress}");
 
             var workbook = new XLWorkbook(file.OpenReadStream());
             foreach (var worksheet in workbook.Worksheets)
@@ -34,6 +45,8 @@ namespace IGSLControlPanel.Helpers
             var path = Path.Combine(
                 Directory.GetCurrentDirectory(), PathToExcelFiles,
                 fileName);
+
+            _logger.Info($"Download excel file requested from {_httpAccessor.HttpContext.Connection.RemoteIpAddress}");
             using (var workBook = new XLWorkbook())
             {
                 foreach (var link in tariff.RiskFactorsTariffLinks)
@@ -44,6 +57,7 @@ namespace IGSLControlPanel.Helpers
                     AddWorkSheet(tariff, link.RiskFactor, workBook);
                 }
                 workBook.SaveAs(path);
+                _logger.Info("Requested file created");
             }
             return path;
         }
@@ -109,6 +123,7 @@ namespace IGSLControlPanel.Helpers
 
         private async Task ReadWorksheetData(IXLWorksheet worksheet, Tariff tariff, IGSLContext context)
         {
+            _logger.Info("Reading data from excel file...");
             var createdColIndexes = new Dictionary<int, FactorValue>();
 
             // получаем Id фактора риска
@@ -175,6 +190,7 @@ namespace IGSLControlPanel.Helpers
                             {
                                 await context.FactorValues.AddAsync(newFactorValue);
                                 createdColIndexes.Add(j, newFactorValue);
+                                _logger.Info($"While reading excel file, a new FactorValue (id ={newFactorValue.Id}) was created");
                             }
                             else
                             {
@@ -207,6 +223,7 @@ namespace IGSLControlPanel.Helpers
             }
 
             await context.SaveChangesAsync();
+            _logger.Info($"Reading file completed");
         }
 
         private void AddCoefficient(IXLWorksheet worksheet, int rowIndex, int colIndex, FactorValue factorValue, Guid riskId)
@@ -256,6 +273,7 @@ namespace IGSLControlPanel.Helpers
                 var factorToDelete = await context.FactorValues.FindAsync(deletedId);
                 if(factorToDelete == null) continue;
                 factorToDelete.IsDeleted = true;
+                _logger.Info($"While reading excel file, FactorValue (id={deletedId}) was deleted (set IsDeleted=true)");
                 factorToDelete.Values.ForEach(x => x.IsDeleted = true);
                 await context.SaveChangesAsync();
             }
@@ -292,7 +310,8 @@ namespace IGSLControlPanel.Helpers
                 var riskToDelete = await context.Risks.FindAsync(deletedId);
                 if (riskToDelete == null) continue;
                 riskToDelete.IsDeleted = true;
-                
+                _logger.Info($"While reading excel file, Risk (id={deletedId}) was deleted (set IsDeleted=true)");
+
                 await context.SaveChangesAsync();
             }
         }

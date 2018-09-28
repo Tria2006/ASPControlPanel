@@ -19,7 +19,6 @@ namespace IGSLControlPanel.Controllers
         private readonly TariffsHelper _tariffsHelper;
         private readonly RiskFactorHelper _factorHelper;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly FilesHelper _filesHelper;
         private readonly ILog _logger;
 
         public RiskFactorsController(IGSLContext context, RiskFactorHelper factorHelper, TariffsHelper tariffsHelper,
@@ -30,7 +29,6 @@ namespace IGSLControlPanel.Controllers
             _logger = LogManager.GetLogger(typeof(RiskFactorsController));
             _tariffsHelper = tariffsHelper;
             _factorHelper = factorHelper;
-            _filesHelper = filesHelper;
         }
 
         public IActionResult Create()
@@ -207,29 +205,6 @@ namespace IGSLControlPanel.Controllers
             var factor = _context.RiskFactors.Find(_factorHelper.CurrentFactor.Id);
             if (factor != null) _factorHelper.CurrentFactor = factor;
             return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
-        }
-
-        public IActionResult CreateExcelFile()
-        {
-            var path = _filesHelper.CreateExcel(_tariffsHelper.CurrentTariff, _context);
-            return File(System.IO.File.ReadAllBytes(path), "application/octet-stream", "tempFile.xlsx");
-        }
-
-        public IActionResult GoToUploadPage()
-        {
-            return View("UploadFileView");
-        }
-
-        public IActionResult ReturnFromUploadForm()
-        {
-            return RedirectToAction("Edit", new { _factorHelper.CurrentFactor.Id });
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> UploadFile(IFormFile file)
-        {
-            await _filesHelper.UploadFile(file, _tariffsHelper.CurrentTariff, _context);
-            return RedirectToAction("Edit", new { _factorHelper.CurrentFactor.Id });
         }
     }
 }
