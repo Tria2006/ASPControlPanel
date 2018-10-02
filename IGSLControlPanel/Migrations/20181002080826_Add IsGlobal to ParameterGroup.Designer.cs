@@ -10,16 +10,46 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    [Migration("20180824101412_Initial")]
-    partial class Initial
+    [Migration("20181002080826_Add IsGlobal to ParameterGroup")]
+    partial class AddIsGlobaltoParameterGroup
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+            modelBuilder.Entity("DBModels.Models.Coefficient", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDate");
+
+                    b.Property<Guid>("FactorValueId");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<DateTime>("ModifyDate");
+
+                    b.Property<string>("Name");
+
+                    b.Property<Guid>("RiskId");
+
+                    b.Property<DateTime?>("ValidFrom");
+
+                    b.Property<DateTime?>("ValidTo");
+
+                    b.Property<double>("Value");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("FactorValueId");
+
+                    b.ToTable("Coefficients");
+                });
 
             modelBuilder.Entity("DBModels.Models.FactorValue", b =>
                 {
@@ -43,8 +73,6 @@ namespace IGSLControlPanel.Migrations
                     b.Property<DateTime?>("ValidFrom");
 
                     b.Property<DateTime?>("ValidTo");
-
-                    b.Property<double>("Value");
 
                     b.HasKey("Id");
 
@@ -114,15 +142,13 @@ namespace IGSLControlPanel.Migrations
 
                     b.Property<string>("Name");
 
-                    b.Property<Guid>("ParameterId");
-
                     b.Property<DateTime?>("ValidFrom");
 
                     b.Property<DateTime?>("ValidTo");
 
                     b.Property<string>("Value");
 
-                    b.Property<Guid?>("ValueLimitId");
+                    b.Property<Guid>("ValueLimitId");
 
                     b.HasKey("Id");
 
@@ -193,6 +219,8 @@ namespace IGSLControlPanel.Migrations
                     b.Property<DateTime>("CreateDate");
 
                     b.Property<bool>("IsDeleted");
+
+                    b.Property<bool>("IsGlobal");
 
                     b.Property<DateTime>("ModifyDate");
 
@@ -384,6 +412,8 @@ namespace IGSLControlPanel.Migrations
 
                     b.Property<Guid>("ProductId");
 
+                    b.Property<string>("StringValue");
+
                     b.Property<DateTime?>("ValidFrom");
 
                     b.Property<DateTime?>("ValidTo");
@@ -391,6 +421,14 @@ namespace IGSLControlPanel.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("ValueLimits");
+                });
+
+            modelBuilder.Entity("DBModels.Models.Coefficient", b =>
+                {
+                    b.HasOne("DBModels.Models.FactorValue")
+                        .WithMany("Values")
+                        .HasForeignKey("FactorValueId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("DBModels.Models.FactorValue", b =>
@@ -405,7 +443,8 @@ namespace IGSLControlPanel.Migrations
                 {
                     b.HasOne("DBModels.Models.ValueLimit")
                         .WithMany("LimitListItems")
-                        .HasForeignKey("ValueLimitId");
+                        .HasForeignKey("ValueLimitId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("DBModels.Models.ManyToManyLinks.InsRuleTariffLink", b =>

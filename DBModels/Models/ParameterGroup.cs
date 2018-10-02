@@ -6,5 +6,8 @@ namespace DBModels.Models
     {
         [DisplayName("Может повторяться")]
         public bool CanRepeat { get; set; }
+
+        [DisplayName("Глобальная")]
+        public bool IsGlobal { get; set; }
     }
 }

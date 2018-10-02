@@ -32,6 +32,10 @@ namespace IGSLControlPanel
             services.AddSingleton<FilesHelper>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+            if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "ExcelFiles")))
+            {
+                Directory.CreateDirectory(Path.Combine(Directory.GetCurrentDirectory(), "ExcelFiles"));
+            }
             services.AddSingleton<IFileProvider>(
                 new PhysicalFileProvider(
                     Path.Combine(Directory.GetCurrentDirectory(), "ExcelFiles")));

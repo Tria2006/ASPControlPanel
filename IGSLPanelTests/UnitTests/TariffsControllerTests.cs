@@ -16,7 +16,12 @@ namespace IGSLPanelTests.UnitTests
     {
         private readonly IGSLContext _context;
 
-        public TariffsControllerTests()
+        private HttpContextAccessor _httpAccessor = new HttpContextAccessor
+        {
+            HttpContext = new DefaultHttpContext()
+        };
+
+    public TariffsControllerTests()
         {
             var options = new DbContextOptionsBuilder<IGSLContext>()
                 .UseInMemoryDatabase(Guid.NewGuid().ToString())
@@ -28,10 +33,7 @@ namespace IGSLPanelTests.UnitTests
         public void GetIndexMustReturnFolderTree()
         {
             //arrange
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             // act
             var result = controller.Index(Guid.Empty) as ViewResult;
@@ -45,10 +47,7 @@ namespace IGSLPanelTests.UnitTests
         public void GetCreateNewTariffView()
         {
             //arrange
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             //act
             var result = controller.Create(Guid.Empty) as ViewResult;
@@ -70,10 +69,7 @@ namespace IGSLPanelTests.UnitTests
                 Id = Guid.NewGuid(),
                 Name = "New Tariff"
             };
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             // act
             RedirectToActionResult result;
@@ -101,10 +97,7 @@ namespace IGSLPanelTests.UnitTests
             _context.Tariffs.Add(tariff);
             _context.SaveChanges();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             // act
             var result = controller.Edit(tariff.Id) as ViewResult;
@@ -129,10 +122,7 @@ namespace IGSLPanelTests.UnitTests
             await _context.Tariffs.AddAsync(tariff);
             await _context.SaveChangesAsync();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
             controller.Index(Guid.Empty);
 
             // act
@@ -178,10 +168,7 @@ namespace IGSLPanelTests.UnitTests
             _context.FolderTreeEntries.Add(folder);
             await _context.SaveChangesAsync();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
             //act
             controller.Index(Guid.Empty);
             await controller.ClearFolderItems(new List<FolderTreeEntry> {folder});
@@ -211,10 +198,7 @@ namespace IGSLPanelTests.UnitTests
             _context.Tariffs.AddRange(new List<Tariff>{tariff1, tariff2});
             await _context.SaveChangesAsync();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             //act
             var result = controller.TariffCheckBoxClick(tariff1.Id);
@@ -236,10 +220,7 @@ namespace IGSLPanelTests.UnitTests
             _context.Tariffs.Add(tariff);
             _context.SaveChanges();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             //act
             controller.Index(Guid.Empty);
@@ -264,10 +245,7 @@ namespace IGSLPanelTests.UnitTests
             _context.Tariffs.Add(tariff);
             _context.SaveChanges();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             //act
             controller.Edit(tariff.Id);
@@ -313,10 +291,7 @@ namespace IGSLPanelTests.UnitTests
             _context.Tariffs.AddRange(new List<Tariff>{tariff1, tariff2});
             await _context.SaveChangesAsync();
             
-            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), new HttpContextAccessor
-            {
-                HttpContext = new DefaultHttpContext()
-            });
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
 
             //act
             // выбираем кого перемещать

@@ -218,6 +218,8 @@ namespace IGSLControlPanel.Migrations
 
                     b.Property<bool>("IsDeleted");
 
+                    b.Property<bool>("IsGlobal");
+
                     b.Property<DateTime>("ModifyDate");
 
                     b.Property<string>("Name");

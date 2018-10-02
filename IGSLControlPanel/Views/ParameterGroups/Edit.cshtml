@@ -12,24 +12,24 @@
 <body>
 
     <h4>Группа параметров</h4>
-            <form asp-action="Edit" class="create_update_form">
-                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-                <input type="hidden" asp-for="Id" />
-                <div class="form-group">
-                    <label asp-for="Name" class="control-label"></label>
-                    <input asp-for="Name" class="form-control" />
-                    <span asp-validation-for="Name" class="text-danger"></span>
-                </div>
-                <div class="form-group">
-                    <label asp-for="CanRepeat" class="control-label" style="width: 220px"></label>
-                    <input id="calcRequired" asp-for="CanRepeat" style="vertical-align: top" />
-                </div>
-                <div class="form-group">
-                    <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
-                    <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
-                    <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
-                </div>
-            </form>
+    <form asp-action="Edit" class="create_update_form">
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <input type="hidden" asp-for="Id" />
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="CanRepeat" class="control-label" style="width: 220px"></label>
+            <input id="calcRequired" asp-for="CanRepeat" style="vertical-align: top" />
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
+            <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
+        </div>
+    </form>
 
 </body>
 </html>

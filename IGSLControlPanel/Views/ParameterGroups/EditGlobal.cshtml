@@ -1,0 +1,59 @@
+﻿@using DBModels.Models
+@model ParameterGroup
+
+@{
+    ViewData["Title"] = "Редактирование глобальной группы";
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <link href="~/css/site.css" />
+</head>
+<body>
+
+<h4>Глобальная группа параметров</h4>
+<form asp-action="Edit" class="create_update_form">
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+    <input type="hidden" asp-for="Id" />
+    <div class="form-group">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+        <span asp-validation-for="Name" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="CanRepeat" class="control-label" style="width: 220px"></label>
+        <input asp-for="CanRepeat" style="vertical-align: top" />
+    </div>
+    <div class="form-group">
+        <label asp-for="IsGlobal" class="control-label" style="width: 220px"></label>
+        <input asp-for="IsGlobal" style="vertical-align: top" disabled="disabled" />
+    </div>
+
+    <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@Model.Id" asp-route-isSelectGroupDisabled="true">
+        <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
+    </a>
+    @*<a onclick="ParameterUpClick(this)">
+        <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
+    </a>
+    <a onclick="ParameterDownClick(this)">
+        <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
+    </a>*@
+
+    @await Html.PartialAsync("_ProductParametersBlock", (ViewData["Parameters"] as List<ProductParameter>)?.OrderBy(x => x.Order).ToList() ?? new List<ProductParameter>())
+
+    <div class="form-group">
+        <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+        <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
+        <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
+    </div>
+</form>
+
+</body>
+</html>
+
+<script>
+    function GoBack() {
+        javascript: history.go(-1);
+    }
+</script>

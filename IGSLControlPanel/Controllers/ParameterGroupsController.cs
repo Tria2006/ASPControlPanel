@@ -46,7 +46,50 @@ namespace IGSLControlPanel.Controllers
             {
                 return NotFound();
             }
-            return View(parameterGroup);
+            return parameterGroup.IsGlobal ? await EditGlobal(parameterGroup.Id) : View(parameterGroup);
+        }
+
+        public async Task<IActionResult> EditGlobal(Guid id)
+        {
+            var parameterGroup = await _context.ParameterGroups.FindAsync(id);
+            if (parameterGroup == null)
+            {
+                return NotFound();
+            }
+
+            ViewData["Parameters"] = _context.ProductParameters.Where(x => x.GroupId == id && !x.IsDeleted).ToList();
+            return View("EditGlobal", parameterGroup);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> EditGlobal(Guid id, ParameterGroup parameterGroup, string save, string saveAndExit)
+        {
+            if (id != parameterGroup.Id)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid) return View(parameterGroup);
+            try
+            {
+                _context.Update(parameterGroup);
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!ParameterGroupExists(parameterGroup.Id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction(nameof(Index));
+            return RedirectToAction("EditGlobal", new { id });
         }
 
         [HttpPost]

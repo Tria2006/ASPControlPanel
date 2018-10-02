@@ -1,16 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DBModels.Models;
+﻿using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -19,17 +19,17 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly ILog logger;
+        private readonly ILog _logger;
 
         public ProductParametersController(IGSLContext context, ProductsHelper productsHelper, IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(ProductParametersController));
+            _logger = LogManager.GetLogger(typeof(ProductParametersController));
             _productsHelper = productsHelper;
         }
 
-        public IActionResult Create(Guid? groupId)
+        public async Task<IActionResult> Create(Guid? groupId)
         {
             var groups = new List<ParameterGroup>
             {
@@ -37,13 +37,16 @@ namespace IGSLControlPanel.Controllers
             };
             groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groupId ?? groups.First().Id);
+            // пытаемся получить данные группы
+            var group = await GetGroupById(groupId);
             var tempParam = new ProductParameter
             {
                 GroupId = groupId,
                 ValidFrom = DateTime.Today,
                 ValidTo = new DateTime(2100, 1, 1)
             };
-                _productsHelper.CurrentParameter = tempParam;
+            ViewData["IsSelectGroupDisabled"] = group?.IsGlobal ?? false;
+            _productsHelper.CurrentParameter = tempParam;
             return View(tempParam);
         }
 
@@ -51,17 +54,35 @@ namespace IGSLControlPanel.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductParameter productParameter, string create, string createAndExit)
         {
-            if (!ModelState.IsValid) return View(productParameter);
+            // пытаемся получить данные группы
+            var group = await GetGroupById(productParameter.GroupId);
+
+            if (!ModelState.IsValid)
+            {
+                // если данные некорректны, то при возвращении надо выставить выбранную группу
+                var groups = new List<ParameterGroup>
+                {
+                    new ParameterGroup{Id = Guid.Empty, Name = "Не выбрано"}
+                };
+                groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
+                ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", group?.Id ?? groups.First().Id);
+                ViewData["IsSelectGroupDisabled"] = group?.IsGlobal ?? false;
+                _productsHelper.CurrentParameter = productParameter;
+                return View(productParameter);
+            }
             if (productParameter.GroupId == Guid.Empty) productParameter.GroupId = null;
 
-                _context.Add(productParameter);
-                _context.SaveChanges();
-                productParameter.Limit = _productsHelper.CurrentParameter.Limit;
-                if (productParameter.Limit != null)
-                {
-                    productParameter.Limit.ParameterId = productParameter.Id;
-                    productParameter.Limit.ProductId = _productsHelper.CurrentProduct.Id;
-                }
+            _context.Add(productParameter);
+            _context.SaveChanges();
+            productParameter.Limit = _productsHelper.CurrentParameter.Limit;
+            if (productParameter.Limit != null)
+            {
+                productParameter.Limit.ParameterId = productParameter.Id;
+                productParameter.Limit.ProductId = _productsHelper.CurrentProduct.Id;
+            }
+
+            if (group == null || !group.IsGlobal)
+            {
                 var link = new ProductLinkToProductParameter
                 {
                     ProductId = _productsHelper.CurrentProduct.Id,
@@ -76,29 +97,45 @@ namespace IGSLControlPanel.Controllers
                     .SingleOrDefault(x => x.Id == productId);
                 await CheckParameterOrders(productParameter);
                 _productsHelper.LoadProductLimits(_productsHelper.CurrentProduct, _context);
-                _productsHelper.CurrentParameter = null;
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ProductParameter (id={productParameter.Id})");
+            }
+            else
+            {
+                productParameter.LinkToProduct = new List<ProductLinkToProductParameter> ();
+                await _context.SaveChangesAsync();
+            }
+            _productsHelper.CurrentParameter = null;
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ProductParameter (id={productParameter.Id})");
+
+            if (group != null && group.IsGlobal)
+            {
+                if (!string.IsNullOrEmpty(createAndExit))
+                    return RedirectToAction("Index", "ParameterGroups");
+                return RedirectToAction("Edit", new { productParameter.Id });
+            }
+
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
             return RedirectToAction("Edit", new { productParameter.Id });
         }
 
-        public IActionResult Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id)
         {
-            var productParameter =
-                _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(x => x.ProductParameterId == id);
+            var productParameter = _context.ProductParameters.Find(id);
             if (productParameter == null)
             {
                 return NotFound();
             }
+            // пытаемся получить данные группы
+            var group = await GetGroupById(productParameter.GroupId);
             var groups = new List<ParameterGroup>
             {
                 new ParameterGroup{Id = Guid.Empty, Name = "Не выбрано"}
             };
             groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
-            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groups.SingleOrDefault(x => x.Id == productParameter.Parameter.GroupId));
-            _productsHelper.CurrentParameter = productParameter.Parameter;
-            return View(productParameter.Parameter);
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groups.SingleOrDefault(x => x.Id == productParameter.GroupId));
+            _productsHelper.CurrentParameter = productParameter;
+            ViewData["IsSelectGroupDisabled"] = group?.IsGlobal ?? false;
+            return View(productParameter);
         }
 
         [HttpPost]
@@ -116,7 +153,7 @@ namespace IGSLControlPanel.Controllers
                 _context.Update(productParameter);
                 _productsHelper.CurrentParameter = productParameter;
                 await _context.SaveChangesAsync();
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ProductParameter (id={productParameter.Id})");
+                _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ProductParameter (id={productParameter.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -129,12 +166,25 @@ namespace IGSLControlPanel.Controllers
                     throw;
                 }
             }
-            await CheckParameterOrders(productParameter);
+            // пытаемся получить данные группы
+            var group = await GetGroupById(productParameter.GroupId);
+            if (group != null && !group.IsGlobal)
+            {
+                await CheckParameterOrders(productParameter);
+            }
             _productsHelper.CurrentParameter = null;
+
+            if (group != null && group.IsGlobal)
+            {
+                if (!string.IsNullOrEmpty(saveAndExit))
+                    return RedirectToAction("Index", "ParameterGroups");
+                return RedirectToAction("Edit", new { productParameter.Id });
+            }
+
             if (!string.IsNullOrEmpty(saveAndExit))
                 return RedirectToAction("Edit", "Products",
                     _productsHelper.CurrentProduct);
-            return RedirectToAction("Edit", new {id});
+            return RedirectToAction("Edit", new { id });
         }
 
         public async Task<IActionResult> Delete(Guid id)
@@ -176,7 +226,7 @@ namespace IGSLControlPanel.Controllers
                 productParameter.LinkToProduct.Remove(link);
             }
             await _context.SaveChangesAsync();
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ProductParameter (id={id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ProductParameter (id={id})");
             return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
         }
 
@@ -199,10 +249,10 @@ namespace IGSLControlPanel.Controllers
 
         private void MoveParam(Guid groupId, bool up = true)
         {
-            if(_productsHelper.CurrentParameter == null) return;
+            if (_productsHelper.CurrentParameter == null) return;
             // выбранный параметр из контекста
             var contextParameter = _context.ProductParameters.SingleOrDefault(x => x.Id == _productsHelper.CurrentParameter.Id);
-            if(contextParameter == null) return;
+            if (contextParameter == null) return;
 
             // нужно переместить параметр вверх
             if (up)
@@ -211,7 +261,7 @@ namespace IGSLControlPanel.Controllers
                 var prevParam =
                     _productsHelper.CurrentProduct.LinkToProductParameters.Where(
                         x => x.Parameter.GroupId == groupId && x.Parameter.Order < contextParameter.Order).OrderByDescending(x => x.Parameter.Order).FirstOrDefault();
-                if(prevParam == null) return;
+                if (prevParam == null) return;
 
                 // Order куда надо переместить
                 var destOrder = prevParam.Parameter.Order;
@@ -223,7 +273,7 @@ namespace IGSLControlPanel.Controllers
                 // перемещаем предыдущий параметр на место выбранного
                 prevParam.Parameter.Order = contextParameter.Order;
                 if (contextPrevParam != null) contextPrevParam.Order = contextParameter.Order;
-                
+
                 // перемещаем текущий переметр на место предыдущего
                 contextParameter.Order = _productsHelper.CurrentParameter.Order = destOrder;
                 _context.SaveChanges();
@@ -256,7 +306,7 @@ namespace IGSLControlPanel.Controllers
         private async Task CheckParameterOrders(ProductParameter parameter)
         {
             List<ProductLinkToProductParameter> resultList;
-            var paramsList =
+            var paramsList = 
                 _productsHelper.CurrentProduct.LinkToProductParameters.Where(
                     x => x.Parameter.GroupId == parameter.GroupId).OrderBy(x => x.Parameter.Order).ToList();
 
@@ -265,18 +315,18 @@ namespace IGSLControlPanel.Controllers
                 _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(
                     x => x.ProductParameterId == parameter.Id);
 
-            if(currentLink == null) return;
+            if (currentLink == null) return;
 
             // если добавляем в начало
             if (parameter.Order == 1)
             {
-                resultList = new List<ProductLinkToProductParameter>{currentLink};
+                resultList = new List<ProductLinkToProductParameter> { currentLink };
                 resultList.AddRange(paramsList.Where(x => x.ProductParameterId != parameter.Id));
 
             } // если Order больше, чем максимальный, то добавляем в конец
             else if (parameter.Order >= paramsList.Max(x => x.Parameter.Order))
             {
-                resultList = new List<ProductLinkToProductParameter>(paramsList.Where(x => x.ProductParameterId != parameter.Id)) {currentLink};
+                resultList = new List<ProductLinkToProductParameter>(paramsList.Where(x => x.ProductParameterId != parameter.Id)) { currentLink };
             }
             else
             {
@@ -311,8 +361,8 @@ namespace IGSLControlPanel.Controllers
 
         // Нужно сохранить значения полей параметра если он еще не был сохранен, иначе при возвращении обратно 
         // на экран создания нового параметра все данные очистятся
-        public void SaveTempData(int dataType, string name, 
-            DateTime? dateFrom, DateTime? dateTo, 
+        public void SaveTempData(int dataType, string name,
+            DateTime? dateFrom, DateTime? dateTo,
             bool requiredForSave, bool requiredForCalc,
             Guid? groupId, int order)
         {
@@ -326,9 +376,31 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.Order = order;
         }
 
-        public IActionResult GoBack()
+        public async Task<IActionResult> GoBack(Guid parameterId)
         {
-            return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+            var productParameter = _context.ProductParameters.Find(parameterId);
+            if (productParameter == null)
+            {
+                return NotFound();
+            }
+            // пытаемся получить данные группы
+            var group = await GetGroupById(productParameter.GroupId);
+            if (group == null || !group.IsGlobal)
+            {
+                return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+            }
+
+            return RedirectToAction("EditGlobal", "ParameterGroups", new {id = group.Id});
+        }
+
+        private async Task<ParameterGroup> GetGroupById(Guid? id)
+        {
+            if (id != null)
+            {
+                return await _context.ParameterGroups.FindAsync(id);
+            }
+
+            return null;
         }
     }
 }

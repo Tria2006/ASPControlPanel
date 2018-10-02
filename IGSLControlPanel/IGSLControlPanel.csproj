@@ -44,6 +44,12 @@
     <Compile Remove="Migrations\20180824101738_added LimitListItem model.cs" />
     <Compile Remove="Migrations\20180824101929_added LimitListItem model.cs" />
     <Compile Remove="Migrations\20180824102002_added LimitListItem model.cs" />
+    <Compile Remove="Migrations\20181002080508_Add IsGlobal to ParameterGroup.cs" />
+    <Compile Remove="Migrations\20181002080508_Add IsGlobal to ParameterGroup.Designer.cs" />
+    <Compile Remove="Migrations\20181002132139_Add IsGlobal to ParameterGroup - mainDB.cs" />
+    <Compile Remove="Migrations\20181002132139_Add IsGlobal to ParameterGroup - mainDB.Designer.cs" />
+    <Compile Remove="Migrations\20181002132232_Add IsGlobal to ParameterGroup - mainDB.cs" />
+    <Compile Remove="Migrations\20181002132232_Add IsGlobal to ParameterGroup - mainDB.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

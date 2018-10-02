@@ -113,7 +113,7 @@ namespace IGSLControlPanel.Controllers
 
         public void ProductParameterClick(Guid id)
         {
-            _productsHelper.SelectUnselectParameter(id);
+            _productsHelper.SelectUnselectParameter(id, _context);
         }
 
         public override async Task ClearFolderItems(List<FolderTreeEntry> foldersToClear)

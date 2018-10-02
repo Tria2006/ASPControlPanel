@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    [Migration("20180919140316_add Coefficient model")]
-    partial class addCoefficientmodel
+    [Migration("20181002080248_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -219,6 +219,8 @@ namespace IGSLControlPanel.Migrations
                     b.Property<DateTime>("CreateDate");
 
                     b.Property<bool>("IsDeleted");
+
+                    b.Property<bool>("IsGlobal");
 
                     b.Property<DateTime>("ModifyDate");
 

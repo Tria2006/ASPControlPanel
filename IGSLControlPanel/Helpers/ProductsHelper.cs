@@ -105,11 +105,9 @@ namespace IGSLControlPanel.Helpers
             BuildProducts(parentFolder);
         }
 
-        public void SelectUnselectParameter(Guid parameterId)
+        public void SelectUnselectParameter(Guid parameterId, IGSLContext context)
         {
-            CurrentParameter = CurrentProduct.LinkToProductParameters
-                .SingleOrDefault(s => s.ProductParameterId == parameterId)
-                ?.Parameter;
+            CurrentParameter = context.ProductParameters.Find(parameterId);
         }
 
         public void CheckProduct(Guid id, IGSLContext _context)
