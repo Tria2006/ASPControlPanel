@@ -10,37 +10,35 @@
     <link href="~/css/site.css" />
 </head>
 <body>
-    <div class="row">
-        <form asp-action="CreateProduct" class="create_update_form">
-            <input id="folderId" asp-for="FolderId" type="hidden" />
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group" style="width: 600px">
-                <label asp-for="Name" class="control-label"></label>
-                <input id="name" asp-for="Name" class="form-control" />
-                <span asp-validation-for="Name" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
-                <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt">
-                <span asp-validation-for="ValidFrom" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
-                <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" />
-                <span asp-validation-for="ValidTo" class="text-danger"></span>
-            </div>
-            <hr />
-            <h4 style="margin-top: 50px; color: red">
-                Добавление параметров продукта будет доступно после сохранения продукта.
-            </h4>
-            
-                <div class="form-group">
-                    <input type="submit" value="Создать" name="create" class="btn btn-default" />
-                    <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" />
-                    <button class="btn btn-default" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
-                </div>
-        </form>
-    </div>
+    <form asp-action="CreateProduct" class="create_update_form">
+        <input id="folderId" asp-for="FolderId" type="hidden" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group" style="width: 600px">
+            <label asp-for="Name" class="control-label"></label>
+            <input id="name" asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
+            <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt">
+            <span asp-validation-for="ValidFrom" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
+            <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" />
+            <span asp-validation-for="ValidTo" class="text-danger"></span>
+        </div>
+        <hr />
+        <h4 style="margin-top: 50px; color: red">
+            Добавление параметров продукта будет доступно после сохранения продукта.
+        </h4>
+
+        <div class="form-group">
+            <input type="submit" value="Создать" name="create" class="btn btn-default" />
+            <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" />
+            <button class="btn btn-default" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
+        </div>
+    </form>
 </body>
 </html>
 
