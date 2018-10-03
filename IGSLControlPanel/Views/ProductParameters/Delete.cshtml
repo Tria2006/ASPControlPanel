@@ -4,69 +4,134 @@
     ViewData["Title"] = "Удаление параметра продукта";
 }
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-</head>
-<body>
-
     <h3>Вы уверены, что хотите удалить этот параметр продукта?</h3>
-    <div>
-        <h4>Параметр продукта</h4>
-        <div style="margin-top: 20px; margin-bottom: 20px">
-            <div style="margin-top: 5px; margin-bottom: 5px">
-                <div style="float: left; width: 250px">
-                    <label asp-for="Name" style="font-weight: normal"></label>
+    <div style="padding-bottom: 20px">
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input id="name" asp-for="Name" class="form-control" style="width: 500px" onchange="SaveTempData()" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
+            <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt" onchange="SaveTempData()">
+            <span asp-validation-for="ValidFrom" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
+            <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" onchange="SaveTempData()" />
+            <span asp-validation-for="ValidTo" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="DataType" class="control-label" style="width: 220px"></label>
+            <select id="dataType" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
+        </div>
+        <div class="form-group">
+            <label asp-for="IsRequiredForCalc" class="control-label" style="width: 220px"></label>
+            <input id="calcRequired" asp-for="IsRequiredForCalc" style="vertical-align: top" onchange="SaveTempData()" />
+        </div>
+        <div class="form-group">
+            <label asp-for="IsRequiredForSave" class="control-label" style="width: 220px"></label>
+            <input id="saveRequired" asp-for="IsRequiredForSave" style="vertical-align: top" onchange="SaveTempData()" />
+        </div>
+        <div class="form-group">
+            <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+            <input id="order" asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" onchange="SaveTempData()" />
+        </div>
+        <div class="form-group">
+            <label asp-for="GroupId" class="control-label" style="width: 220px"></label>
+            <select asp-for="GroupId" disabled="@ViewData["IsSelectGroupDisabled"]" id="groupId" asp-items="@ViewData["ParamGroups"] as SelectList" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
+            @Html.HiddenFor(x => x.GroupId)
+        </div>
+        <div class="form-group">
+            <label>
+                Лимиты значений
+                @if (Model.Limit != null)
+                {
+                    <a>
+                        <img src="~/images/Icons/add_gray.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
+                    </a>
+                    <a asp-controller="ValueLimits" asp-action="Edit">
+                        <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
+                    </a>
+                    <a asp-controller="ValueLimits" asp-action="Delete">
+                        <img src="~/images/Icons/del_param.png" class="small-button-img" style="margin: 2px" alt="" />
+                    </a>
+                }
+                else
+                {
+                    <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
+                        <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
+                    </a>
+                    <a>
+                        <img src="~/images/Icons/edit_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
+                    </a>
+                    <a>
+                        <img src="~/images/Icons/del_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
+                    </a>
+                }
+            </label>
+            @if (Model.Limit == null)
+            {
+                <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
+                    <label>Нет ограничений по значению</label>
                 </div>
-                <div>
-                    @Html.DisplayFor(model => model.Name)
+            }
+            else
+            {
+                <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 700px; padding: 10px">
+                    <div>
+                        <label asp-for="Limit.Name" class="control-label" style="width: 180px"></label>
+                        <label>@Model.Limit.Name</label>
+                    </div>
+                    <div>
+                        <label asp-for="DataType" class="control-label" style="width: 180px"></label>
+                        <select asp-for="DataType" disabled="disabled" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="width: 150px"></select>
+                    </div>
+                    <div>
+                        @if (Model.Limit.ParameterDataType == (int)DataTypes.Date)
+                        {
+                            <div>
+                                <label asp-for="Limit.DateValueFrom" class="control-label" style="width: 180px"></label>
+                                <label>@Model.Limit.DateValueFrom</label>
+                            </div>
+                            <div>
+                                <label asp-for="Limit.DateValueTo" class="control-label" style="width: 180px"></label>
+                                <label>@Model.Limit.DateValueTo</label>
+                            </div>
+                        }
+                        else if (Model.Limit.ParameterDataType == (int)DataTypes.Number)
+                        {
+                            <div>
+                                <label asp-for="Limit.IntValueFrom" class="control-label" style="width: 180px"></label>
+                                <label>@Model.Limit.IntValueFrom</label>
+                            </div>
+                            <div>
+                                <label asp-for="Limit.IntValueTo" class="control-label" style="width: 180px"></label>
+                                <label>@Model.Limit.IntValueTo</label>
+                            </div>
+                        }
+                        else if (Model.Limit.ParameterDataType == (int)DataTypes.String)
+                        {
+                            <div>
+                                <label asp-for="Limit.StringValue" class="control-label" style="width: 180px"></label>
+                                <label>@Model.Limit.StringValue</label>
+                            </div>
+                        }
+                        else if (Model.Limit.ParameterDataType == (int)DataTypes.List)
+                        {
+                            <label>Количество элементов в списке: @Model.Limit.LimitListItems.Count</label>
+                            <label>Для просмотра\редактирования элементов используйте режим редактирования лимита</label>
+                        }
+                    </div>
                 </div>
-            </div>
-            <div style="margin-top: 5px; margin-bottom: 5px">
-                <div style="float: left; width: 250px">
-                    <label asp-for="DataType" style="font-weight: normal"></label>
-                </div>
-                <div>
-                    <select asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" class="form-control" style="margin-left: 5px" disabled="disabled"></select>
-                </div>
-            </div>
-            <div style="margin-top: 5px; margin-bottom: 5px">
-                <div style="float: left; width: 250px">
-                    <label asp-for="IsRequiredForCalc" style="font-weight: normal"></label>
-                </div>
-                <div>
-                    @Html.DisplayFor(model => model.IsRequiredForCalc)
-                </div>
-            </div>
-            <div style="margin-top: 5px; margin-bottom: 5px">
-                <div style="float: left; width: 250px">
-                    <label asp-for="IsRequiredForSave" style="font-weight: normal"></label>
-                </div>
-                <div>
-                    @Html.DisplayFor(model => model.IsRequiredForSave)
-                </div>
-            </div>
-            <div style="margin-top: 5px; margin-bottom: 5px">
-                <label asp-for="Order" style="float: left; width: 220px; height: 30px; margin-top: 5px; font-weight: normal"></label>
-                <input asp-for="Order" min="1" disabled="disabled" class="form-control" type="number" style="width: 60px; text-align: right" />
-            </div>
-            <div style="margin-top: 5px; margin-bottom: 5px">
-                <div style="float: left; width: 250px">
-                    <label asp-for="GroupId" style="font-weight: normal"></label>
-                </div>
-                <div>
-                    <select asp-for="GroupId" class="form-control" disabled="disabled" asp-items="@ViewData["ParamGroups"] as SelectList"></select>
-                </div>
-            </div>
+            }
         </div>
 
-        <form asp-action="Delete">
+        <form asp-action="Delete" style="margin-top: 50px">
             <input type="hidden" asp-for="Id" />
             <input type="submit" value="Удалить" class="btn btn-default" />
-            <a asp-action="GoBack">
+            <a asp-action="GoBack" asp-route-parameterId="@Model.Id">
                 <input class="btn btn-default" value="Отменить удаление" />
             </a>
         </form>
     </div>
-</body>
-</html>

@@ -1,0 +1,46 @@
+﻿@model IEnumerable<DBModels.Models.ParameterGroup>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+            <th>
+                @Html.DisplayNameFor(model => model.Name)
+            </th>
+            <th>
+                @Html.DisplayNameFor(x => x.CanRepeat)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                <input type="radio" asp-for="@item.Id" id="@item.Id-radio" value="" onchange="SelectItem('@item.Id')"/>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td>
+                <input asp-for="@item.CanRepeat" style="vertical-align: top; margin-left: 50px" disabled="disabled"/>
+            </td>
+            <td style="width: 90px; align-content: right">
+                <a asp-controller="ParameterGroups" asp-action="Edit" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/edit_param.png" alt="Редактировать группу параметров" class="small-button-img"/>
+                </a>
+                <a style="margin-left: 10px;" asp-controller="ParameterGroups" asp-action="Delete" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/del_param.png" alt="Удалить группу параметров" class="small-button-img"/>
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<script>
+    function SelectItem(groupId) {
+        $.get("/ParameterGroups/SelectGroup/" + groupId, null);
+    }
+</script>

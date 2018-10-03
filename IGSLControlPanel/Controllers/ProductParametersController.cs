@@ -189,8 +189,8 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Delete(Guid id)
         {
-            var productParameter =
-                _productsHelper.CurrentProduct.LinkToProductParameters.SingleOrDefault(x => x.ProductParameterId == id);
+            var productParameter = await _context.ProductParameters
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (productParameter == null)
             {
                 return NotFound();
@@ -200,16 +200,10 @@ namespace IGSLControlPanel.Controllers
                 new ParameterGroup{Id = Guid.Empty, Name = "Не выбрано"}
             };
             groups.AddRange(_context.ParameterGroups.Where(x => !x.IsDeleted));
-            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groups.SingleOrDefault(x => x.Id == productParameter.Parameter.GroupId));
-            _productsHelper.CurrentParameter = productParameter.Parameter;
-            var contextParameter = await _context.ProductParameters
-                .FirstOrDefaultAsync(m => m.Id == id);
-            if (contextParameter == null)
-            {
-                return NotFound();
-            }
+            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name", groups.SingleOrDefault(x => x.Id == productParameter.GroupId));
+            _productsHelper.CurrentParameter = productParameter;
 
-            return View(productParameter.Parameter);
+            return View(productParameter);
         }
 
         [HttpPost, ActionName("Delete")]
@@ -217,17 +211,35 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> DeleteConfirmed(Guid id)
         {
             var productParameter = _context.ProductParameters.Include(x => x.LinkToProduct).ThenInclude(p => p.Product).SingleOrDefault(x => x.Id == id);
-            if (productParameter == null) return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
-            productParameter.IsDeleted = true;
-            var link = productParameter.LinkToProduct.SingleOrDefault(
-                p => p.ProductParameterId == id && p.ProductId == _productsHelper.CurrentProduct.Id);
-            if (link != null)
+            // пытаемся получить данные группы
+            var group = await GetGroupById(productParameter?.GroupId);
+            var isGlobal = group != null && group.IsGlobal;
+
+            if (productParameter == null)
             {
-                productParameter.LinkToProduct.Remove(link);
+                if (!isGlobal)
+                {
+                    return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+                }
+
+                return RedirectToAction("EditGlobal", "ParameterGroups", new { group.Id });
+            }
+            productParameter.IsDeleted = true;
+
+            if (!isGlobal)
+            {
+                var link = productParameter.LinkToProduct.SingleOrDefault(
+                    p => p.ProductParameterId == id && p.ProductId == _productsHelper.CurrentProduct.Id);
+                if (link != null)
+                {
+                    productParameter.LinkToProduct.Remove(link);
+                }
             }
             await _context.SaveChangesAsync();
             _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ProductParameter (id={id})");
-            return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+
+            if (!isGlobal) return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+            return RedirectToAction("EditGlobal", "ParameterGroups", new {group.Id});
         }
 
         private bool ProductParameterExists(Guid id)

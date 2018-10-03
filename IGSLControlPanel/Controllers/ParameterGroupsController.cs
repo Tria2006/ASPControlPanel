@@ -2,19 +2,23 @@
 using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
+using DBModels.Models.ManyToManyLinks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Helpers;
 
 namespace IGSLControlPanel.Controllers
 {
     public class ParameterGroupsController : Controller
     {
         private readonly IGSLContext _context;
+        private readonly GroupsHelper _groupHelper;
 
-        public ParameterGroupsController(IGSLContext context)
+        public ParameterGroupsController(IGSLContext context, GroupsHelper groupHelper)
         {
             _context = context;
+            _groupHelper = groupHelper;
         }
 
         public async Task<IActionResult> Index()
@@ -158,6 +162,32 @@ namespace IGSLControlPanel.Controllers
         private bool ParameterGroupExists(Guid id)
         {
             return _context.ParameterGroups.Any(e => e.Id == id);
+        }
+
+        public async Task SelectGroup(Guid id)
+        {
+            await _groupHelper.SelectGroup(id, _context);
+        }
+
+        public async Task AttachGroup(Guid productId)
+        {
+            var product = await _context.Products.Include(x => x.LinkToProductParameters).SingleOrDefaultAsync(x => x.Id == productId);
+            if(product == null) return;
+
+            var globalParams = _groupHelper.GetSelectedGroupParameters(_context);
+
+            //foreach (var globalParam in globalParams)
+            //{
+            //    // если вдруг связь с этим параметром уже есть, то идем дальше
+            //    if(!product.LinkToProductParameters.Any(x => x.ProductId == productId && x.ProductParameterId == globalParam.Id)) continue;
+
+            //    globalParam.LinkToProduct.Add(new ProductLinkToProductParameter
+            //    {
+            //        ProductId = productId,
+            //        ProductParameterId = globalParam.Id
+            //    });
+            //    await _context.SaveChangesAsync();
+            //}
         }
     }
 }
