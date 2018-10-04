@@ -14,11 +14,13 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly GroupsHelper _groupHelper;
+        private readonly ProductsHelper _productsHelper;
 
-        public ParameterGroupsController(IGSLContext context, GroupsHelper groupHelper)
+        public ParameterGroupsController(IGSLContext context, GroupsHelper groupHelper, ProductsHelper productsHelper)
         {
             _context = context;
             _groupHelper = groupHelper;
+            _productsHelper = productsHelper;
         }
 
         public async Task<IActionResult> Index()
@@ -169,25 +171,27 @@ namespace IGSLControlPanel.Controllers
             await _groupHelper.SelectGroup(id, _context);
         }
 
-        public async Task AttachGroup(Guid productId)
+        public async Task<IActionResult> AttachGroup(Guid productId)
         {
-            var product = await _context.Products.Include(x => x.LinkToProductParameters).SingleOrDefaultAsync(x => x.Id == productId);
-            if(product == null) return;
+
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null) return PartialView("_ParameterGroupsBlock", _productsHelper.CurrentProduct);
 
             var globalParams = _groupHelper.GetSelectedGroupParameters(_context);
 
-            //foreach (var globalParam in globalParams)
-            //{
-            //    // если вдруг связь с этим параметром уже есть, то идем дальше
-            //    if(!product.LinkToProductParameters.Any(x => x.ProductId == productId && x.ProductParameterId == globalParam.Id)) continue;
+            foreach (var globalParam in globalParams)
+            {
+                // если вдруг связь с этим параметром уже есть, то идем дальше
+                if (product.LinkToProductParameters.Any(x => x.ProductId == productId && x.ProductParameterId == globalParam.Id)) continue;
 
-            //    globalParam.LinkToProduct.Add(new ProductLinkToProductParameter
-            //    {
-            //        ProductId = productId,
-            //        ProductParameterId = globalParam.Id
-            //    });
-            //    await _context.SaveChangesAsync();
-            //}
+                product.LinkToProductParameters.Add(new ProductLinkToProductParameter
+                {
+                    ProductId = productId,
+                    ProductParameterId = globalParam.Id
+                });
+                await _context.SaveChangesAsync();
+            }
+            return PartialView("_ParameterGroupsBlock", product);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace DBModels.Models
         [DisplayName("Тип данных")]
         public int DataType { get; set; }
 
-        public List<ProductLinkToProductParameter> LinkToProduct { get; set; }
+        public List<ProductLinkToProductParameter> LinkToProduct { get; set; } = new List<ProductLinkToProductParameter>();
 
         [DisplayName("Обязателен для расчета")]
         public bool IsRequiredForCalc { get; set; }
