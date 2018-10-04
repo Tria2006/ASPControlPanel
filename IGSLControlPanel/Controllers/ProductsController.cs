@@ -19,14 +19,14 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly ILog logger;
+        private readonly ILog _logger;
 
         public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, IHttpContextAccessor accessor) 
             : base(context, helper)
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(ProductsController));
+            _logger = LogManager.GetLogger(typeof(ProductsController));
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
         }
@@ -52,7 +52,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> CreateProduct(Product product, string create, string createAndExit)
         {
             await _productsHelper.AddProduct(product, _context);
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Product (id={product.Id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Product (id={product.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Index", new { id = product.FolderId });
             return RedirectToAction("Edit", new { product.Id });
@@ -62,12 +62,14 @@ namespace IGSLControlPanel.Controllers
         {
             var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
-            ViewData["GlobalGroups"] = _context.ParameterGroups.Where(x => x.IsGlobal && !x.IsDeleted).ToList();
             var product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
                 return NotFound();
             }
+            var attachedGroups = product.LinkToProductParameters.Select(x => x.Parameter.GroupId).Distinct().ToList();
+            ViewData["GlobalGroups"] = _context.ParameterGroups.Where(x => x.IsGlobal && !x.IsDeleted && !attachedGroups.Contains(x.Id)).ToList();
+
             _productsHelper.LoadProductLimits(product, _context);
             _productsHelper.CurrentProduct = product;
             return View(product);
@@ -78,7 +80,7 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Edit(Product product, string save, string saveAndExit)
         {
             await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Product (id={product.Id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Product (id={product.Id})");
             if (!string.IsNullOrEmpty(saveAndExit))
                 return RedirectToAction("Index", new { id = product.FolderId });
             return RedirectToAction("Edit", new { product.Id });
@@ -88,7 +90,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (_productsHelper.HasSelectedProducts)
             {
-                await _productsHelper.RemoveProducts(_context, GetFolderById(folderId), logger, _httpAccessor);
+                await _productsHelper.RemoveProducts(_context, GetFolderById(folderId), _logger, _httpAccessor);
             }
             return RedirectToAction("Index", new { folderId });
         }
