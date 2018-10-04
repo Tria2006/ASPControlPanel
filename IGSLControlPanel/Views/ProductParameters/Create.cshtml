@@ -12,7 +12,7 @@
 <body>
 
     <h4>Параметр продукта</h4>
-    <div  style="margin-top: 20px">
+    <div style="margin-top: 20px">
         <div class="col-md-4">
             <form asp-action="Create" class="create_update_form">
                 <div asp-validation-summary="ModelOnly" class="text-danger"></div>
@@ -34,7 +34,7 @@
                 </div>
                 <div class="form-group">
                     <label asp-for="DataType" class="control-label" style="width: 220px"></label>
-                    <select id="dataType" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
+                    <select id="dataType" asp-for="DataType" asp-items="Html.GetEnumSelectList<DataTypes>()" onchange="DataTypeChanged()" class="form-control" style="width: 150px"></select>
                 </div>
                 <div class="form-group">
                     <label asp-for="IsRequiredForCalc" class="control-label" style="width: 220px"></label>
@@ -44,6 +44,15 @@
                     <label asp-for="IsRequiredForSave" class="control-label" style="width: 220px"></label>
                     <input id="saveRequired" asp-for="IsRequiredForSave" onchange="SaveTempData()" style="vertical-align: top" />
                 </div>
+                <div class="form-group">
+                    <label asp-for="IsConstant" class="control-label" style="width: 220px"></label>
+                    <input id="isConstant" asp-for="IsConstant" onchange="IsConstantChanged()" style="vertical-align: top" />
+                </div>
+
+                <div class="form-group" id="constantValuePartial">
+                    @await Html.PartialAsync("_ConstantParamValues", Model)
+                </div>
+
                 <div class="form-group">
                     <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
                     <input asp-for="Order" id="order" min="1" value="1" class="form-control" onchange="SaveTempData()" type="number" style="width: 60px; text-align: right" />
@@ -82,9 +91,43 @@
                 requiredForSave: $("#saveRequired").val(),
                 requiredForCalc: $("#calcRequired").val(),
                 groupId: $("#groupId").val(),
-                order: $("#order").val()
+                order: $("#order").val(),
+                isConstant: $("#isConstant").val(),
+                valueStr: $("#valueStr").val(),
+                valueInt: $("#valueInt").val(),
+                valueDate: $("#valueDate").val()
             },
             success: function () { }
+        });
+    }
+
+    function IsConstantChanged() {
+        SaveTempData();
+
+        var isConstant = $("#isConstant").prop("checked");
+
+        if (isConstant === true) {
+            $("#constantValuePartial").show();
+        } else {
+            $("#constantValuePartial").hide();
+        }
+
+        $.get("/ProductParameters/ClearConstantValues");
+        UpdateConstantPartial();
+    }
+
+    function DataTypeChanged() {
+        SaveTempData();
+        UpdateConstantPartial();
+    }
+
+    function UpdateConstantPartial() {
+        $.ajax({
+            url: "/ProductParameters/UpdateConstantValuesView",
+            type: "post",
+            success: function (result) {
+                $("#constantValuePartial").html(result);
+            }
         });
     }
 </script>

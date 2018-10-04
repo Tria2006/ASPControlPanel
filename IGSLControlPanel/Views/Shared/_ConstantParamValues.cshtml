@@ -1,0 +1,58 @@
+﻿@model DBModels.Models.ProductParameter
+
+@if (Model.IsConstant)
+{
+    switch (Model.DataType)
+    {
+        case (int)DataTypes.String:
+            <label asp-for="ConstantValueStr" class="control-label" style="width: 220px"></label>
+            <input id="valueStr" asp-for="ConstantValueStr" onchange="SaveTempData()" style="vertical-align: top" />
+            break;
+        case (int)DataTypes.Number:
+            <label asp-for="ConstantValueInt" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+            <input id="valueInt" asp-for="ConstantValueInt" class="form-control" onchange="SaveTempData()" type="number" style="width: 60px; text-align: right" />
+            break;
+        case (int)DataTypes.Date:
+            <label asp-for="ConstantValueDate" class="control-label" style="width: 220px"></label>
+            <input id="valueDate" asp-for="ConstantValueDate" class="form-control" style="width: 160px" onchange="SaveTempData()" type="date" />
+            break;
+        case 0:
+            <div />
+            break;
+    }
+}
+
+<input id="paramId" type="hidden" value="@Model.Id" />
+<input id="name" type="hidden" value="@Model.Name" />
+<input id="dateFrom" type="hidden" value="@Model.ValidFrom" />
+<input id="dateTo" type="hidden" value="@Model.ValidTo" />
+<input id="dataType" type="hidden" value="@Model.DataType" />
+<input id="calcRequired" type="hidden" value="@Model.IsRequiredForCalc" />
+<input id="saveRequired" type="hidden" value="@Model.IsRequiredForSave" />
+<input id="isConstant" type="hidden" value="@Model.IsConstant" />
+<input id="groupId" type="hidden" value="@Model.GroupId" />
+<input id="order" type="hidden" value="@Model.Order" />
+
+<script>
+    function SaveTempData() {
+        $.ajax({
+            url: "/ProductParameters/SaveTempData",
+            type: "post",
+            data: {
+                dataType: $("#dataType").val(),
+                name: $("#name").val(),
+                dateFrom: $("#validFromDt").val(),
+                dateTo: $("#validToDt").val(),
+                requiredForSave: $("#saveRequired").val(),
+                requiredForCalc: $("#calcRequired").val(),
+                groupId: $("#groupId").val(),
+                order: $("#order").val(),
+                isConstant: $("#isConstant").val(),
+                valueStr: $("#valueStr").val(),
+                valueInt: $("#valueInt").val(),
+                valueDate: $("#valueDate").val()
+            },
+            success: function () { }
+        });
+    }
+</script>

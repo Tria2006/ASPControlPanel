@@ -376,7 +376,7 @@ namespace IGSLControlPanel.Controllers
         public void SaveTempData(int dataType, string name,
             DateTime? dateFrom, DateTime? dateTo,
             bool requiredForSave, bool requiredForCalc,
-            Guid? groupId, int order)
+            Guid? groupId, int order, bool isConstant, string valueStr, int? valueInt, DateTime? valueDate)
         {
             _productsHelper.CurrentParameter.Name = name;
             _productsHelper.CurrentParameter.ValidFrom = dateFrom;
@@ -386,6 +386,10 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.IsRequiredForSave = requiredForSave;
             _productsHelper.CurrentParameter.GroupId = groupId;
             _productsHelper.CurrentParameter.Order = order;
+            _productsHelper.CurrentParameter.IsConstant = isConstant;
+            _productsHelper.CurrentParameter.ConstantValueStr = valueStr;
+            _productsHelper.CurrentParameter.ConstantValueInt = valueInt;
+            _productsHelper.CurrentParameter.ConstantValueDate = valueDate;
         }
 
         public async Task<IActionResult> GoBack(Guid parameterId)
@@ -413,6 +417,19 @@ namespace IGSLControlPanel.Controllers
             }
 
             return null;
+        }
+
+        public IActionResult UpdateConstantValuesView()
+        {
+            ClearConstantValues();
+            return PartialView("_ConstantParamValues", _productsHelper.CurrentParameter);
+        }
+
+        public void ClearConstantValues()
+        {
+            _productsHelper.CurrentParameter.ConstantValueDate = null;
+            _productsHelper.CurrentParameter.ConstantValueInt = null;
+            _productsHelper.CurrentParameter.ConstantValueStr = null;
         }
     }
 }

@@ -20,6 +20,18 @@ namespace DBModels.Models
         [DisplayName("Обязателен при сохранении")]
         public bool IsRequiredForSave { get; set; }
 
+        [DisplayName("Неизменяемый")]
+        public bool IsConstant { get; set; }
+
+        [DisplayName("Значение параметра")]
+        public string ConstantValueStr { get; set; }
+
+        [DisplayName("Значение параметра")]
+        public int? ConstantValueInt { get; set; }
+
+        [DisplayName("Значение параметра")]
+        public DateTime? ConstantValueDate { get; set; }
+
         [DisplayName("Порядковый номер")]
         public int Order { get; set; }
 
