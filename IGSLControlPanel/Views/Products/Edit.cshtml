@@ -11,67 +11,143 @@
     <script src="~/lib/jquery/dist/jquery.min.js" type="text/javascript"></script>
 </head>
 <body>
-<!-- диалог для перемещения объектов -->
-<div id="addGroupModal" class="modal fade">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <button type="button" class="close" data-dismiss="modal">
-                    ×
-                </button>
-                <h4 class="modal-title">Выберите группу</h4>
-            </div>
-            <form>
-                <div class="form-group" style="float: left; width: 95%; margin-right: 16px; margin-left: 16px">
-                    @await Html.PartialAsync("_GroupSelectView", ViewData["GlobalGroups"])
-                </div>
-
-                <div class="form-group" style="margin-left: 18px;">
-                    <button id="addGroupOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
-                    <button id="addGroupCancelBtn" type="button" class="btn btn-primary">
-                        Отмена
+    <!-- диалог для выбора глобальной группы -->
+    <div id="addGroupModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
                     </button>
+                    <h4 class="modal-title">Выберите группу</h4>
                 </div>
-            </form>
+                <form>
+                    <input type="hidden" value="@Model.Id" />
+                    <div class="form-group" style="float: left; width: 95%; margin-right: 16px; margin-left: 16px">
+                        @await Html.PartialAsync("_GroupSelectView", ViewData["GlobalGroups"])
+                    </div>
+
+                    <div class="form-group" style="margin-left: 18px;">
+                        <button id="addGroupOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
+                        <button id="addGroupCancelBtn" type="button" class="btn btn-primary">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
-</div>
-<form asp-action="Edit" asp-controller="Products" class="create_update_form">
-    <input id="modelId" type="hidden" value="@Model.Id"/>
-    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-    <div class="form-group" style="width: 600px">
-        <label asp-for="Name" class="control-label"></label>
-        <input asp-for="Name" class="form-control"/>
-        <span asp-validation-for="Name" class="text-danger"></span>
+
+    <!-- диалог для выбора тарифа -->
+    <div id="selectTariffModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Выберите тариф</h4>
+                </div>
+                <div class="form-group" style="float: left; width: 95%; margin-right: 16px; margin-left: 16px">
+                    @await Html.PartialAsync("_SelectTariffView", ViewData["Tariffs"], ViewData)
+                </div>
+                <form>
+                    <div class="form-group" style="margin-left: 18px;">
+                        <button id="selectTariffOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
+                        <button id="selectTariffCancelBtn" type="button" class="btn btn-primary">
+                            Отмена
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
-        <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt">
-        <span asp-validation-for="ValidFrom" class="text-danger"></span>
+
+    <!-- подтверждение detach тарифа -->
+    <div id="detachTariffModal" class="modal fade">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">
+                        ×
+                    </button>
+                    <h4 class="modal-title">Подтверждение действия</h4>
+                </div>
+                <div class="modal-body">
+                    <form>
+                        <div class="form-group">
+                            <div style="margin: 20px; margin-left: 0; margin-top: 0">
+                                <h4>Вы действительно хотите отсоединить тариф?</h4>
+                            </div>
+                            <div>
+                                <button id="confirmDetachTariffBtn" type="submit" class="btn btn-primary">Подтвердить</button>
+                                <button id="cancelDetachTariffBtn" type="button" class="btn btn-primary">
+                                    Отмена
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
     </div>
-    <div class="form-group">
-        <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
-        <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt"/>
-        <span asp-validation-for="ValidTo" class="text-danger"></span>
+
+    <div style="width: 100%">
+        <a id="selectTariffModalBtn" title="Связать с тарифом" style="font-size: 0">
+            <img src="~/images/Icons/attach.png" alt="Связать с тарифом" style="margin: 10px; width: 40px; height: 40px" />
+        </a>
+        <a id="changeTariffBtn" title="Изменить тариф" style="font-size: 0">
+            <img src="~/images/Icons/reattach.png" alt="Изменить тариф" style="margin: 10px; width: 40px; height: 40px" />
+        </a>
+        <a id="detachTariffBtn" title="Отвязать от тарифа" style="font-size: 0">
+            <img src="~/images/Icons/deattach.png" alt="Отвязать от тарифа" style="margin: 10px; width: 40px; height: 40px" />
+        </a>
+        <a id="bundleSettingsBtn" title="Настройка связки" style="font-size: 0">
+            <img src="~/images/Icons/settings.png" alt="Настройка связки" style="margin: 10px; width: 40px; height: 40px" />
+        </a>
+        Присоединенный тариф: <a title="Просмотр данных тарифа" asp-controller="Tariffs" asp-action="Details" asp-route-tariffId="@Model.TariffId">@Model.Tariff.Name</a>
     </div>
-    <hr/>
-    <h3 class="control-label" style="margin-bottom: 20px">Параметры продукта</h3>
-    <div>
-        <a id="addGroupModalBtn">Добавить группу</a>
-    </div>
-    <div id="groupsPartial">
-        @await Html.PartialAsync("_ParameterGroupsBlock", Model)
-    </div>
-    <div class="form-group">
-        <input type="submit" value="Сохранить" name="save" class="btn btn-default"/>
-        <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default"/>
-        <button class="btn btn-default" style="width: 200px" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Выйти без сохранения</button>
-    </div>
-</form>
+    <form asp-action="Edit" asp-controller="Products" class="create_update_form">
+        <input id="modelId" type="hidden" value="@Model.Id" />
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+        <div class="form-group" style="width: 600px">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidFrom" class="control-label" style="width: 150px"></label>
+            <input asp-for="ValidFrom" class="form-control" style="width: 160px" type="date" id="validFromDt">
+            <span asp-validation-for="ValidFrom" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="ValidTo" class="control-label" style="width: 150px"></label>
+            <input asp-for="ValidTo" class="form-control" style="width: 160px" type="date" id="validToDt" />
+            <span asp-validation-for="ValidTo" class="text-danger"></span>
+        </div>
+        <hr />
+        <h3 class="control-label" style="margin-bottom: 20px">Параметры продукта</h3>
+        <div>
+            <a id="addGroupModalBtn">Добавить группу</a>
+        </div>
+        <div id="groupsPartial">
+            @await Html.PartialAsync("_ParameterGroupsBlock", Model)
+        </div>
+        <div class="form-group">
+            <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
+            <button class="btn btn-default" style="width: 200px" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Выйти без сохранения</button>
+        </div>
+    </form>
 </body>
 </html>
 
 <script>
+    $(document).ready(function () {
+        $(document).tooltip({
+            track: true
+        });
+    });
     $("#addGroupModalBtn").click(function () {
         $("#addGroupModal").modal('show');
     });
@@ -80,11 +156,42 @@
             url: "/ParameterGroups/AttachGroup",
             type: "post",
             data: { productId: $("#modelId").val() },
-            success: function (result) { $("#groupsPartial").html(result);}
+            success: function (result) { $("#groupsPartial").html(result); }
         });
         $("#addGroupModal").modal('hide');
     });
     $("#addGroupCancelBtn").click(function () {
         $("#addGroupModal").modal('hide');
+    });
+
+    $("#selectTariffModalBtn").click(function () {
+        $("#selectTariffModal").modal('show');
+    });
+    $("#changeTariffBtn").click(function () {
+        $("#selectTariffModal").modal('show');
+    });
+    $("#selectTariffOkBtn").click(function () {
+        $.ajax({
+            async: false,
+            url: "/Tariffs/AttachTariffToProduct",
+            type: "post",
+            data: { productId: $("#modelId").val() },
+            success: function () { }
+        });
+        $("#selectTariffModal").modal('hide');
+    });
+    $("#selectTariffCancelBtn").click(function () {
+        $("#selectTariffModal").modal('hide');
+    });
+
+    $("#detachTariffBtn").click(function () {
+        $("#detachTariffModal").modal('show');
+    });
+    $("#confirmDetachTariffBtn").click(function () {
+        $.get("/Tariffs/DetachTariff?productId=" + $("#modelId").val());
+        $("#detachTariffModal").modal('hide');
+    });
+    $("#cancelDetachTariffBtn").click(function () {
+        $("#detachTariffModal").modal('hide');
     });
 </script>

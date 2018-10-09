@@ -69,7 +69,9 @@ namespace IGSLControlPanel.Controllers
             }
             var attachedGroups = product.LinkToProductParameters.Select(x => x.Parameter.GroupId).Distinct().ToList();
             ViewData["GlobalGroups"] = _context.ParameterGroups.Where(x => x.IsGlobal && !x.IsDeleted && !attachedGroups.Contains(x.Id)).ToList();
-
+            ViewData["Tariffs"] = _context.Tariffs.Where(x => !x.IsDeleted);
+            ViewData["TariffId"] = product.TariffId;
+            product.Tariff = await _context.Tariffs.FindAsync(product.TariffId);
             _productsHelper.LoadProductLimits(product, _context);
             _productsHelper.CurrentProduct = product;
             return View(product);

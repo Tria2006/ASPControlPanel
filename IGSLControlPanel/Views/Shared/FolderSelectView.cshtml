@@ -1,10 +1,5 @@
 ﻿@model DBModels.Models.FolderTreeEntry
 
-<html>
-<head>
-    <meta name="viewport" content="width=device-width" />
-</head>
-<body>
     <div id="partial">
         <input id="parentId" type="hidden" value="@Model.ParentFolderId" />
         <input id="controllerName" type="hidden" value="@ViewData["ControllerName"]" />
@@ -42,15 +37,13 @@
             }
         </div>
     </div>
-</body>
-</html>
 
 <script>
     function folderClick(child) {
         $.ajax({
             url: "/" + $("#controllerName").val() + "/FolderClick",
             type: "post",
-            data: { id : child.id},
+            data: { id: child.id, controllerName: $("#controllerName").val()},
             success: function (result) {
                 $("#partial").html(result);
             }
@@ -60,7 +53,7 @@
         $.ajax({
             url: "/" + $("#controllerName").val() + "/OneLevelUp",
             type: "post",
-            data: { destFolderId: $("#parentId").val(), returnPartial: true },
+            data: { destFolderId: $("#parentId").val(), controllerName: $("#controllerName").val(), returnPartial: true },
             success: function (result) {
                 $("#partial").html(result);
             }

@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DBModels.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using DBModels.Models;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -41,7 +41,7 @@ namespace IGSLControlPanel.Controllers
         public IActionResult Create(Guid folderId)
         {
             var tempTariff = new Tariff { FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1) };
-                _tariffsHelper.CurrentTariff = tempTariff;
+            _tariffsHelper.CurrentTariff = tempTariff;
             ViewData["ParentFolderId"] = folderId;
             return View(tempTariff);
         }
@@ -124,6 +124,23 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Index", new { id });
         }
 
+        public IActionResult Details(Guid tariffId)
+        {
+            var tariff = _context.Tariffs
+                .Include(x => x.RiskFactorsTariffLinks)
+                .ThenInclude(x => x.RiskFactor)
+                .Include(x => x.InsRuleTariffLink)
+                .ThenInclude(x => x.InsRule)
+                .ThenInclude(x => x.LinksToRisks)
+                .ThenInclude(x => x.Risk)
+                .SingleOrDefault(x => x.Id == tariffId);
+            if (tariff == null)
+            {
+                return NotFound();
+            }
+            return View(tariff);
+        }
+
         private bool TariffExists(Guid id)
         {
             return _context.Tariffs.Any(e => e.Id == id);
@@ -148,7 +165,7 @@ namespace IGSLControlPanel.Controllers
             foreach (var folder in foldersToClear)
             {
                 var tariffs = _context.Tariffs.Where(x => x.FolderId == folder.Id);
-                if(!tariffs.Any()) continue;
+                if (!tariffs.Any()) continue;
                 await tariffs.ForEachAsync(x => x.FolderId = Guid.Empty);
             }
             await _context.SaveChangesAsync();
@@ -190,6 +207,48 @@ namespace IGSLControlPanel.Controllers
         {
             await _filesHelper.UploadFile(file, _tariffsHelper.CurrentTariff, _context);
             return RedirectToAction("Edit", new { _tariffsHelper.CurrentTariff.Id });
+        }
+
+        public async Task SelectTariff(Guid id)
+        {
+            await _tariffsHelper.SelectTariffForProduct(id, _context);
+            ViewData["TariffId"] = id;
+        }
+
+        public IActionResult AttachTariffToProduct(Guid productId)
+        {
+            var product = _context.Products.Find(productId);
+            if (product == null) return NotFound();
+
+            var attachedTariff = _context.Tariffs.Include(x => x.LinkedProducts).SingleOrDefault(x => x.Id == product.TariffId);
+
+            if (attachedTariff != null)
+            {
+                attachedTariff.LinkedProducts.RemoveAll(x => x.Id != productId);
+                _tariffsHelper.SelectedTariffForProduct.LinkedProducts.Add(product);
+                product.TariffId = _tariffsHelper.SelectedTariffForProduct.Id;
+            }
+            else
+            {
+                _tariffsHelper.SelectedTariffForProduct.LinkedProducts.Add(product);
+                product.TariffId = _tariffsHelper.SelectedTariffForProduct.Id;
+            }
+            _context.SaveChanges();
+            return RedirectToAction("Edit", "Products", product);
+        }
+
+        public async Task<IActionResult> DetachTariff(Guid productId)
+        {
+            var product = await _context.Products.FindAsync(productId);
+            if (product == null) return NotFound();
+
+            var attachedTariff = await _context.Tariffs.Include(x => x.LinkedProducts).SingleOrDefaultAsync(x => x.Id == product.TariffId);
+
+            attachedTariff.LinkedProducts.RemoveAll(x => x.Id == productId);
+            product.TariffId = null;
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Edit", "Products", product);
         }
     }
 }

@@ -50,10 +50,11 @@ namespace IGSLControlPanel.Controllers
             return HasSelectedFolders;
         }
 
-        public IActionResult FolderClick(Guid id)
+        public IActionResult FolderClick(Guid id, string controllerName)
         {
             var folder = _folderDataHelper.GetFolderById(id, _folderDataHelper.FoldersTree);
             _folderDataHelper.SelectedDestFolderId = id;
+            ViewData["ControllerName"] = controllerName;
             return PartialView("FolderSelectView", folder);
         }
 
@@ -62,6 +63,7 @@ namespace IGSLControlPanel.Controllers
             if (!returnPartial) return RedirectToAction("Index", controllerName, new { id = destFolderId });
             var folder = _folderDataHelper.GetFolderById(destFolderId, _folderDataHelper.FoldersTree);
             _folderDataHelper.SelectedDestFolderId = destFolderId;
+            ViewData["ControllerName"] = controllerName;
             return PartialView("FolderSelectView", folder);
         }
 

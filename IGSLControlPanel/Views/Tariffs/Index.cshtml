@@ -1,6 +1,7 @@
 ﻿@model DBModels.Models.FolderTreeEntry
 
 @{
+    ViewData["ControllerName"] = "Tariffs";
     ViewData["Title"] = "Тарифы";
 }
 
@@ -82,7 +83,7 @@
                 </div>
                 <form>
                     <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
-                        @await Html.PartialAsync("FolderSelectView", Model)
+                        @await Html.PartialAsync("FolderSelectView", Model, ViewData)
                     </div>
 
                     <div class="form-group" style="margin-left: 18px;">

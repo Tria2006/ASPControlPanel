@@ -1,0 +1,19 @@
+﻿@model DBModels.Models.Tariff
+
+<input type="hidden" asp-for="Id" />
+<div style="float: left; margin: 2px; border: 1px solid lightgrey">
+    <div class="form-group" style="width: 600px">
+        <label asp-for="Name" class="control-label"></label>
+        <input asp-for="Name" class="form-control" />
+    </div>
+    <div class="form-group">
+        <label asp-for="ValidFrom" class="control-label"></label>
+        <input asp-for="ValidFrom" class="form-control" style="width: 160px" />
+        <span asp-validation-for="ValidFrom" class="text-danger"></span>
+    </div>
+    <div class="form-group">
+        <label asp-for="ValidTo" class="control-label"></label>
+        <input asp-for="ValidTo" class="form-control" style="width: 160px" />
+        <span asp-validation-for="ValidTo" class="text-danger"></span>
+    </div>
+</div>

@@ -1,0 +1,43 @@
+﻿@model IEnumerable<DBModels.Models.Tariff>
+
+<table class="table">
+    <thead>
+    <tr>
+        <th></th>
+        <th>
+            @Html.DisplayNameFor(model => model.Name)
+        </th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    @{
+        var tariffId = ViewData["TariffId"] as Guid?;
+    }
+    @foreach (var item in Model.Where(x => x.Id != tariffId))
+    {
+        <tr>
+            <td>
+                <input type="radio" asp-for="@item.Id" id="@item.Id-radio" value="" onchange="SelectItem('@item.Id')"/>
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Name)
+            </td>
+            <td style="width: 90px; align-content: right">
+                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/edit_param.png" alt="Редактировать элемент" class="small-button-img"/>
+                </a>
+                <a style="margin-left: 10px;" asp-controller="Tariffs" asp-action="Delete" asp-route-id="@item.Id">
+                    <img src="~/images/Icons/del_param.png" alt="Удалить Элемент" class="small-button-img"/>
+                </a>
+            </td>
+        </tr>
+    }
+    </tbody>
+</table>
+
+<script>
+    function SelectItem(tariffId) {
+        $.get("/Tariffs/SelectTariff/" + tariffId, null);
+    }
+</script>

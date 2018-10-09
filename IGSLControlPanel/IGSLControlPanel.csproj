@@ -50,6 +50,8 @@
     <Compile Remove="Migrations\20181002132139_Add IsGlobal to ParameterGroup - mainDB.Designer.cs" />
     <Compile Remove="Migrations\20181002132232_Add IsGlobal to ParameterGroup - mainDB.cs" />
     <Compile Remove="Migrations\20181002132232_Add IsGlobal to ParameterGroup - mainDB.Designer.cs" />
+    <Compile Remove="Migrations\20181008151300_TariffId in Product can be null.cs" />
+    <Compile Remove="Migrations\20181008151300_TariffId in Product can be null.Designer.cs" />
   </ItemGroup>
 
   <ItemGroup>

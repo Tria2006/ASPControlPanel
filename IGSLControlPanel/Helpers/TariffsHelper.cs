@@ -13,16 +13,17 @@ namespace IGSLControlPanel.Helpers
     public class TariffsHelper
     {
         public Tariff CurrentTariff { get; set; }
+        public Tariff SelectedTariffForProduct { get; set; }
         public InsuranceRule CurrentRule { get; set; }
-        private List<Tariff> _tariffs { get; set; }
+        private List<Tariff> Tariffs { get; set; }
         public List<Tariff> RootTariffs { get; set; }
-        private List<Tariff> _checkedTariffs { get; } = new List<Tariff>();
-        public bool HasSelectedTariffs => _checkedTariffs.Any();
+        private List<Tariff> CheckedTariffs { get; } = new List<Tariff>();
+        public bool HasSelectedTariffs => CheckedTariffs.Any();
 
-        public void Initialize(IGSLContext _context, FolderTreeEntry rootFolder)
+        public void Initialize(IGSLContext context, FolderTreeEntry rootFolder)
         {
             // продукты получаем вместе со связанными параметрами 
-            _tariffs = _context.Tariffs.Include(x => x.InsRuleTariffLink)
+            Tariffs = context.Tariffs.Include(x => x.InsRuleTariffLink)
                 .ThenInclude(s => s.InsRule)
                 .Include(x => x.RiskFactorsTariffLinks)
                 .ThenInclude(x => x.RiskFactor).
@@ -30,14 +31,14 @@ namespace IGSLControlPanel.Helpers
                 .Where(s => !s.IsDeleted).ToList();
 
             // продукты, не привязанные ни к какой папке
-            RootTariffs = _tariffs.Where(x => x.FolderId == Guid.Empty && !x.IsDeleted).ToList();
+            RootTariffs = Tariffs.Where(x => x.FolderId == Guid.Empty && !x.IsDeleted).ToList();
 
             BuildTariffs(rootFolder);
         }
 
         public void BuildTariffs(FolderTreeEntry parent)
         {
-            var tariffs = _tariffs.Where(x => x.FolderId == parent.Id && !x.IsDeleted);
+            var tariffs = Tariffs.Where(x => x.FolderId == parent.Id && !x.IsDeleted);
             foreach (var tariff in tariffs)
             {
                 if (parent.Tariffs.Contains(tariff)) continue;
@@ -50,46 +51,46 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        public async Task RemoveFolderId(Tariff tariff, IGSLContext _context)
+        public async Task RemoveFolderId(Tariff tariff, IGSLContext context)
         {
             // отвязываем продукт от папки
-            var contextTariff = _context.Tariffs.FirstOrDefault(x => x.Id == tariff.Id);
+            var contextTariff = context.Tariffs.FirstOrDefault(x => x.Id == tariff.Id);
             if (contextTariff == null) return;
             contextTariff.FolderId = Guid.Empty;
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
-        public void CheckTariff(Guid id, IGSLContext _context)
+        public void CheckTariff(Guid id, IGSLContext context)
         {
             // получаем продукт из контекста
-            var tariff = _context.Tariffs.SingleOrDefault(x => x.Id == id);
+            var tariff = context.Tariffs.SingleOrDefault(x => x.Id == id);
             if (tariff == null) return;
             // добавляем или удаляем продукт из списка _checkedFolders
-            if (_checkedTariffs.Any(p => p.Id == tariff.Id))
-                _checkedTariffs.RemoveAll(p => p.Id == tariff.Id);
+            if (CheckedTariffs.Any(p => p.Id == tariff.Id))
+                CheckedTariffs.RemoveAll(p => p.Id == tariff.Id);
             else
-                _checkedTariffs.Add(tariff);
+                CheckedTariffs.Add(tariff);
         }
 
         public void MoveSelectedTariffs(IGSLContext context, Guid selectedDestFolderId)
         {
-            foreach (var tariff in _checkedTariffs)
+            foreach (var tariff in CheckedTariffs)
             {
                 var contextTariff = context.Tariffs.SingleOrDefault(p => p.Id == tariff.Id);
                 if (contextTariff == null) continue;
                 contextTariff.FolderId = selectedDestFolderId;
             }
-            _checkedTariffs.Clear();
+            CheckedTariffs.Clear();
             context.SaveChanges();
         }
 
-        public async Task RemoveTariffs(IGSLContext _context, FolderTreeEntry parentFolder, ILog logger, IHttpContextAccessor _httpAccessor)
+        public async Task RemoveTariffs(IGSLContext context, FolderTreeEntry parentFolder, ILog logger, IHttpContextAccessor httpAccessor)
         {
             // двигаемся по списку выбранных тарифов
-            foreach (var f in _checkedTariffs)
+            foreach (var f in CheckedTariffs)
             {
                 // получаем тариф из контекста и далее работавем с ним
-                var contextTariff = _context.Tariffs
+                var contextTariff = context.Tariffs
                     .Include(x => x.RiskFactorsTariffLinks)
                     .ThenInclude(x => x.RiskFactor)
                     .Include(x => x.InsRuleTariffLink)
@@ -104,7 +105,7 @@ namespace IGSLControlPanel.Helpers
                 // удаляем связи
                 contextTariff.InsRuleTariffLink.Clear();
                 contextTariff.IsDeleted = true;
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Tariff (id={f.Id})");
+                logger.Info($"{httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) Tariff (id={f.Id})");
             }
 
             // удаляются тарифы только из FoldersTree
@@ -112,10 +113,10 @@ namespace IGSLControlPanel.Helpers
             parentFolder?.Tariffs.RemoveAll(x => x.IsDeleted);
 
             // удалить тарифы нужно и из _productsWOFolder
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
 
             // очищаем список выбранных тарифов
-            _checkedTariffs.Clear();
+            CheckedTariffs.Clear();
             BuildTariffs(parentFolder);
         }
 
@@ -138,6 +139,11 @@ namespace IGSLControlPanel.Helpers
             if(tempTariff == null) return;
             CurrentTariff.RiskFactorsTariffLinks = tempTariff.RiskFactorsTariffLinks;
             CurrentTariff.InsRuleTariffLink = tempTariff.InsRuleTariffLink;
+        }
+
+        public async Task SelectTariffForProduct(Guid tariffId, IGSLContext context)
+        {
+            SelectedTariffForProduct = await context.Tariffs.Include(x => x.LinkedProducts).SingleOrDefaultAsync(x => x.Id == tariffId);
         }
     }
 }

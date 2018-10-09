@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using DBModels.Models;
 using IGSLControlPanel.Controllers;
 using IGSLControlPanel.Data;
+using IGSLControlPanel.Enums;
 using IGSLControlPanel.Helpers;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -300,7 +301,7 @@ namespace IGSLPanelTests.UnitTests
             controller.FolderCheckBoxClick(childFolder.Id);
 
             // выбираем куда
-            controller.FolderClick(Guid.Empty);
+            controller.FolderClick(Guid.Empty, ModelTypes.Tariffs.ToString());
 
             //перемещаем
             var result = controller.MoveSelectedItems();

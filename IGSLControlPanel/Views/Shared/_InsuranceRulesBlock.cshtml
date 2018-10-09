@@ -4,7 +4,9 @@
 <div class="form-group" style="min-height: 200px; max-height: 300px; border: 1px lightgrey solid; padding: 1px; overflow: auto">
     @{
         var counter = 1;
+        var readOnly = ViewData["ReadOnly"] as bool?;
     }
+    <input id="isReadOnly" type="hidden" value="@readOnly.ToString()"/>
     @foreach (var link in Model)
     {
         <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative"
@@ -13,14 +15,17 @@
                 <label style="margin-right: 10px">@counter.</label>
                 <label>@link.InsRule.Name</label>
             </div>
-            <div style="position: absolute; right: 10px; top: 5px">
-                <a asp-controller="InsuranceRules" asp-action="Edit" asp-route-id="@link.InsRuleId">
-                    <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" />
-                </a>
-                <a style="margin-left: 10px;" asp-controller="InsuranceRules" asp-action="Delete" asp-route-id="@link.InsRuleId">
-                    <img src="~/images/Icons/del_param.png" alt="Создать папку" class="small-button-img" />
-                </a>
-            </div>
+            @if (readOnly == null || !(bool)readOnly)
+            {
+                <div style="position: absolute; right: 10px; top: 5px">
+                    <a asp-controller="InsuranceRules" asp-action="Edit" asp-route-id="@link.InsRuleId">
+                        <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" />
+                    </a>
+                    <a style="margin-left: 10px;" asp-controller="InsuranceRules" asp-action="Delete" asp-route-id="@link.InsRuleId">
+                        <img src="~/images/Icons/del_param.png" alt="Создать папку" class="small-button-img" />
+                    </a>
+                </div>
+            }
         </div>
         counter++;
     }
@@ -28,6 +33,9 @@
 
 <script>
     function ParameterClick(div, ruleId) {
+        if ($("#isReadOnly").val() === "True") {
+            return;
+        }
         var elements = $("#parametersList").children();
         $.each(elements, function () {
             if (this !== div) {
