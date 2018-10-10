@@ -13,10 +13,10 @@
                 <label>@parameter.Name</label>
             </div>
             <div style="position: absolute; right: 10px; top: 5px">
-                <a asp-controller="ProductParameters" asp-action="Edit" asp-route-id="@parameter.Id">
+                <a asp-controller="ProductParameters" asp-action="Edit" asp-route-id="@parameter.Id" style="font-size: 0">
                     <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" style="margin-top: 0" />
                 </a>
-                <a style="margin-left: 10px;" asp-controller="ProductParameters" asp-action="Delete" asp-route-id="@parameter.Id">
+                <a style="margin-left: 10px; font-size: 0" asp-controller="ProductParameters" asp-action="Delete" asp-route-id="@parameter.Id">
                     <img src="~/images/Icons/del_param.png" alt="Создать папку" class="small-button-img" style="margin-top: 0" />
                 </a>
             </div>

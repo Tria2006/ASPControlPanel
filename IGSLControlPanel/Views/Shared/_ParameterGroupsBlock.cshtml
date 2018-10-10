@@ -14,13 +14,13 @@
         }
         @Html.LabelFor(x => p.Text, p.Text, new { style = "margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium" })
 
-        <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@p.Value" onclick="SaveTempData()">
+        <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@p.Value" onclick="SaveTempData()" style="font-size: 0">
             <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
         </a>
-        <a id="@p.Value" onclick="ParameterUpClick(this)">
+        <a id="@p.Value" onclick="ParameterUpClick(this)" style="font-size: 0">
             <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
         </a>
-        <a id="@p.Value" onclick="ParameterDownClick(this)">
+        <a id="@p.Value" onclick="ParameterDownClick(this)" style="font-size: 0">
             <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
         </a>
 
@@ -34,13 +34,13 @@
 {
     <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
 
-    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()">
+    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()" style="font-size: 0">
         <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
     </a>
-    <a onclick="ParameterUpClick(this)">
+    <a onclick="ParameterUpClick(this)" style="font-size: 0">
         <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
     </a>
-    <a onclick="ParameterDownClick(this)">
+    <a onclick="ParameterDownClick(this)" style="font-size: 0">
         <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
     </a>
 
@@ -53,13 +53,13 @@
 {
     <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
 
-    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()">
+    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()" style="font-size: 0">
         <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
     </a>
-    <a onclick="ParameterUpClick(this)">
+    <a onclick="ParameterUpClick(this)" style="font-size: 0">
         <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
     </a>
-    <a onclick="ParameterDownClick(this)">
+    <a onclick="ParameterDownClick(this)" style="font-size: 0">
         <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
     </a>
 

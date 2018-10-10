@@ -18,10 +18,10 @@
             @if (readOnly == null || !(bool)readOnly)
             {
                 <div style="position: absolute; right: 10px; top: 5px">
-                    <a asp-controller="InsuranceRules" asp-action="Edit" asp-route-id="@link.InsRuleId">
+                    <a asp-controller="InsuranceRules" asp-action="Edit" asp-route-id="@link.InsRuleId" style="font-size: 0">
                         <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" />
                     </a>
-                    <a style="margin-left: 10px;" asp-controller="InsuranceRules" asp-action="Delete" asp-route-id="@link.InsRuleId">
+                    <a style="margin-left: 10px; font-size: 0" asp-controller="InsuranceRules" asp-action="Delete" asp-route-id="@link.InsRuleId">
                         <img src="~/images/Icons/del_param.png" alt="Создать папку" class="small-button-img" />
                     </a>
                 </div>

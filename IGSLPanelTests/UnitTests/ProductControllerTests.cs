@@ -32,7 +32,7 @@ namespace IGSLPanelTests.UnitTests
 	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
 	        {
 	            HttpContext = new DefaultHttpContext()
-	        });
+	        }, new ProductParamRiskFactorLinkHelper());
 
 	        // act
 	        var result = controller.Index(Guid.Empty) as ViewResult;
@@ -65,7 +65,7 @@ namespace IGSLPanelTests.UnitTests
 		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
 		    {
 		        HttpContext = new DefaultHttpContext()
-		    });
+		    }, new ProductParamRiskFactorLinkHelper());
 
             // act
 		    var result = controller.CreateProduct(Guid.Empty) as ViewResult;
@@ -91,7 +91,7 @@ namespace IGSLPanelTests.UnitTests
 	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
 	            {
                     HttpContext = new DefaultHttpContext()
-	            });
+	            }, new ProductParamRiskFactorLinkHelper());
 
 	        // act
 	        RedirectToActionResult result;
@@ -122,7 +122,7 @@ namespace IGSLPanelTests.UnitTests
 		    var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
 		    {
 		        HttpContext = new DefaultHttpContext()
-		    });
+		    }, new ProductParamRiskFactorLinkHelper());
 
             // act
 		    var result = await controller.Edit(product.Id) as ViewResult;
@@ -150,7 +150,7 @@ namespace IGSLPanelTests.UnitTests
 	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
 	            {
                     HttpContext = new DefaultHttpContext()
-	            });
+	            }, new ProductParamRiskFactorLinkHelper());
 	        controller.Index(Guid.Empty);
 
 	        // act
@@ -199,7 +199,7 @@ namespace IGSLPanelTests.UnitTests
 	        var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
 	        {
 	            HttpContext = new DefaultHttpContext()
-	        });
+	        }, new ProductParamRiskFactorLinkHelper());
 	        //act
 	        controller.Index(Guid.Empty);
 	        await controller.ClearFolderItems(new List<FolderTreeEntry> {folder});
@@ -232,7 +232,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
 
             //act
             var result = controller.ProductCheckBoxClick(product1.Id);
@@ -257,7 +257,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
 
             //act
             controller.Index(Guid.Empty);
@@ -285,7 +285,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
 
             //act
             await controller.Edit(product.Id);
@@ -334,7 +334,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
 
             //act
             // выбираем кого перемещать

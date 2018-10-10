@@ -1,0 +1,64 @@
+﻿@using DBModels.Models.ManyToManyLinks
+@model DBModels.Models.Product
+
+@{
+    List<RiskFactorTariffLink> items;
+    if (ViewData["SelectedIds"] is List<Guid> selectedList)
+    {
+        items = Model.Tariff.RiskFactorsTariffLinks.Where(x => !selectedList.Contains(x.RiskFactorId)).ToList();
+    }
+    else
+    {
+        items = Model.Tariff.RiskFactorsTariffLinks;
+    }
+}
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>LinkSettings</title>
+</head>
+<body>
+    <div style="margin: 20px; margin-left: 0">
+        Продукт: <label style="margin-left: 10px; margin-right: 200px">@Model.Name</label>
+        Тариф: <label style="margin-right: 10px">@Model.Tariff.Name</label>
+    </div>
+    @foreach (var paramLink in Model.LinkToProductParameters)
+    {
+        <div style="padding: 10px; padding-left: 0;">
+            <label style="margin-left: 0; margin-right: 30px; float: left; width: 300px">@paramLink.Parameter.Name</label>
+            <select id="@paramLink.ProductParameterId" class="form-control" style="width: 250px" onchange="AddSelectedItem(this)">
+                @foreach (var item in items)
+                {
+                    <option value="@item.RiskFactorId">@item.RiskFactor.Name</option>
+                }
+            </select>
+        </div>
+    }
+    <form asp-controller="Products" asp-action="SaveLinks" asp-route-productId="@Model.Id">
+        <input id="productId" type="hidden" value="@Model.Id" />
+        <input id="tariffId" type="hidden" value="@Model.TariffId" />
+        <div class="form-group">
+            <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
+            <button class="btn btn-default" style="width: 200px" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id">Выйти без сохранения</button>
+        </div>
+    </form>
+</body>
+</html>
+
+<script>
+    function AddSelectedItem(combobox) {
+        $.ajax({
+            url: "/Products/AddLink",
+            type: "post",
+            data: {
+                productId: $("#productId").val(),
+                tariffId: $("#tariffId").val(),
+                paramId: combobox.id,
+                factorId: combobox.value
+            },
+            success: function () { }
+        });
+    }
+</script>

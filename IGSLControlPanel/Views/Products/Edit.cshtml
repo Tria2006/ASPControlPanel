@@ -102,10 +102,10 @@
         <a id="detachTariffBtn" title="Отвязать от тарифа" style="font-size: 0">
             <img src="~/images/Icons/deattach.png" alt="Отвязать от тарифа" style="margin: 10px; width: 40px; height: 40px" />
         </a>
-        <a id="bundleSettingsBtn" title="Настройка связки" style="font-size: 0">
+        <a title="Настройка связки" style="font-size: 0" asp-controller="Products" asp-action="LinkSettings" asp-route-productId="@Model.Id">
             <img src="~/images/Icons/settings.png" alt="Настройка связки" style="margin: 10px; width: 40px; height: 40px" />
         </a>
-        Присоединенный тариф: <a title="Просмотр данных тарифа" asp-controller="Tariffs" asp-action="Details" asp-route-tariffId="@Model.TariffId">@Model.Tariff.Name</a>
+        Присоединенный тариф: <a title="Просмотр данных тарифа" asp-controller="Tariffs" asp-action="Details" asp-route-tariffId="@Model.TariffId">@Model.Tariff?.Name</a>
     </div>
     <form asp-action="Edit" asp-controller="Products" class="create_update_form">
         <input id="modelId" type="hidden" value="@Model.Id" />

@@ -30,7 +30,7 @@
         <input asp-for="IsGlobal" style="vertical-align: top" disabled="disabled" />
     </div>
 
-    <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@Model.Id" asp-route-isSelectGroupDisabled="true">
+    <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@Model.Id" asp-route-isSelectGroupDisabled="true" style="font-size: 0">
         <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
     </a>
     @*<a onclick="ParameterUpClick(this)">

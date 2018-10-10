@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -14,6 +15,7 @@ namespace DBModels.Models
 
         public Guid RiskId  { get; set; }
 
+        [DisplayName("Обязателен")]
         public bool IsRequired { get; set; }
     }
 }

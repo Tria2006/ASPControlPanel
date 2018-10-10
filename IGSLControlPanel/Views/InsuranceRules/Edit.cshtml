@@ -48,10 +48,11 @@
                             <label>@link.Risk.Name</label>
                         </div>
                         <div style="position: absolute; right: 10px; top: 5px">
-                            <a asp-controller="Risks" asp-action="Edit" asp-route-id="@link.RiskId" asp-route-tariffId="@ViewData["TariffId"]">
+                            <a asp-controller="Risks" asp-action="Edit" asp-route-id="@link.RiskId" asp-route-tariffId="@ViewData["TariffId"]"
+                               style="font-size: 0">
                                 <img src="~/images/Icons/edit_param.png" alt="Редактировать" class="small-button-img" />
                             </a>
-                            <a style="margin-left: 10px;" asp-controller="Risks" asp-action="Delete" asp-route-id="@link.RiskId">
+                            <a style="margin-left: 10px; font-size: 0" asp-controller="Risks" asp-action="Delete" asp-route-id="@link.RiskId">
                                 <img src="~/images/Icons/del_param.png" alt="Удалить" class="small-button-img" />
                             </a>
                         </div>

@@ -24,6 +24,7 @@ namespace IGSLControlPanel.Data
         public DbSet<ParameterGroup> ParameterGroups { get; set; }
         public DbSet<LimitListItem> LimitListItems { get; set; }
         public DbSet<Coefficient> Coefficients { get; set; }
+        public DbSet<ParameterToFactorLink> ParameterToFactorLinks { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

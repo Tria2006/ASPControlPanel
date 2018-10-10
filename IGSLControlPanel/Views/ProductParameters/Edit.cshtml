@@ -65,25 +65,25 @@
                     Лимиты значений
                     @if (Model.Limit != null)
                     {
-                        <a>
+                        <a style="font-size: 0">
                             <img src="~/images/Icons/add_gray.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
                         </a>
-                        <a asp-controller="ValueLimits" asp-action="Edit">
+                        <a asp-controller="ValueLimits" asp-action="Edit" style="font-size: 0">
                             <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
                         </a>
-                        <a asp-controller="ValueLimits" asp-action="Delete">
+                        <a asp-controller="ValueLimits" asp-action="Delete" style="font-size: 0">
                             <img src="~/images/Icons/del_param.png" class="small-button-img" style="margin: 2px" alt="" />
                         </a>
                     }
                     else
                     {
-                        <a id="add-limit" asp-controller="ValueLimits" asp-action="Create">
+                        <a id="add-limit" asp-controller="ValueLimits" asp-action="Create" style="font-size: 0">
                             <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
                         </a>
-                        <a>
+                        <a style="font-size: 0">
                             <img src="~/images/Icons/edit_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
                         </a>
-                        <a>
+                        <a style="font-size: 0">
                             <img src="~/images/Icons/del_param_gray.png" style="margin: 2px; width: 25px; height: 25px" alt="" />
                         </a>
                     }

@@ -31,6 +31,7 @@ namespace IGSLControlPanel
             services.AddSingleton<RiskFactorHelper>();
             services.AddSingleton<FilesHelper>();
             services.AddSingleton<GroupsHelper>();
+            services.AddSingleton<ProductParamRiskFactorLinkHelper>();
             services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
             if (!Directory.Exists(Path.Combine(Directory.GetCurrentDirectory(), "ExcelFiles")))

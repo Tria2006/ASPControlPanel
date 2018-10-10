@@ -27,10 +27,10 @@
                 <input asp-for="@item.CanRepeat" style="vertical-align: top; margin-left: 50px" disabled="disabled"/>
             </td>
             <td style="width: 90px; align-content: right">
-                <a asp-controller="ParameterGroups" asp-action="Edit" asp-route-id="@item.Id">
+                <a asp-controller="ParameterGroups" asp-action="Edit" asp-route-id="@item.Id" style="font-size: 0">
                     <img src="~/images/Icons/edit_param.png" alt="Редактировать группу параметров" class="small-button-img"/>
                 </a>
-                <a style="margin-left: 10px;" asp-controller="ParameterGroups" asp-action="Delete" asp-route-id="@item.Id">
+                <a style="margin-left: 10px; font-size: 0" asp-controller="ParameterGroups" asp-action="Delete" asp-route-id="@item.Id">
                     <img src="~/images/Icons/del_param.png" alt="Удалить группу параметров" class="small-button-img"/>
                 </a>
             </td>

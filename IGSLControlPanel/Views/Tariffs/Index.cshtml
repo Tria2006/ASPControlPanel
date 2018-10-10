@@ -17,32 +17,33 @@
     <input id="modelIdValue" type="hidden" value="@Model.Id" />
 
     <!-- кнопка Назад-->
-    <a id="backBtn" asp-controller="Tariffs" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId" asp-route-controllerName="Tariffs">
+<a id="backBtn" asp-controller="Tariffs" asp-action="OneLevelUp" asp-route-destFolderId="@Model.ParentFolderId" asp-route-controllerName="Tariffs"
+   style="font-size: 0">
         <img src="~/images/Icons/back.png" alt="Назад" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
     <!-- кнопка Создать папку-->
-    <a id="createFolderBtn">
+    <a id="createFolderBtn" style="font-size: 0">
         <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
     <!-- кнопка Удалить папку-->
-    <a id="deleteFolderBtn" style="margin-left: 10px">
+    <a id="deleteFolderBtn" style="margin-left: 10px; font-size: 0">
         <img id="deleteFolderImg" src="~/images/Icons/folder_delete_gray.png" alt="Удалить папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
     <!-- кнопка Создать тариф-->
-    <a asp-controller="Tariffs" asp-action="Create" asp-route-folderId="@Model.Id">
+    <a asp-controller="Tariffs" asp-action="Create" asp-route-folderId="@Model.Id" style="font-size: 0">
         <img src="~/images/Icons/documentnew.png" alt="Создать продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
     <!-- кнопка Удалить тариф-->
-    <a id="removeTariffsBtn">
+    <a id="removeTariffsBtn" style="font-size: 0">
         <img id="productDeleteImg" src="~/images/Icons/document_remove_gray.png" alt="Удалить продукт" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
     <!-- кнопка Переместить в папку-->
-    <a id="moveBtn">
+    <a id="moveBtn" style="font-size: 0">
         <img id="moveImg" src="~/images/Icons/move_gray.png" alt="Переместить в папку" style="margin: 10px; width: 40px; height: 40px" />
     </a>
 
@@ -153,7 +154,7 @@
                             <td>
                                 <input id="cb" type="checkbox" onclick="FolderCheckBoxClick(' @child.Id ')" style="margin: 2px; width: 16px; height: 16px" />
 
-                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id">
+                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id" style="font-size: 0">
                                     @if (child.ChildFolders.Any() || child.Tariffs.Any())
                                     {
                                         <img src="~/images/Icons/folder.png" width="50" height="50" alt="Image" class="center-block" />
@@ -167,7 +168,7 @@
                         </tr>
                         <tr>
                             <td style="text-align: center; vertical-align: text-top">
-                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id">
+                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id" style="font-size: 0">
                                     @Html.LabelFor(n => child.Name, child.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
                                 </a>
                             </td>
@@ -184,14 +185,14 @@
                         <tr>
                             <td>
                                 <input type="checkbox" onclick="TariffCheckBoxClick('@p.Id')" style="margin: 2px; width: 16px; height: 16px" />
-                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id">
+                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="font-size: 0">
                                     <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
                                 </a>
                             </td>
                         </tr>
                         <tr>
                             <td style="text-align: center; vertical-align: text-top">
-                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id">
+                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="font-size: 0">
                                     @Html.LabelFor(n => p.Name, p.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
                                 </a>
                             </td>

@@ -19,9 +19,11 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly IHttpContextAccessor _httpAccessor;
+        private readonly ProductParamRiskFactorLinkHelper _linkHelper;
         private readonly ILog _logger;
 
-        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, IHttpContextAccessor accessor) 
+        public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, IHttpContextAccessor accessor,
+            ProductParamRiskFactorLinkHelper linkHelper) 
             : base(context, helper)
         {
             _context = context;
@@ -29,6 +31,7 @@ namespace IGSLControlPanel.Controllers
             _logger = LogManager.GetLogger(typeof(ProductsController));
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
+            _linkHelper = linkHelper;
         }
 
         public IActionResult Index(Guid id)
@@ -140,6 +143,34 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentProduct.FolderId = folderId;
             _productsHelper.CurrentProduct.ValidFrom = dateFrom;
             _productsHelper.CurrentProduct.ValidTo = dateTo;
+        }
+
+        public async Task<IActionResult> LinkSettings(Guid productId)
+        {
+            var product = await _context.Products
+                .Include(x => x.LinkToProductParameters)
+                .ThenInclude(x => x.Parameter).SingleOrDefaultAsync(x => x.Id == productId);
+            if (product == null) return NotFound();
+            product.Tariff = await _context.Tariffs
+                .Include(x => x.RiskFactorsTariffLinks)
+                .ThenInclude(x => x.RiskFactor).SingleOrDefaultAsync(x => x.Id == product.TariffId);
+
+            return View(product);
+        }
+
+        public void AddLink(Guid productId, Guid tariffId, Guid paramId, Guid factorId)
+        {
+            _linkHelper.AddParamToFactorLink(productId, tariffId, paramId, factorId);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> SaveLinks(Guid productId, string save, string saveAndExit)
+        {
+            await _linkHelper.SaveLinks(_context);
+
+            if (!string.IsNullOrEmpty(saveAndExit))
+                return RedirectToAction("Edit", new { productId });
+            return RedirectToAction("LinkSettings", new { productId });
         }
     }
 }

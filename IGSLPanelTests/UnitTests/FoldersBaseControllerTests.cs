@@ -32,7 +32,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
             controller.Index(Guid.Empty);
 
             //act
@@ -72,7 +72,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
             controller.Index(Guid.Empty);
             controller.FolderCheckBoxClick(folder.Id);
             
@@ -103,7 +103,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
             {
                 HttpContext = new DefaultHttpContext()
-            });
+            }, new ProductParamRiskFactorLinkHelper());
             controller.Index(folder.Id);
 
             //act

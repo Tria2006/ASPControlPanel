@@ -17,10 +17,10 @@
             <label>@item.Value</label>
         </div>
         <div style="position: absolute; right: 10px; top: 5px">
-            <a asp-controller="LimitListItems" asp-action="Edit" asp-route-id="@item.Id">
+            <a asp-controller="LimitListItems" asp-action="Edit" asp-route-id="@item.Id" style="font-size: 0">
                 <img src="~/images/Icons/edit_param.png" alt="Редактировать" class="small-button-img" style="margin-top: 0" />
             </a>
-            <a style="margin-left: 10px;" asp-controller="LimitListItems" asp-action="Delete" asp-route-id="@item.Id">
+            <a style="margin-left: 10px; font-size: 0" asp-controller="LimitListItems" asp-action="Delete" asp-route-id="@item.Id">
                 <img src="~/images/Icons/del_param.png" alt="Удалить" class="small-button-img" style="margin-top: 0" />
             </a>
         </div>

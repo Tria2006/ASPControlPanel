@@ -52,7 +52,7 @@
         {
             @Html.LabelFor(x => Model.LimitListItems, new { style = "margin-right: 50px; margin-top: 20px; vertical-align: bottom" })
 
-            <a asp-controller="LimitListItems" asp-action="Create" asp-route-limitId="@Model.Id" onclick="SaveTempData()">
+            <a asp-controller="LimitListItems" asp-action="Create" asp-route-limitId="@Model.Id" onclick="SaveTempData()" style="font-size: 0">
                 <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
             </a>
 

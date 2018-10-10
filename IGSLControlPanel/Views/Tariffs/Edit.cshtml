@@ -83,16 +83,26 @@
             <input asp-for="ValidTo" class="form-control" style="width: 160px" />
             <span asp-validation-for="ValidTo" class="text-danger"></span>
         </div>
+        <div class="form-group">
+            <label asp-for="BaseTariffType" class="control-label"></label>
+            <select asp-for="BaseTariffType" asp-items="Html.GetEnumSelectList<BaseTariffTypes>()" class="form-control" style="width: 250px"></select>
+            <span asp-validation-for="BaseTariffType" class="text-danger"></span>
+        </div>
+        <div class="form-group">
+            <label asp-for="BaseTariffValue" class="control-label"></label>
+            <input asp-for="BaseTariffValue" class="form-control" style="width: 100px" />
+            <span asp-validation-for="BaseTariffValue" class="text-danger"></span>
+        </div>
 
         <h3>Правила страхования</h3>
         <div style="float: left">
-            <a asp-controller="InsuranceRules" asp-action="Create">
+            <a asp-controller="InsuranceRules" asp-action="Create" style="font-size: 0">
                 <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px" />
             </a>
         </div>
         <div>
             <!-- кнопка выбора правила -->
-            <a id="selectInsRuleBtn">
+            <a id="selectInsRuleBtn" style="font-size: 0">
                 <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px" />
             </a>
         </div>
@@ -100,13 +110,13 @@
 
         <h3>Факторы риска</h3>
         <div style="float: left">
-            <a asp-controller="RiskFactors" asp-action="Create">
+            <a asp-controller="RiskFactors" asp-action="Create" style="font-size: 0">
                 <img src="~/images/Icons/add_param.png" alt="Добавить новую запись" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px" />
             </a>
         </div>
         <div>
             <!-- кнопка выбора фактора -->
-            <a id="selectFactorBtn">
+            <a id="selectFactorBtn" style="font-size: 0">
                 <img src="~/images/Icons/folderadd.png" alt="Выбор существующей" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px" />
             </a>
         </div>

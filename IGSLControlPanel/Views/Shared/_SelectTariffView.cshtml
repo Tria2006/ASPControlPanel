@@ -24,10 +24,10 @@
                 @Html.DisplayFor(modelItem => item.Name)
             </td>
             <td style="width: 90px; align-content: right">
-                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@item.Id">
+                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@item.Id" style="font-size: 0">
                     <img src="~/images/Icons/edit_param.png" alt="Редактировать элемент" class="small-button-img"/>
                 </a>
-                <a style="margin-left: 10px;" asp-controller="Tariffs" asp-action="Delete" asp-route-id="@item.Id">
+                <a style="margin-left: 10px; font-size: 0" asp-controller="Tariffs" asp-action="Delete" asp-route-id="@item.Id">
                     <img src="~/images/Icons/del_param.png" alt="Удалить Элемент" class="small-button-img"/>
                 </a>
             </td>

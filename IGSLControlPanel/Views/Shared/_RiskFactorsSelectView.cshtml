@@ -9,13 +9,13 @@
                 <tr>
                     <td>
                         <input type="checkbox" onclick="FactorCheckBoxClick('@factor.Id', Event)" style="margin: 2px; width: 16px; height: 16px" />
-                        <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id">
+                        <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id" style="font-size: 0">
                             <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
                         </a>
                     </td>
                 </tr>
                 <tr>
-                    <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id">
+                    <a asp-controller="RiskFactors" asp-action="AddFactorsToTariff" asp-route-factorId="@factor.Id" style="font-size: 0">
                         <td style="text-align: center; vertical-align: text-top">
                             @Html.DisplayTextFor(n => factor.Name)
                         </td>
