@@ -168,7 +168,7 @@
                         </tr>
                         <tr>
                             <td style="text-align: center; vertical-align: text-top">
-                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id" style="font-size: 0">
+                                <a asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@child.Id">
                                     @Html.LabelFor(n => child.Name, child.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
                                 </a>
                             </td>
@@ -185,14 +185,14 @@
                         <tr>
                             <td>
                                 <input type="checkbox" onclick="TariffCheckBoxClick('@p.Id')" style="margin: 2px; width: 16px; height: 16px" />
-                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="font-size: 0">
+                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id">
                                     <img src="~/images/Icons/product.png" width="50" height="50" alt="Image" class="center-block" />
                                 </a>
                             </td>
                         </tr>
                         <tr>
                             <td style="text-align: center; vertical-align: text-top">
-                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id" style="font-size: 0">
+                                <a asp-controller="Tariffs" asp-action="Edit" asp-route-id="@p.Id">
                                     @Html.LabelFor(n => p.Name, p.Name, new { style = "white-space: nowrap; display: inline-block; width: 84px; overflow: hidden; text-overflow: ellipsis" })
                                 </a>
                             </td>
