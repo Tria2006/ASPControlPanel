@@ -171,10 +171,12 @@ namespace IGSLControlPanel.Controllers
             await _groupHelper.SelectGroup(id, _context);
         }
 
-        public async Task<IActionResult> AttachGroup(Guid productId)
+        public IActionResult AttachGroup(Guid productId)
         {
 
-            var product = await _context.Products.FindAsync(productId);
+            var product = _context.Products
+                .Include(x => x.LinkToProductParameters)
+                .ThenInclude(x => x.Parameter).SingleOrDefault(x => x.Id == productId);
             if (product == null) return PartialView("_ParameterGroupsBlock", _productsHelper.CurrentProduct);
 
             var globalParams = _groupHelper.GetSelectedGroupParameters(_context);
@@ -189,7 +191,7 @@ namespace IGSLControlPanel.Controllers
                     ProductId = productId,
                     ProductParameterId = globalParam.Id
                 });
-                await _context.SaveChangesAsync();
+                _context.SaveChanges();
             }
             return PartialView("_ParameterGroupsBlock", product);
         }

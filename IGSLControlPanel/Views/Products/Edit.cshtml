@@ -153,6 +153,7 @@
     });
     $("#addGroupOkBtn").click(function () {
         $.ajax({
+            async: false,
             url: "/ParameterGroups/AttachGroup",
             type: "post",
             data: { productId: $("#modelId").val() },
