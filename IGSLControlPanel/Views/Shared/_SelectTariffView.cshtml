@@ -18,7 +18,7 @@
     {
         <tr>
             <td>
-                <input type="radio" asp-for="@item.Id" id="@item.Id-radio" value="" onchange="SelectItem('@item.Id')"/>
+                <input type="radio" asp-for="@item.Id" id="@item.Id-radio" value="" onchange="SelectTariff('@item.Id')"/>
             </td>
             <td>
                 @Html.DisplayFor(modelItem => item.Name)
@@ -37,7 +37,7 @@
 </table>
 
 <script>
-    function SelectItem(tariffId) {
+    function SelectTariff(tariffId) {
         $.get("/Tariffs/SelectTariff/" + tariffId, null);
     }
 </script>

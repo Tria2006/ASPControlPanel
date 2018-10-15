@@ -18,6 +18,7 @@ namespace IGSLControlPanel.Helpers
 
         public List<ProductParameter> GetSelectedGroupParameters(IGSLContext context)
         {
+            if(SelectedGroup == null) return  new List<ProductParameter>();
             return context.ProductParameters.Where(x => x.GroupId == SelectedGroup.Id).ToList();
         }
     }

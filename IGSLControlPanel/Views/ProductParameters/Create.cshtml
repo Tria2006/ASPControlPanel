@@ -103,7 +103,11 @@
 
     function IsConstantChanged() {
         SaveTempData();
+        $.get("/ProductParameters/ClearConstantValues");
+        UpdateConstantPartial();
+    }
 
+    function ConstValuesVisibility() {
         var isConstant = $("#isConstant").prop("checked");
 
         if (isConstant === true) {
@@ -111,9 +115,6 @@
         } else {
             $("#constantValuePartial").hide();
         }
-
-        $.get("/ProductParameters/ClearConstantValues");
-        UpdateConstantPartial();
     }
 
     function DataTypeChanged() {
@@ -127,6 +128,7 @@
             type: "post",
             success: function (result) {
                 $("#constantValuePartial").html(result);
+                ConstValuesVisibility();
             }
         });
     }
