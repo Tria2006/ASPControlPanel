@@ -22,7 +22,11 @@
         </div>
         <div class="form-group">
             <label asp-for="CanRepeat" class="control-label" style="width: 220px"></label>
-            <input id="calcRequired" asp-for="CanRepeat" style="vertical-align: top" />
+            <input asp-for="CanRepeat" style="vertical-align: top" />
+        </div>
+        <div class="form-group">
+            <label asp-for="IsGlobal" class="control-label" style="width: 220px"></label>
+            <input asp-for="IsGlobal" disabled="disabled" style="vertical-align: top" />
         </div>
         <div class="form-group">
             <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
