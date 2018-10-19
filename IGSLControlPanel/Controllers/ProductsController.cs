@@ -82,12 +82,16 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Product p, string save, string saveAndExit)
+        public async Task<IActionResult> Edit(Product product, string save, string saveAndExit)
         {
-            var product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == p.Id);
-            if (product == null)
+            if (string.IsNullOrEmpty(save) && string.IsNullOrEmpty(saveAndExit))
             {
-                return NotFound();
+                var id = product.Id;
+                product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == id);
+                if (product == null)
+                {
+                    return NotFound();
+                }
             }
             await _productsHelper.UpdateProduct(product, GetFolderById(product.FolderId), _context);
             _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Product (id={product.Id})");
