@@ -17,7 +17,7 @@ namespace DBModels.Models
 
         [DisplayName("Значение базового тарифа")]
         [DefaultValue(1)]
-        public int BaseTariffValue { get; set; }
+        public double BaseTariffValue { get; set; }
 
         [DisplayName("Тип базового тарифа")]
         [DefaultValue(1)]

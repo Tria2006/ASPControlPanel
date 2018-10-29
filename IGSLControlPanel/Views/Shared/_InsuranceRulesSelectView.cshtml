@@ -2,7 +2,7 @@
 
 
 <div class="form-group" style="float: left; width: 100%; margin-left: 16px">
-    @foreach (var rule in Model)
+    @foreach (var rule in Model.Where(x => !x.IsDeleted))
     {
         <div style="float: left; margin: 2px; border: 1px solid lightgrey">
             <table id="folderItem" style="height: 90px; width: 90px">

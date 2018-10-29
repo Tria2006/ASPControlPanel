@@ -73,12 +73,6 @@ namespace IGSLControlPanel.Controllers
             {
                 return NotFound();
             }
-            var rules = _context.InsuranceRules.Where(x => !x.IsDeleted).ToList();
-            ViewData["InsRulesList"] = rules.Where(x => tariff.InsRuleTariffLink.All(s => s.InsRuleId != x.Id));
-
-            var factors = _context.RiskFactors.Where(x => !x.IsDeleted).ToList();
-            ViewData["RiskFactorsList"] =
-                factors.Where(x => tariff.RiskFactorsTariffLinks.All(s => s.RiskFactorId != x.Id));
             _tariffsHelper.CurrentTariff = tariff;
             return View(tariff);
         }
@@ -92,7 +86,7 @@ namespace IGSLControlPanel.Controllers
                 return NotFound();
             }
 
-            if (!ModelState.IsValid) return View(tariff);
+            if (!ModelState.IsValid) return View(_tariffsHelper.CurrentTariff);
             try
             {
                 _context.Update(tariff);

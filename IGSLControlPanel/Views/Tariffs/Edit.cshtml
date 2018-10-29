@@ -23,7 +23,7 @@
                 <h4 class="modal-title">Выберите правила страхования</h4>
             </div>
             <form asp-controller="InsuranceRules" asp-action="AddRulesToTariff">
-                @await Html.PartialAsync("_InsuranceRulesSelectView", ViewData["InsRulesList"], ViewData)
+                @await Html.PartialAsync("_InsuranceRulesSelectView", Model.InsRuleTariffLink.Select(x => x.InsRule))
 
                 <div class="form-group" style="margin-left: 18px;">
                     <button id="ruleOkBtn" type="submit" class="btn btn-primary">Выбрать</button>
@@ -46,7 +46,7 @@
                 <h4 class="modal-title">Выберите факторы риска</h4>
             </div>
             <form>
-                @await Html.PartialAsync("_RiskFactorsSelectView", ViewData["RiskFactorsList"], ViewData)
+                @await Html.PartialAsync("_RiskFactorsSelectView", Model.RiskFactorsTariffLinks.Select(x => x.RiskFactor))
 
                 <div class="form-group" style="margin-left: 18px;">
                     <button id="factorOkBtn" type="submit" class="btn btn-primary" asp-controller="RiskFactors" asp-action="AddFactorsToTariff">Выбрать</button>
