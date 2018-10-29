@@ -253,16 +253,24 @@ namespace IGSLControlPanel.Controllers
             return _context.ProductParameters.Any(e => e.Id == id);
         }
 
-        public IActionResult ParameterUp(Guid? groupId)
+        public IActionResult ParameterUp(Guid groupId)
         {
-            MoveParam(groupId ?? Guid.Empty);
-            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => groupId != null ? x.Parameter.GroupId == groupId : x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).ToList());
+            MoveParam(groupId);
+            var parameters = _context.ProductParameters.Include(x => x.LinkToProduct)
+                .Where(x => x.LinkToProduct.Any(s => s.ProductId == _productsHelper.CurrentProduct.Id)
+                            && !x.IsDeleted
+                            && x.GroupId == groupId);
+            return PartialView("_ProductParametersBlock", parameters.ToList());
         }
 
-        public IActionResult ParameterDown(Guid? groupId)
+        public IActionResult ParameterDown(Guid groupId)
         {
-            MoveParam(groupId ?? Guid.Empty, false);
-            return PartialView("_ProductParametersBlock", _productsHelper.CurrentProduct.LinkToProductParameters.Where(x => groupId != null ? x.Parameter.GroupId == groupId : x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).ToList());
+            MoveParam(groupId, false);
+            var parameters = _context.ProductParameters.Include(x => x.LinkToProduct)
+                .Where(x => x.LinkToProduct.Any(s => s.ProductId == _productsHelper.CurrentProduct.Id)
+                            && !x.IsDeleted
+                            && x.GroupId == groupId);
+            return PartialView("_ProductParametersBlock", parameters.ToList());
         }
 
         private void MoveParam(Guid groupId, bool up = true)
@@ -276,21 +284,20 @@ namespace IGSLControlPanel.Controllers
             if (up)
             {
                 // предыдущий параметр по Order(выбираем ближайший order, который меньше, чем в текущем параметре)
-                var prevParam =
-                    _productsHelper.CurrentProduct.LinkToProductParameters.Where(
-                        x => x.Parameter.GroupId == groupId && x.Parameter.Order < contextParameter.Order).OrderByDescending(x => x.Parameter.Order).FirstOrDefault();
+                var prevParam = _context.ProductParameters.Include(x => x.LinkToProduct)
+                    .Where(x => x.GroupId == groupId 
+                                && x.Order < contextParameter.Order 
+                                && !x.IsDeleted 
+                                && x.LinkToProduct.Any(s => s.ProductId == _productsHelper.CurrentProduct.Id))
+                    .OrderByDescending(x => x.Order)
+                    .FirstOrDefault();
                 if (prevParam == null) return;
 
                 // Order куда надо переместить
-                var destOrder = prevParam.Parameter.Order;
-
-                // получаем предыдущий параметр из контекста
-                var contextPrevParam =
-                    _context.ProductParameters.SingleOrDefault(s => s.Id == prevParam.ProductParameterId);
+                var destOrder = prevParam.Order;
 
                 // перемещаем предыдущий параметр на место выбранного
-                prevParam.Parameter.Order = contextParameter.Order;
-                if (contextPrevParam != null) contextPrevParam.Order = contextParameter.Order;
+                prevParam.Order = contextParameter.Order;
 
                 // перемещаем текущий переметр на место предыдущего
                 contextParameter.Order = _productsHelper.CurrentParameter.Order = destOrder;
@@ -299,21 +306,20 @@ namespace IGSLControlPanel.Controllers
             else
             {
                 // следующий параметр по Order(выбираем ближайший order, который больше, чем в текущем параметре)
-                var nextParam =
-                    _productsHelper.CurrentProduct.LinkToProductParameters.Where(
-                        x => x.Parameter.GroupId == groupId && x.Parameter.Order > contextParameter.Order).OrderBy(x => x.Parameter.Order).FirstOrDefault();
+                var nextParam = _context.ProductParameters.Include(x => x.LinkToProduct)
+                    .Where(x => x.GroupId == groupId
+                                && x.Order > contextParameter.Order
+                                && !x.IsDeleted 
+                                && x.LinkToProduct.Any(s => s.ProductId == _productsHelper.CurrentProduct.Id))
+                    .OrderByDescending(x => x.Order)
+                    .FirstOrDefault();
                 if (nextParam == null) return;
 
                 // Order куда надо переместить
-                var destOrder = nextParam.Parameter.Order;
-
-                // получаем следующий параметр из контекста
-                var contextNextParam =
-                    _context.ProductParameters.SingleOrDefault(s => s.Id == nextParam.ProductParameterId);
+                var destOrder = nextParam.Order;
 
                 // перемещаем следующий параметр на место выбранного
-                nextParam.Parameter.Order = contextParameter.Order;
-                if (contextNextParam != null) contextNextParam.Order = contextParameter.Order;
+                nextParam.Order = contextParameter.Order;
 
                 // перемещаем текущий переметр на место предыдущего
                 contextParameter.Order = _productsHelper.CurrentParameter.Order = destOrder;
