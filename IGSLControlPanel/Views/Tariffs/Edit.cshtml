@@ -60,8 +60,11 @@
 </div>
 
 <div style="margin-top: 20px">
-    <a asp-controller="Tariffs" asp-action="CreateExcelFile" style="margin-right: 50px">Скачать шаблон Excel</a>
-    <a asp-controller="Tariffs" asp-action="GoToUploadPage">Загрузить файл на сервер</a>
+    @if (Model.RiskFactorsTariffLinks.Count > 0)
+    {
+        <a asp-controller="Tariffs" asp-action="CreateExcelFile" style="margin-right: 50px">Скачать шаблон Excel</a>
+        <a asp-controller="Tariffs" asp-action="GoToUploadPage">Загрузить файл на сервер</a>
+    }
 </div>
 
 <div>
