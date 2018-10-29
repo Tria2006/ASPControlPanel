@@ -120,7 +120,8 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            var productParameter = _context.ProductParameters.Find(id);
+            var productParameter =
+                await _context.ProductParameters.Include(x => x.Limit).ThenInclude(x => x.LimitListItems).SingleOrDefaultAsync(x => x.Id == id);
             if (productParameter == null)
             {
                 return NotFound();
@@ -140,18 +141,23 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ProductParameter productParameter, string save, string saveAndExit)
+        public async Task<IActionResult> Edit(ProductParameter productParameter, string save, string saveAndExit)
         {
-            if (id != productParameter.Id)
-            {
-                return NotFound();
-            }
-
-            if (!ModelState.IsValid) return View(productParameter);
             try
             {
-                _context.Update(productParameter);
-                _productsHelper.CurrentParameter = productParameter;
+                var contextParam = await _context.ProductParameters.FindAsync(productParameter.Id);
+                contextParam.DataType = _productsHelper.CurrentParameter.DataType;
+                contextParam.Name = _productsHelper.CurrentParameter.Name;
+                contextParam.ValidFrom = _productsHelper.CurrentParameter.ValidFrom;
+                contextParam.ValidTo = _productsHelper.CurrentParameter.ValidTo;
+                contextParam.Order = _productsHelper.CurrentParameter.Order;
+                contextParam.GroupId = _productsHelper.CurrentParameter.GroupId;
+                contextParam.IsRequiredForCalc = _productsHelper.CurrentParameter.IsRequiredForCalc;
+                contextParam.IsRequiredForSave = _productsHelper.CurrentParameter.IsRequiredForSave;
+                contextParam.IsConstant = _productsHelper.CurrentParameter.IsConstant;
+                contextParam.ConstantValueDate = _productsHelper.CurrentParameter.ConstantValueDate;
+                contextParam.ConstantValueInt = _productsHelper.CurrentParameter.ConstantValueInt;
+                contextParam.ConstantValueStr = _productsHelper.CurrentParameter.ConstantValueStr;
                 await _context.SaveChangesAsync();
                 _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ProductParameter (id={productParameter.Id})");
             }
@@ -184,7 +190,7 @@ namespace IGSLControlPanel.Controllers
             if (!string.IsNullOrEmpty(saveAndExit))
                 return RedirectToAction("Edit", "Products",
                     _productsHelper.CurrentProduct);
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new { productParameter.Id });
         }
 
         public async Task<IActionResult> Delete(Guid id)

@@ -49,9 +49,11 @@ namespace IGSLControlPanel.Controllers
             if (!ModelState.IsValid) return View(valueLimit);
             valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
             _productsHelper.CurrentParameter.Limit = valueLimit;
+            var contextParam = await _context.ProductParameters.FindAsync(_productsHelper.CurrentParameter.Id);
+            contextParam.Limit = valueLimit;
 
-                _context.Add(valueLimit);
-                await _context.SaveChangesAsync();
+            _context.Add(valueLimit);
+            await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ValueLimit (id={valueLimit.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
@@ -60,19 +62,14 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult Edit(Guid id)
         {
-            _productsHelper.LimitWOChanges = _productsHelper.CurrentParameter.Limit;
-            return View(_productsHelper.CurrentParameter.Limit);
+            var contextLimit = _context.ValueLimits.Include(x => x.LimitListItems).SingleOrDefault(x => x.Id == id);
+            return View(contextLimit);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Guid id, ValueLimit valueLimit, string save, string saveAndExit)
         {
-            if (id != valueLimit.Id)
-            {
-                return NotFound();
-            }
-
             if (!ModelState.IsValid) return View(valueLimit);
             try
             {
@@ -95,7 +92,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
+                return RedirectToAction("Edit", "ProductParameters", new{ _productsHelper.CurrentParameter.Id });
             return RedirectToAction("Edit", new { id });
         }
 
@@ -111,6 +108,8 @@ namespace IGSLControlPanel.Controllers
             var valueLimit = await _context.ValueLimits.FindAsync(id);
             valueLimit.IsDeleted = true;
             _productsHelper.CurrentParameter.Limit = null;
+            var contextParam = await _context.ProductParameters.FindAsync(_productsHelper.CurrentParameter.Id);
+            contextParam.Limit = null;
             await _context.SaveChangesAsync();
             logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ValueLimit (id={id})");
             return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
@@ -134,7 +133,7 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult GoBack()
         {
-            _productsHelper.CurrentParameter.Limit = _productsHelper.LimitWOChanges;
+            //_productsHelper.CurrentParameter.Limit = _productsHelper.LimitWOChanges;
             return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
     }

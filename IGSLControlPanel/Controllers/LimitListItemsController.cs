@@ -48,7 +48,7 @@ namespace IGSLControlPanel.Controllers
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created LimitListItem (id={limitListItem.Id})");
 
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction("Edit", "ValueLimits", _productsHelper.CurrentParameter.Limit);
+                return RedirectToAction("Edit", "ValueLimits", new {id = limitListItem.ValueLimitId});
             return RedirectToAction("Edit", new { limitListItem.Id });
         }
 
@@ -96,7 +96,7 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
+                return RedirectToAction("Edit", "ValueLimits", new { id = limitListItem.ValueLimitId });
             return RedirectToAction("Edit", new { id });
         }
 

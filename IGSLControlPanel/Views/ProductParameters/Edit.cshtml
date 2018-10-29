@@ -51,11 +51,11 @@
         </div>
         <div class="form-group">
             <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
-            <input id="order" asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" onchange="SaveTempData()" />
+            <input id="orderfld" asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" onchange="SaveTempData()" />
         </div>
         <div class="form-group">
             <label asp-for="GroupId" class="control-label" style="width: 220px"></label>
-            <select asp-for="GroupId" disabled="@ViewData["IsSelectGroupDisabled"]" id="groupId" asp-items="@ViewData["ParamGroups"] as SelectList" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
+            <select asp-for="GroupId" disabled="@ViewData["IsSelectGroupDisabled"]" id="groupIdfld" asp-items="@ViewData["ParamGroups"] as SelectList" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
             @Html.HiddenFor(x => x.GroupId)
         </div>
         @if (!Model.IsConstant)
@@ -68,10 +68,10 @@
                         <a style="font-size: 0">
                             <img src="~/images/Icons/add_gray.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
                         </a>
-                        <a asp-controller="ValueLimits" asp-action="Edit" style="font-size: 0">
+                        <a asp-controller="ValueLimits" asp-action="Edit" asp-route-id="@Model.Limit.Id" style="font-size: 0">
                             <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
                         </a>
-                        <a asp-controller="ValueLimits" asp-action="Delete" style="font-size: 0">
+                        <a asp-controller="ValueLimits" asp-action="Delete"  asp-route-id="@Model.Limit.Id" style="font-size: 0">
                             <img src="~/images/Icons/del_param.png" class="small-button-img" style="margin: 2px" alt="" />
                         </a>
                     }
@@ -137,7 +137,7 @@
                             }
                             else if (Model.Limit.ParameterDataType == (int)DataTypes.List)
                             {
-                                <label>Количество элементов в списке: @Model.Limit.LimitListItems.Count</label>
+                                <label>Количество элементов в списке: @Model.Limit.LimitListItems.Count(x => !x.IsDeleted)</label>
                                 <label>Для просмотра\редактирования элементов используйте режим редактирования лимита</label>
                             }
                         </div>
@@ -166,8 +166,7 @@
             $("#dataType").attr("disabled", "disabled");
             $("#calcRequired").attr("disabled", "disabled");
             $("#saveRequired").attr("disabled", "disabled");
-            $("#groupId").attr("disabled", "disabled");
-            $("#order").attr("disabled", "disabled");
+            $("#orderfld").attr("disabled", "disabled");
             $("#valueStr").attr("disabled", "disabled");
             $("#valueInt").attr("disabled", "disabled");
             $("#valueDate").attr("disabled", "disabled");
@@ -183,11 +182,11 @@
                 name: $("#name").val(),
                 dateFrom: $("#validFromDt").val(),
                 dateTo: $("#validToDt").val(),
-                requiredForSave: $("#saveRequired").val(),
-                requiredForCalc: $("#calcRequired").val(),
-                groupId: $("#groupId").val(),
-                order: $("#order").val(),
-                isConstant: $("#isConstant").val(),
+                requiredForSave: $("#saveRequired").prop("checked"),
+                requiredForCalc: $("#calcRequired").prop("checked"),
+                groupId: $("#groupIdfld").val(),
+                order: $("#orderfld").val(),
+                isConstant: $("#isConstant").prop("checked"),
                 valueStr: $("#valueStr").val(),
                 valueInt: $("#valueInt").val(),
                 valueDate: $("#valueDate").val()
