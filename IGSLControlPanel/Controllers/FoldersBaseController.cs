@@ -15,7 +15,7 @@ namespace IGSLControlPanel.Controllers
     {
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
-        public bool HasSelectedFolders => _folderDataHelper._checkedFolders.Any();
+        public bool HasSelectedFolders => _folderDataHelper.CheckedFolders.Any();
 
         protected FoldersBaseController(IGSLContext context, FolderDataHelper helper)
         {
@@ -35,7 +35,7 @@ namespace IGSLControlPanel.Controllers
         {
             if (HasSelectedFolders)
             {
-                await ClearFolderItems(_folderDataHelper._checkedFolders);
+                await ClearFolderItems(_folderDataHelper.CheckedFolders);
                 await _folderDataHelper.RemoveFolders(_context, id);
             }
             return RedirectToAction("Index", controllerName, id);

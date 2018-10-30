@@ -11,22 +11,22 @@ namespace IGSLControlPanel.Helpers
     public class FolderDataHelper
     {
         public FolderTreeEntry FoldersTree { get; set; }
-        private List<FolderTreeEntry> _folders { get; set; }
-        public List<FolderTreeEntry> _checkedFolders { get; set; } = new List<FolderTreeEntry>();
+        private List<FolderTreeEntry> Folders { get; set; }
+        public List<FolderTreeEntry> CheckedFolders { get; set; } = new List<FolderTreeEntry>();
         public Guid SelectedDestFolderId { get; set; }
 
-        public void Initialize(IGSLContext _context)
+        public void Initialize(IGSLContext context)
         {
             // создается root папка с Id = Guid.Empty
             FoldersTree = new FolderTreeEntry();
             // папки из БД
-            _folders = _context.FolderTreeEntries.ToList();
+            Folders = context.FolderTreeEntries.ToList();
         }
 
         public FolderTreeEntry BuildFolderTree(ModelTypes modelType)
         {
             // первый уровень папок
-            var firstLevelFolders = _folders.Where(s => (s.ParentFolderId == null || s.ParentFolderId == Guid.Empty) && !s.IsDeleted && s.ModelTypeId == (int)modelType);
+            var firstLevelFolders = Folders.Where(s => (s.ParentFolderId == null || s.ParentFolderId == Guid.Empty) && !s.IsDeleted && s.ModelTypeId == (int)modelType);
             foreach (var folder in firstLevelFolders)
             {
                 // заполняем ChildFolders
@@ -40,7 +40,7 @@ namespace IGSLControlPanel.Helpers
         private void BuildChildFolders(FolderTreeEntry parent)
         {
             // получаем родительскую папку по ID
-            var folders = _folders.Where(x => x.ParentFolderId != null && x.ParentFolderId == parent.Id && !x.IsDeleted);
+            var folders = Folders.Where(x => x.ParentFolderId != null && x.ParentFolderId == parent.Id && !x.IsDeleted);
             foreach (var folder in folders)
             {
                 // рекурсия для заполнения вложенных ChildFolders
@@ -51,7 +51,7 @@ namespace IGSLControlPanel.Helpers
             }
         }
 
-        public async Task<FolderTreeEntry> AddFolder(string name, int modelTypeId, IGSLContext _context, FolderTreeEntry parent = null)
+        public async Task<FolderTreeEntry> AddFolder(string name, int modelTypeId, IGSLContext context, FolderTreeEntry parent = null)
         {
             // новая папка с введенным именем
             var newFolder = new FolderTreeEntry
@@ -67,25 +67,25 @@ namespace IGSLControlPanel.Helpers
                 newFolder.ParentFolderId = parent.Id;
                 parent.ChildFolders.Add(newFolder);
             }
-            _context.FolderTreeEntries.Add(newFolder);
-            await _context.SaveChangesAsync();
+            context.FolderTreeEntries.Add(newFolder);
+            await context.SaveChangesAsync();
             return parent;
         }
 
-        public async Task RemoveFolders(IGSLContext _context, Guid parentId)
+        public async Task RemoveFolders(IGSLContext context, Guid parentId)
         {
             // идем по списку выбранных папок
-            foreach (var f in _checkedFolders)
+            foreach (var f in CheckedFolders)
             {
                 // получаем папку из контекста и далее работаем с ней
-                var contextFolder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == f.Id);
+                var contextFolder = context.FolderTreeEntries.SingleOrDefault(x => x.Id == f.Id);
                 if (contextFolder == null) continue;
                 RemoveChildFoldersAndProducts(contextFolder);
                 f.IsDeleted = true;
             }
             var parentFolder = GetFolderById(parentId, FoldersTree);
             parentFolder?.ChildFolders.RemoveAll(x => x.IsDeleted);
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
 
         private void RemoveChildFoldersAndProducts(FolderTreeEntry parent)
@@ -101,16 +101,16 @@ namespace IGSLControlPanel.Helpers
             parent.IsDeleted = true;
         }
 
-        public void CheckFolder(Guid id, IGSLContext _context)
+        public void CheckFolder(Guid id, IGSLContext context)
         {
             // получаем папку из контекста
-            var folder = _context.FolderTreeEntries.SingleOrDefault(x => x.Id == id);
+            var folder = context.FolderTreeEntries.SingleOrDefault(x => x.Id == id);
             if (folder == null) return;
             // добавляем или удаляем папку из списка _checkedFolders
-            if (_checkedFolders.Any(f => f.Id == folder.Id))
-                _checkedFolders.RemoveAll(f => f.Id == folder.Id);
+            if (CheckedFolders.Any(f => f.Id == folder.Id))
+                CheckedFolders.RemoveAll(f => f.Id == folder.Id);
             else
-                _checkedFolders.Add(folder);
+                CheckedFolders.Add(folder);
         }
 
         public FolderTreeEntry GetFolderById(Guid id, FolderTreeEntry folder)
@@ -133,13 +133,13 @@ namespace IGSLControlPanel.Helpers
 
         public void MoveSelectedFolders(IGSLContext context)
         {
-            foreach (var folder in _checkedFolders)
+            foreach (var folder in CheckedFolders)
             {
                 var contextFolder = context.FolderTreeEntries.SingleOrDefault(f => f.Id == folder.Id);
                 if(contextFolder == null) continue;
                 contextFolder.ParentFolderId = SelectedDestFolderId;
             }
-            _checkedFolders.Clear();
+            CheckedFolders.Clear();
         }
     }
 }

@@ -11,12 +11,12 @@ namespace IGSLControlPanel.Controllers
             return View();
         }
 
-        public IActionResult Error(Exception e)
+        public IActionResult Error()
         {
             var feature = HttpContext?.Features.Get<IExceptionHandlerPathFeature>();
             var logger = log4net.LogManager.GetLogger(typeof(ProductsController));
             logger.Error($"Message: {feature?.Error.Message ?? "NO HTTPCONTEXT"}; Trace: {feature?.Error.StackTrace ?? ""}");
-            return View();
+            return View(feature?.Error ?? new Exception("NO DESCRIPTION"));
         }
     }
 }
