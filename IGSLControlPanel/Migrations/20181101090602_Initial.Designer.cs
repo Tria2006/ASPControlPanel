@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    [Migration("20181002080826_Add IsGlobal to ParameterGroup")]
-    partial class AddIsGlobaltoParameterGroup
+    [Migration("20181101090602_Initial")]
+    partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.3-rtm-32065")
+                .HasAnnotation("ProductVersion", "2.1.4-rtm-31024")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -235,6 +235,36 @@ namespace IGSLControlPanel.Migrations
                     b.ToTable("ParameterGroups");
                 });
 
+            modelBuilder.Entity("DBModels.Models.ParameterToFactorLink", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreateDate");
+
+                    b.Property<bool>("IsDeleted");
+
+                    b.Property<DateTime>("ModifyDate");
+
+                    b.Property<string>("Name");
+
+                    b.Property<Guid>("ProductId");
+
+                    b.Property<Guid>("ProductParameterId");
+
+                    b.Property<Guid>("RiskFactorId");
+
+                    b.Property<Guid>("TariffId");
+
+                    b.Property<DateTime?>("ValidFrom");
+
+                    b.Property<DateTime?>("ValidTo");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ParameterToFactorLinks");
+                });
+
             modelBuilder.Entity("DBModels.Models.Product", b =>
                 {
                     b.Property<Guid>("Id")
@@ -250,11 +280,15 @@ namespace IGSLControlPanel.Migrations
 
                     b.Property<string>("Name");
 
+                    b.Property<Guid?>("TariffId");
+
                     b.Property<DateTime?>("ValidFrom");
 
                     b.Property<DateTime?>("ValidTo");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("TariffId");
 
                     b.ToTable("Products");
                 });
@@ -264,11 +298,19 @@ namespace IGSLControlPanel.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<DateTime?>("ConstantValueDate");
+
+                    b.Property<int?>("ConstantValueInt");
+
+                    b.Property<string>("ConstantValueStr");
+
                     b.Property<DateTime>("CreateDate");
 
                     b.Property<int>("DataType");
 
                     b.Property<Guid?>("GroupId");
+
+                    b.Property<bool>("IsConstant");
 
                     b.Property<bool>("IsDeleted");
 
@@ -299,10 +341,6 @@ namespace IGSLControlPanel.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
-
-                    b.Property<int>("BaseTariffType");
-
-                    b.Property<int>("BaseTariffValue");
 
                     b.Property<DateTime>("CreateDate");
 
@@ -365,6 +403,10 @@ namespace IGSLControlPanel.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<int>("BaseTariffType");
+
+                    b.Property<double?>("BaseTariffValue");
 
                     b.Property<DateTime>("CreateDate");
 
@@ -497,6 +539,13 @@ namespace IGSLControlPanel.Migrations
                         .WithMany("LinksToInsRules")
                         .HasForeignKey("RiskId")
                         .OnDelete(DeleteBehavior.Cascade);
+                });
+
+            modelBuilder.Entity("DBModels.Models.Product", b =>
+                {
+                    b.HasOne("DBModels.Models.Tariff")
+                        .WithMany("LinkedProducts")
+                        .HasForeignKey("TariffId");
                 });
 
             modelBuilder.Entity("DBModels.Models.ProductParameter", b =>

@@ -404,7 +404,7 @@ namespace IGSLControlPanel.Migrations
 
                     b.Property<int>("BaseTariffType");
 
-                    b.Property<double>("BaseTariffValue");
+                    b.Property<double?>("BaseTariffValue");
 
                     b.Property<DateTime>("CreateDate");
 

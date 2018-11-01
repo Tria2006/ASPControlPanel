@@ -28,7 +28,7 @@ namespace IGSLPanelTests.UnitTests
             var controller = new HomeController();
             
             //act
-            var result = controller.Error(new Exception("Test Exception")) as ViewResult;
+            var result = controller.Error() as ViewResult;
 
             //assert
             Assert.NotNull(result);
