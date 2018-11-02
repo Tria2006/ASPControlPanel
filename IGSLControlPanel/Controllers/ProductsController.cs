@@ -22,6 +22,8 @@ namespace IGSLControlPanel.Controllers
         private readonly ProductParamRiskFactorLinkHelper _linkHelper;
         private readonly ILog _logger;
 
+        private IQueryable<ParameterGroup> GroupList { get; }
+
         public ProductsController(IGSLContext context, FolderDataHelper helper, ProductsHelper productsHelper, IHttpContextAccessor accessor,
             ProductParamRiskFactorLinkHelper linkHelper) 
             : base(context, helper)
@@ -32,6 +34,7 @@ namespace IGSLControlPanel.Controllers
             BuildFolderTree(ModelTypes.Products);
             _productsHelper = productsHelper;
             _linkHelper = linkHelper;
+            GroupList = _context.ParameterGroups.Where(x => !x.IsDeleted);
         }
 
         public IActionResult Index(Guid id)
@@ -44,8 +47,8 @@ namespace IGSLControlPanel.Controllers
         {
             var tempProduct = new Product {FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1)};
                 _productsHelper.CurrentProduct = tempProduct;
-            var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
-            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
+            //var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
+            ViewData["ParamGroups"] = new SelectList(GroupList, "Id", "Name");
             ViewData["ParentFolderId"] = folderId;
             return View(tempProduct);
         }
@@ -63,8 +66,8 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
-            ViewData["ParamGroups"] = new SelectList(groups, "Id", "Name");
+            //var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
+            ViewData["ParamGroups"] = new SelectList(GroupList, "Id", "Name");
             var product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == id);
             if (product == null)
             {
@@ -180,6 +183,16 @@ namespace IGSLControlPanel.Controllers
             if (!string.IsNullOrEmpty(saveAndExit))
                 return RedirectToAction("Edit", new { id = productId });
             return RedirectToAction("LinkSettings", new { productId });
+        }
+
+        public IActionResult GetProductById(Guid id)
+        {
+            ViewData["ParamGroups"] = new SelectList(GroupList, "Id", "Name");
+            ViewData["IsSelectParamView"] = true;
+            return PartialView("_ParameterGroupsBlock", 
+                _context.Products
+                    .Include(x => x.LinkToProductParameters)
+                    .ThenInclude(x => x.Parameter).SingleOrDefault(x => x.Id == id));
         }
     }
 }

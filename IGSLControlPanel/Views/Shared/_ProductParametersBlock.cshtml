@@ -24,21 +24,3 @@
         counter++;
     }
 </div>
-
-<script>
-    function ParameterClick(div, paramId) {
-        var elements = $("#parametersList").children();
-        $.each(elements, function () {
-            if (this !== div) {
-                this.style.backgroundColor = "lavender";
-            }
-        });
-        if (div.style.backgroundColor === "lavender") {
-            div.style.backgroundColor = "cornflowerblue";
-        } else {
-            div.style.backgroundColor = "lavender";
-        }
-
-        $.get("/Products/ProductParameterClick/" + paramId, null);
-    }
-</script>

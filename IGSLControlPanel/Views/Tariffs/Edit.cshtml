@@ -122,6 +122,7 @@
             <a id="selectFactorBtn" style="font-size: 0">
                 <img src="~/images/Icons/folderadd.png" alt="Выбор существующей" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px" />
             </a>
+            <a asp-controller="Tariffs" asp-action="CreateFactorFromParameterView">Фактор риска из параметра</a>
         </div>
         @await Html.PartialAsync("_RiskFactorsBlock", Model.RiskFactorsTariffLinks)
 

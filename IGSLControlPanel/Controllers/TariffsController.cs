@@ -244,5 +244,10 @@ namespace IGSLControlPanel.Controllers
 
             return RedirectToAction("Edit", "Products", product);
         }
+
+        public IActionResult CreateFactorFromParameterView()
+        {
+            return View(_context.Products.Where(x => !x.IsDeleted));
+        }
     }
 }

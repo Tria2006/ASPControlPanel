@@ -3,76 +3,107 @@
 
 @{
     var groupsList = ViewData["ParamGroups"] as SelectList;
+    var isSelectParamView = ViewData["IsSelectParamView"] as bool? ?? false;
 }
-@if (groupsList != null)
+@if (Model.Id != Guid.Empty)
 {
-    foreach (var p in groupsList)
+    if (groupsList != null)
     {
-        if (Model.LinkToProductParameters.All(x => x.Parameter.GroupId != Guid.Parse(p.Value)))
+        foreach (var p in groupsList)
         {
-            continue;
+            if (Model.LinkToProductParameters.All(x => x.Parameter.GroupId != Guid.Parse(p.Value)))
+            {
+                continue;
+            }
+            @Html.LabelFor(x => p.Text, p.Text, new { style = "margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium" })
+
+            if (!isSelectParamView)
+            {
+                <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@p.Value" onclick="SaveTempData()" style="font-size: 0">
+                    <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
+                </a>
+                <a id="@p.Value" onclick="ParameterUpClick(this)" href="#" style="font-size: 0">
+                    <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
+                </a>
+                <a id="@p.Value" onclick="ParameterDownClick(this)" href="#" style="font-size: 0">
+                    <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
+                </a>
+
+                <div id="@p.Value-partial">
+                    @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == Guid.Parse(p.Value)).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
+                </div>
+            }
+            else
+            {
+                <div id="@p.Value-partial">
+                    @await Html.PartialAsync("_SelectProductParameterBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == Guid.Parse(p.Value)).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
+                </div>
+            }
         }
-        @Html.LabelFor(x => p.Text, p.Text, new { style = "margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium" })
+    }
 
-        <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@p.Value" onclick="SaveTempData()" style="font-size: 0">
-            <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-        </a>
-        <a id="@p.Value" onclick="ParameterUpClick(this)" href="#" style="font-size: 0">
-            <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-        </a>
-        <a id="@p.Value" onclick="ParameterDownClick(this)" href="#" style="font-size: 0">
-            <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-        </a>
+    if (Model.LinkToProductParameters.Any(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty))
+    {
+        <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
 
-        <div id="@p.Value-partial">
-            @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == Guid.Parse(p.Value)).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
-        </div>
+        if (!isSelectParamView)
+        {
+            <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()" style="font-size: 0">
+                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
+            </a>
+            <a onclick="ParameterUpClick(this)" href="#" style="font-size: 0">
+                <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
+            </a>
+            <a onclick="ParameterDownClick(this)" href="#" style="font-size: 0">
+                <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
+            </a>
+
+            <div id="partialNoGroup">
+                @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
+            </div>
+        }
+        else
+        {
+            <div id="partialNoGroup">
+                @await Html.PartialAsync("_SelectProductParameterBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
+            </div>
+        }
+    }
+
+    if (!Model.LinkToProductParameters.Any())
+    {
+        <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
+
+        if (!isSelectParamView)
+        {
+            <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()" style="font-size: 0">
+                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
+            </a>
+            <a onclick="ParameterUpClick(this)" href="#" style="font-size: 0">
+                <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
+            </a>
+            <a onclick="ParameterDownClick(this)" href="#" style="font-size: 0">
+                <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
+            </a>
+
+            <div id="partialNoGroup">
+                @await Html.PartialAsync("_ProductParametersBlock", new List<ProductParameter>())
+            </div>
+        }
+        else
+        {
+            <div id="partialNoGroup">
+                @await Html.PartialAsync("_SelectProductParameterBlock", new List<ProductParameter>())
+            </div>
+        }
+
+        <input id="folderId" type="hidden" value="@Model.FolderId" />
+        <input id="name" type="hidden" value="@Model.Name" />
+        <input id="dateFrom" type="hidden" value="@Model.ValidFrom" />
+        <input id="dateTo" type="hidden" value="@Model.ValidTo" />
     }
 }
 
-@if (Model.LinkToProductParameters.Any(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty))
-{
-    <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
-
-    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()" style="font-size: 0">
-        <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-    </a>
-    <a onclick="ParameterUpClick(this)" href="#" style="font-size: 0">
-        <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-    </a>
-    <a onclick="ParameterDownClick(this)" href="#" style="font-size: 0">
-        <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-    </a>
-
-    <div id="partialNoGroup">
-        @await Html.PartialAsync("_ProductParametersBlock", Model.LinkToProductParameters.Where(x => x.Parameter.GroupId == null || x.Parameter.GroupId == Guid.Empty).Select(s => s.Parameter).OrderBy(x => x.Order).ToList())
-    </div>
-}
-
-@if (!Model.LinkToProductParameters.Any())
-{
-    <label style="margin-right: 50px; vertical-align: bottom; font-weight: normal; font-size: medium">Параметры без группы</label>
-
-    <a asp-controller="ProductParameters" asp-action="Create" onclick="SaveTempData()" style="font-size: 0">
-        <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
-    </a>
-    <a onclick="ParameterUpClick(this)" href="#" style="font-size: 0">
-        <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-    </a>
-    <a onclick="ParameterDownClick(this)" href="#" style="font-size: 0">
-        <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-    </a>
-
-    <div id="partialNoGroup">
-        @await Html.PartialAsync("_ProductParametersBlock", new List<ProductParameter>())
-    </div>
-
-
-    <input id="folderId" type="hidden" value="@Model.FolderId" />
-    <input id="name" type="hidden" value="@Model.Name" />
-    <input id="dateFrom" type="hidden" value="@Model.ValidFrom" />
-    <input id="dateTo" type="hidden" value="@Model.ValidTo" />
-}
 
 <script>
     function ParameterUpClick(link) {
@@ -115,5 +146,9 @@
             },
             success: function () { }
         });
+    }
+    function ParameterClick(div, paramId) {
+        SelectSingleItem($("parametersList"), div, "transparent", "cornflowerblue");
+        $.get("/Products/ProductParameterClick/" + paramId, null);
     }
 </script>
