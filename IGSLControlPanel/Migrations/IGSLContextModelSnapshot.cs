@@ -296,6 +296,8 @@ namespace IGSLControlPanel.Migrations
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
 
+                    b.Property<bool>("BoolValue");
+
                     b.Property<DateTime?>("ConstantValueDate");
 
                     b.Property<int?>("ConstantValueInt");

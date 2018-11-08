@@ -158,6 +158,7 @@ namespace IGSLControlPanel.Controllers
                 contextParam.ConstantValueDate = _productsHelper.CurrentParameter.ConstantValueDate;
                 contextParam.ConstantValueInt = _productsHelper.CurrentParameter.ConstantValueInt;
                 contextParam.ConstantValueStr = _productsHelper.CurrentParameter.ConstantValueStr;
+                contextParam.BoolValue = _productsHelper.CurrentParameter.BoolValue;
                 await _context.SaveChangesAsync();
                 _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ProductParameter (id={productParameter.Id})");
             }
@@ -388,7 +389,7 @@ namespace IGSLControlPanel.Controllers
         public void SaveTempData(int dataType, string name,
             DateTime? dateFrom, DateTime? dateTo,
             bool requiredForSave, bool requiredForCalc,
-            Guid? groupId, int order, bool isConstant, string valueStr, int? valueInt, DateTime? valueDate)
+            Guid? groupId, int order, bool isConstant, string valueStr, int? valueInt, DateTime? valueDate, bool boolValue)
         {
             _productsHelper.CurrentParameter.Name = name;
             _productsHelper.CurrentParameter.ValidFrom = dateFrom;
@@ -402,6 +403,7 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.ConstantValueStr = valueStr;
             _productsHelper.CurrentParameter.ConstantValueInt = valueInt;
             _productsHelper.CurrentParameter.ConstantValueDate = valueDate;
+            _productsHelper.CurrentParameter.BoolValue = boolValue;
         }
 
         public async Task<IActionResult> GoBack(Guid parameterId)

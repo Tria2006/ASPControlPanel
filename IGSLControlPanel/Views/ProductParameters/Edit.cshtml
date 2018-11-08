@@ -58,7 +58,15 @@
             <select asp-for="GroupId" disabled="@ViewData["IsSelectGroupDisabled"]" id="groupIdfld" asp-items="@ViewData["ParamGroups"] as SelectList" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
             @Html.HiddenFor(x => x.GroupId)
         </div>
-        @if (!Model.IsConstant)
+        @if (Model.DataType == (int) DataTypes.Bool)
+        {
+            <div class="form-group">
+                <label asp-for="BoolValue" class="control-label" style="width: 220px"></label>
+                <input id="boolValue" asp-for="BoolValue" style="vertical-align: top" onchange="SaveTempData()" />
+            </div>
+        }
+
+        @if (!Model.IsConstant && Model.DataType != (int)DataTypes.Bool)
         {
             <div class="form-group" id="limitsDiv">
                 <label>
@@ -170,6 +178,7 @@
             $("#valueStr").attr("disabled", "disabled");
             $("#valueInt").attr("disabled", "disabled");
             $("#valueDate").attr("disabled", "disabled");
+            $("#boolValue").attr("disabled", "disabled");
         }
     };
 
@@ -189,7 +198,8 @@
                 isConstant: $("#isConstant").prop("checked"),
                 valueStr: $("#valueStr").val(),
                 valueInt: $("#valueInt").val(),
-                valueDate: $("#valueDate").val()
+                valueDate: $("#valueDate").val(),
+                boolValue: $("#boolValue").val()
             },
             success: function () { }
         });

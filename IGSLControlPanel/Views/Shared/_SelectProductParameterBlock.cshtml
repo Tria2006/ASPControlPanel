@@ -6,7 +6,8 @@
     }
     @foreach (var parameter in Model.OrderBy(x => x.Order))
     {
-        <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative">
+        <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative"
+             ondblclick="ParameterDoubleClick('@parameter.Id')">
             <div style="float: left; position: absolute; top: 9px;">
                 <label style="margin-right: 10px">@counter.</label>
                 <label>@parameter.Name</label>

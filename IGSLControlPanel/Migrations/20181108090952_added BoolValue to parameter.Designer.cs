@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    [Migration("20181101090602_Initial")]
-    partial class Initial
+    [Migration("20181108090952_added BoolValue to parameter")]
+    partial class addedBoolValuetoparameter
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -297,6 +297,8 @@ namespace IGSLControlPanel.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd();
+
+                    b.Property<bool>("BoolValue");
 
                     b.Property<DateTime?>("ConstantValueDate");
 

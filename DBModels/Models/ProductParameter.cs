@@ -32,6 +32,9 @@ namespace DBModels.Models
         [DisplayName("Значение параметра")]
         public DateTime? ConstantValueDate { get; set; }
 
+        [DisplayName("Значение параметра")]
+        public bool BoolValue { get; set; }
+
         [DisplayName("Порядковый номер")]
         public int Order { get; set; }
 
