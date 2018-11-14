@@ -157,7 +157,7 @@
         <div class="form-group">
             <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left" />
             <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
-            <a asp-action="GoBack" asp-route-parameterId="@Model.Id">
+            <a asp-action="GoBack" asp-route-parameterId="@Model.Id" asp-route-returnToGroupEdit="@returnToGroupEdit">
                 <input class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />
             </a>
         </div>

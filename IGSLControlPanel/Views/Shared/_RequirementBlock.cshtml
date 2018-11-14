@@ -12,7 +12,8 @@
             url: "/Risks/UpdateRequirement",
             type: "post",
             data: {
-                reqId: $("#reqId").val()
+                reqId: $("#reqId").val(),
+                required: $("#required").prop("checked")
             }
         });
     }

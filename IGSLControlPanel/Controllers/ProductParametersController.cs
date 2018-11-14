@@ -185,7 +185,7 @@ namespace IGSLControlPanel.Controllers
             if (returnToGroupEdit)
             {
                 if (!string.IsNullOrEmpty(saveAndExit))
-                    return RedirectToAction("Index", "ParameterGroups");
+                    return RedirectToAction("EditGlobal", "ParameterGroups", new { id = group?.Id });
                 return RedirectToAction("Edit", new { productParameter.Id });
             }
 
@@ -407,7 +407,7 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.BoolValue = boolValue;
         }
 
-        public async Task<IActionResult> GoBack(Guid parameterId)
+        public async Task<IActionResult> GoBack(Guid parameterId, bool returnToGroupEdit)
         {
             var productParameter = _context.ProductParameters.Find(parameterId);
             if (productParameter == null)
@@ -416,7 +416,7 @@ namespace IGSLControlPanel.Controllers
             }
             // пытаемся получить данные группы
             var group = await GetGroupById(productParameter.GroupId);
-            if (group == null || !group.IsGlobal)
+            if (!returnToGroupEdit)
             {
                 return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
             }

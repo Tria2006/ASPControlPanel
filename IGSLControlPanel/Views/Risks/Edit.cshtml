@@ -37,20 +37,8 @@
     <div class="form-group" style="margin-top: 50px">
         <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
         <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
-        <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
+        <a asp-action="GoBack" asp-route-reqId="@requirement?.Id" asp-route-required="@requirement?.IsRequired">
+            <input type="button" class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />
+        </a>
     </div>
 </form>
-
-<script>
-    function GoBack() {
-        $.ajax({
-            url: "/Risks/UpdateRequirement",
-            type: "post",
-            data: {
-                reqId: $("#reqId").val(),
-                required: $("#reqStartValue").val()
-            }
-        });
-        javascript: history.go(-1);
-    };
-</script>

@@ -128,5 +128,16 @@ namespace IGSLControlPanel.Controllers
         {
             return _context.LimitListItems.Any(e => e.Id == id);
         }
+
+        public IActionResult GoBack(Guid limitId)
+        {
+            var limit = _context.ValueLimits.Find(limitId);
+            if (limit == null)
+            {
+                return NotFound();
+            }
+
+            return RedirectToAction("Edit", "ValueLimits", new { id = limitId });
+        }
     }
 }

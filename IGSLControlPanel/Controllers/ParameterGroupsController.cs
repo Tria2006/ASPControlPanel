@@ -195,5 +195,10 @@ namespace IGSLControlPanel.Controllers
             }
             return PartialView("_ParameterGroupsBlock", product);
         }
+
+        public IActionResult GoBack(Guid limitId)
+        {
+            return RedirectToAction("Index");
+        }
     }
 }

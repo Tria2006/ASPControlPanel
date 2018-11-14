@@ -17,14 +17,16 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly InsuranceRulesHelper _insRuleHelper;
         private readonly IHttpContextAccessor _httpAccessor;
+        private readonly RisksHelper _risksHelper;
         private readonly ILog logger;
 
-        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, IHttpContextAccessor accessor)
+        public RisksController(IGSLContext context, InsuranceRulesHelper insRuleHelper, IHttpContextAccessor accessor, RisksHelper risksHelper)
         {
             _context = context;
             _httpAccessor = accessor;
             logger = LogManager.GetLogger(typeof(RisksController));
             _insRuleHelper = insRuleHelper;
+            _risksHelper = risksHelper;
         }
         
         public IActionResult Create(Guid tariffId, Guid insRuleId)
@@ -102,6 +104,11 @@ namespace IGSLControlPanel.Controllers
             try
             {
                 _context.Update(risk);
+                var requirement = await _context.RiskRequirements.FindAsync(_risksHelper.TempRequirement.Id);
+                if (requirement != null)
+                {
+                    requirement.IsRequired = _risksHelper.TempRequirement.IsRequired;
+                }
                 await _context.SaveChangesAsync();
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Risk (id={risk.Id})");
             }
@@ -153,16 +160,16 @@ namespace IGSLControlPanel.Controllers
             return _context.Risks.Any(e => e.Id == id);
         }
 
-        public async Task UpdateRequirement(Guid reqId, bool? required = null)
+        public async Task UpdateRequirement(Guid reqId, bool? required)
         {
             var requirement = await _context.RiskRequirements.FindAsync(reqId);
 
             if(requirement == null) return;
-            requirement.IsRequired = required ?? !requirement.IsRequired;
-            await _context.SaveChangesAsync();
+            _risksHelper.TempRequirement = requirement;
+            _risksHelper.TempRequirement.IsRequired = required ?? false;
         }
 
-        public IActionResult GoBack()
+        public IActionResult GoBack(Guid reqId, bool? required = null)
         {
             return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
         }

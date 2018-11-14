@@ -31,14 +31,11 @@
         <div class="form-group">
             <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
             <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
-            <input type="button" class="btn btn-default" style="width: 200px" onclick="GoBack()" value="Выйти без сохранения" />
+            <a asp-action="GoBack">
+                <input type="button" class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />
+            </a>
         </div>
     </form>
 
 </body>
 </html>
-<script>
-    function GoBack() {
-        javascript: history.go(-1);
-    }
-</script>
