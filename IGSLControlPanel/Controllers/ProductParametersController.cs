@@ -118,8 +118,9 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Edit", new { productParameter.Id });
         }
 
-        public async Task<IActionResult> Edit(Guid id)
+        public async Task<IActionResult> Edit(Guid id, bool returnToGroupEdit = false)
         {
+            ViewData["ReturnToGroupEdit"] = returnToGroupEdit;
             var productParameter =
                 await _context.ProductParameters.Include(x => x.Limit).ThenInclude(x => x.LimitListItems).SingleOrDefaultAsync(x => x.Id == id);
             if (productParameter == null)
@@ -141,7 +142,7 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(ProductParameter productParameter, string save, string saveAndExit)
+        public async Task<IActionResult> Edit(ProductParameter productParameter, string save, string saveAndExit, bool returnToGroupEdit)
         {
             try
             {
@@ -181,7 +182,7 @@ namespace IGSLControlPanel.Controllers
             }
             _productsHelper.CurrentParameter = null;
 
-            if (group != null && group.IsGlobal)
+            if (returnToGroupEdit)
             {
                 if (!string.IsNullOrEmpty(saveAndExit))
                     return RedirectToAction("Index", "ParameterGroups");

@@ -3,6 +3,7 @@
 
 @{
     ViewData["Title"] = "Редактирование глобальной группы";
+    ViewData["ReturnToGroupEdit"] = true;
 }
 
 <html>
@@ -33,14 +34,8 @@
     <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@Model.Id" asp-route-isSelectGroupDisabled="true" style="font-size: 0">
         <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
     </a>
-    @*<a onclick="ParameterUpClick(this)">
-        <img src="~/images/Icons/arrow-up.png" alt="Параметр вверх" class="small-button-img" />
-    </a>
-    <a onclick="ParameterDownClick(this)">
-        <img src="~/images/Icons/arrow-down.png" alt="Параметр вниз" class="small-button-img" />
-    </a>*@
 
-    @await Html.PartialAsync("_ProductParametersBlock", (ViewData["Parameters"] as List<ProductParameter>)?.OrderBy(x => x.Order).ToList() ?? new List<ProductParameter>())
+    @await Html.PartialAsync("_ProductParametersBlock", (ViewData["Parameters"] as List<ProductParameter>)?.OrderBy(x => x.Order).ToList() ?? new List<ProductParameter>(), ViewData)
 
     <div class="form-group">
         <input type="submit" value="Сохранить" name="save" class="btn btn-default" />

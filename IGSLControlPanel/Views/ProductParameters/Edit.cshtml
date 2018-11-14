@@ -1,6 +1,7 @@
 ﻿@model DBModels.Models.ProductParameter
 @{
     ViewData["Title"] = "Редактирование параметра продукта";
+    var returnToGroupEdit = (bool)ViewData["ReturnToGroupEdit"];
 }
 
 <html>
@@ -11,7 +12,7 @@
 <body onload="OnLoad()">
 
     <h4>Параметр продукта</h4>
-    <form asp-action="Edit" class="create_update_form">
+    <form asp-action="Edit" asp-route-returnToGroupEdit="@returnToGroupEdit" class="create_update_form">
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
         <input type="hidden" asp-for="Id" />
         <div class="form-group">
@@ -199,7 +200,7 @@
                 valueStr: $("#valueStr").val(),
                 valueInt: $("#valueInt").val(),
                 valueDate: $("#valueDate").val(),
-                boolValue: $("#boolValue").val()
+                boolValue: $("#boolValue").prop("checked")
             },
             success: function () { }
         });

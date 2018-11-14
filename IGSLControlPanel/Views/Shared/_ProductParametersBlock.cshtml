@@ -3,6 +3,7 @@
 <div id="parametersList" class="form-group" style="min-height: 200px; max-height: 300px; border: 1px lightgrey solid; padding: 1px; overflow: auto">
     @{
         var counter = 1;
+        var returnToGroupEdit = (bool?) ViewData["ReturnToGroupEdit"] ?? false;
     }
     @foreach (var parameter in Model.OrderBy(x => x.Order))
     {
@@ -13,7 +14,7 @@
                 <label>@parameter.Name</label>
             </div>
             <div style="position: absolute; right: 10px; top: 5px">
-                <a asp-controller="ProductParameters" asp-action="Edit" asp-route-id="@parameter.Id" style="font-size: 0">
+                <a asp-controller="ProductParameters" asp-action="Edit" asp-route-returnToGroupEdit="@returnToGroupEdit" asp-route-id="@parameter.Id" style="font-size: 0">
                     <img src="~/images/Icons/edit_param.png" alt="Создать папку" class="small-button-img" style="margin-top: 0" />
                 </a>
                 <a style="margin-left: 10px; font-size: 0" asp-controller="ProductParameters" asp-action="Delete" asp-route-id="@parameter.Id">
