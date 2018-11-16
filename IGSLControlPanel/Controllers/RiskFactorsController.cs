@@ -218,7 +218,7 @@ namespace IGSLControlPanel.Controllers
             {
                 Name = param.Name,
                 ValidFrom = DateTime.Now,
-                ValidTo = new DateTime(2100,1,1),
+                ValidTo = new DateTime(2100, 1, 1),
             };
             _context.Add(riskFactor);
             await _context.SaveChangesAsync();
@@ -230,6 +230,8 @@ namespace IGSLControlPanel.Controllers
             });
             await _context.SaveChangesAsync();
             _tariffsHelper.RenewCurrentTariffLinks(_context);
+
+            if (param.Limit == null) return RedirectToAction("Edit", "Tariffs", new { id = _tariffsHelper.CurrentTariff.Id });
 
             foreach (var limitListItem in param.Limit.LimitListItems)
             {
