@@ -1,15 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DBModels.Models;
+﻿using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -47,17 +47,17 @@ namespace IGSLControlPanel.Controllers
         public async Task<IActionResult> Create(RiskFactor riskFactor, string create, string createAndExit)
         {
             if (!ModelState.IsValid) return View(riskFactor);
-                _context.Add(riskFactor);
-                await _context.SaveChangesAsync();
-                riskFactor.RiskFactorsTariffLinks.Add(new RiskFactorTariffLink
-                {
-                    TariffId = _tariffsHelper.CurrentTariff.Id,
-                    RiskFactorId = riskFactor.Id,
-                    RiskFactor = riskFactor
-                });
-                await _context.SaveChangesAsync();
+            _context.Add(riskFactor);
+            await _context.SaveChangesAsync();
+            riskFactor.RiskFactorsTariffLinks.Add(new RiskFactorTariffLink
+            {
+                TariffId = _tariffsHelper.CurrentTariff.Id,
+                RiskFactorId = riskFactor.Id,
+                RiskFactor = riskFactor
+            });
+            await _context.SaveChangesAsync();
             _tariffsHelper.RenewCurrentTariffLinks(_context);
-                _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created RiskFactor (id={riskFactor.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
             return RedirectToAction("Edit", new { riskFactor.Id });
@@ -185,13 +185,13 @@ namespace IGSLControlPanel.Controllers
                 }
             }
 
-                var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
-                if (contextTariff != null)
-                {
-                    contextTariff.RiskFactorsTariffLinks.AddRange(factors);
-                    await _context.SaveChangesAsync();
-                    _factorHelper.SelectedFactors.Clear();
-                }
+            var contextTariff = await _context.Tariffs.FindAsync(_tariffsHelper.CurrentTariff.Id);
+            if (contextTariff != null)
+            {
+                contextTariff.RiskFactorsTariffLinks.AddRange(factors);
+                await _context.SaveChangesAsync();
+                _factorHelper.SelectedFactors.Clear();
+            }
             return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
         }
 
@@ -205,6 +205,71 @@ namespace IGSLControlPanel.Controllers
             var factor = _context.RiskFactors.Find(_factorHelper.CurrentFactor.Id);
             if (factor != null) _factorHelper.CurrentFactor = factor;
             return RedirectToAction("Edit", "Tariffs", _tariffsHelper.CurrentTariff);
+        }
+
+        public async Task<IActionResult> CreateRiskFactorFromParameter(Guid parameterId)
+        {
+            var param = _context.ProductParameters
+                .Include(x => x.Limit)
+                .ThenInclude(x => x.LimitListItems)
+                .SingleOrDefault(x => x.Id == parameterId);
+            if (param == null) return NotFound();
+            var riskFactor = new RiskFactor
+            {
+                Name = param.Name,
+                ValidFrom = DateTime.Now,
+                ValidTo = new DateTime(2100,1,1),
+            };
+            _context.Add(riskFactor);
+            await _context.SaveChangesAsync();
+            riskFactor.RiskFactorsTariffLinks.Add(new RiskFactorTariffLink
+            {
+                TariffId = _tariffsHelper.CurrentTariff.Id,
+                RiskFactorId = riskFactor.Id,
+                RiskFactor = riskFactor
+            });
+            await _context.SaveChangesAsync();
+            _tariffsHelper.RenewCurrentTariffLinks(_context);
+
+            foreach (var limitListItem in param.Limit.LimitListItems)
+            {
+                var newFactorValue = new FactorValue
+                {
+                    Name = limitListItem.Name,
+                    ValidFrom = DateTime.Now,
+                    ValidTo = new DateTime(2100, 1, 1),
+                    RiskFactorId = riskFactor.Id,
+                    TariffId = _tariffsHelper.CurrentTariff.Id
+                };
+                _context.FactorValues.Add(newFactorValue);
+
+                // собираем список рисков
+                var risks = new List<Risk>();
+                foreach (var ruleLink in _tariffsHelper.CurrentTariff.InsRuleTariffLink)
+                {
+                    foreach (var riskLink in ruleLink.InsRule.LinksToRisks)
+                    {
+                        if (risks.TrueForAll(x => x.Id != riskLink.Risk.Id))
+                            risks.Add(riskLink.Risk);
+                    }
+                }
+
+                foreach (var risk in risks)
+                {
+                    _context.Coefficients.Add(
+                        new Coefficient
+                        {
+                            Value = double.TryParse(limitListItem.Value, out var val) ? val : 1,
+                            ValidFrom = DateTime.Now,
+                            ValidTo = new DateTime(2100, 1, 1),
+                            FactorValueId = newFactorValue.Id,
+                            RiskId = risk.Id
+                        });
+                }
+            }
+            await _context.SaveChangesAsync();
+
+            return RedirectToAction("Edit", "Tariffs", new { id = _tariffsHelper.CurrentTariff.Id });
         }
     }
 }
