@@ -40,7 +40,7 @@
         <input id="tariffId" type="hidden" value="@Model.TariffId" />
         <div class="form-group">
             <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
-            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" />
+            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default save_and_exit_btn" />
             <button class="btn btn-default" style="width: 200px" asp-controller="Products" asp-action="Edit" asp-route-id="@Model.Id">Выйти без сохранения</button>
         </div>
     </form>

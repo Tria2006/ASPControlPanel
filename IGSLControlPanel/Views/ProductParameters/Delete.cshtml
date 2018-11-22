@@ -34,7 +34,7 @@
             <input id="saveRequired" asp-for="IsRequiredForSave" style="vertical-align: top" onchange="SaveTempData()" />
         </div>
         <div class="form-group">
-            <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+            <label asp-for="Order" class="control-label order_label"></label>
             <input id="order" asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" onchange="SaveTempData()" />
         </div>
         <div class="form-group">
@@ -72,13 +72,13 @@
             </label>
             @if (Model.Limit == null)
             {
-                <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
+                <div class="border_box" style="width: 500px">
                     <label>Нет ограничений по значению</label>
                 </div>
             }
             else
             {
-                <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 700px; padding: 10px">
+                <div class="border_box" style="width: 700px">
                     <div>
                         <label asp-for="Limit.Name" class="control-label" style="width: 180px"></label>
                         <label>@Model.Limit.Name</label>

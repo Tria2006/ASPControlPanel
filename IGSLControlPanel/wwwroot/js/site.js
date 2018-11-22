@@ -11,3 +11,7 @@
         div.style.backgroundColor = color1;
     }
 }
+
+function GoBack() {
+    javascript: history.go(-1);
+}

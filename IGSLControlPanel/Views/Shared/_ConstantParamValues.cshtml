@@ -9,7 +9,7 @@
             <input id="valueStr" asp-for="ConstantValueStr" onchange="SaveTempData()" style="vertical-align: top" />
             break;
         case (int)DataTypes.Number:
-            <label asp-for="ConstantValueInt" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+            <label asp-for="ConstantValueInt" class="control-label order_label"></label>
             <input id="valueInt" asp-for="ConstantValueInt" class="form-control" onchange="SaveTempData()" type="number" style="width: 60px; text-align: right" />
             break;
         case (int)DataTypes.Date:

@@ -29,13 +29,13 @@
             <span asp-validation-for="ValidTo" class="text-danger"></span>
         </div>
         <hr />
-        <h4 style="margin-top: 50px; color: red">
+        <h4 class="on_create_warn">
             Добавление параметров продукта будет доступно после сохранения продукта.
         </h4>
 
         <div class="form-group">
             <input type="submit" value="Создать" name="create" class="btn btn-default" />
-            <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" />
+            <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default save_and_exit_btn" />
             <button class="btn btn-default" asp-controller="Products" asp-action="Index" asp-route-id="@Model.FolderId">Отменить и выйти</button>
         </div>
     </form>

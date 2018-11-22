@@ -19,12 +19,12 @@
                 <input id="name" asp-for="Name" class="form-control" style="width: 400px" onchange="SaveTempData()" />
                 <span asp-validation-for="Name" class="text-danger"></span>
             </div>
-            <h4 style="margin-top: 50px; color: red">
+            <h4 class="on_create_warn">
                 Добавление рисков будет доступно после сохранения правила страхования
             </h4>
             <div class="form-group">
                 <input type="submit" value="Создать" name="create" class="btn btn-default" style="float: left" />
-                <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
+                <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default save_and_exit_btn" />
                 <a asp-action="GoBack">
                     <input class="btn btn-default" value="Отменить и выйти" />
                 </a>

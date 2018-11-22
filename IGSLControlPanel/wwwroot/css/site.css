@@ -9,6 +9,41 @@
     margin-top: 30px
 }
 
+.on_create_warn {
+    margin-top: 50px;
+    color: red
+}
+
+.save_and_exit_btn {
+    float: left;
+    margin-left: 5px;
+    margin-right: 5px
+}
+
+.border_box {
+    border: lightgrey groove thin;
+    border-radius: 3px;
+    box-shadow: 3px 3px 5px darkgrey;
+    padding: 10px
+}
+
+.row_div {
+    width: 100%;
+    height: 40px;
+    border: 1px lightgrey solid;
+    background: lavender;
+    padding-left: 10px;
+    padding-right: 10px;
+    position: relative
+}
+
+.order_label {
+    float: left;
+    width: 220px;
+    height: 30px;
+    margin-top: 5px
+}
+
 .small-button-img {
     margin-bottom: 5px;
     margin-top: 0;

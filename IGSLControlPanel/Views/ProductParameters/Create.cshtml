@@ -54,7 +54,7 @@
                 </div>
 
                 <div class="form-group">
-                    <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+                    <label asp-for="Order" class="control-label order_label"></label>
                     <input asp-for="Order" id="order" min="1" value="1" class="form-control" onchange="SaveTempData()" type="number" style="width: 60px; text-align: right" />
                 </div>
                 <div class="form-group">
@@ -62,12 +62,12 @@
                     <select asp-for="GroupId" disabled="@ViewData["IsSelectGroupDisabled"]" id="groupId" asp-items="@ViewData["ParamGroups"] as SelectList" onchange="SaveTempData()" class="form-control" style="width: 150px"></select>
                     @Html.HiddenFor(x => x.GroupId)
                 </div>
-                <h4 style="margin-top: 50px; color: red">
+                <h4 class="on_create_warn">
                     Добавление лимита будет доступно после сохранения параметра продукта
                 </h4>
                 <div class="form-group">
                     <input type="submit" value="Создать" name="create" class="btn btn-default" style="float: left" />
-                    <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
+                    <input type="submit" value="Создать и выйти" name="createAndExit" class="btn btn-default save_and_exit_btn" />
                     <a onclick="GoBack()">
                         <input class="btn btn-default" value="Отменить и выйти" />
                     </a>
@@ -131,9 +131,5 @@
                 ConstValuesVisibility();
             }
         });
-    }
-
-    function GoBack() {
-        javascript: history.go(-1);
     }
 </script>

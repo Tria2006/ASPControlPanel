@@ -51,7 +51,7 @@
             @await Html.PartialAsync("_ConstantParamValues", Model)
         </div>
         <div class="form-group">
-            <label asp-for="Order" class="control-label" style="float: left; width: 220px; height: 30px; margin-top: 5px"></label>
+            <label asp-for="Order" class="control-label order_label"></label>
             <input id="orderfld" asp-for="Order" min="1" class="form-control" type="number" style="width: 60px; text-align: right" onchange="SaveTempData()" />
         </div>
         <div class="form-group">
@@ -99,13 +99,13 @@
                 </label>
                 @if (Model.Limit == null)
                 {
-                    <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 500px; padding: 10px">
+                    <div class="border_box" style="width: 500px">
                         <label>Нет ограничений по значению</label>
                     </div>
                 }
                 else
                 {
-                    <div style="border: lightgrey groove thin; border-radius: 3px; box-shadow: 3px 3px 5px darkgrey; width: 700px; padding: 10px">
+                    <div class="border_box" style="width: 700px">
                         <div>
                             <label asp-for="Limit.Name" class="control-label" style="width: 180px"></label>
                             <label>@Model.Limit.Name</label>
@@ -156,7 +156,7 @@
         }
         <div class="form-group">
             <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left" />
-            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default" style="float: left; margin-left: 5px; margin-right: 5px" />
+            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default save_and_exit_btn"/>
             <a asp-action="GoBack" asp-route-parameterId="@Model.Id" asp-route-returnToGroupEdit="@returnToGroupEdit">
                 <input class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />
             </a>

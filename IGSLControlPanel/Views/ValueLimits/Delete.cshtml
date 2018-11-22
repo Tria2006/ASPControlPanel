@@ -54,7 +54,7 @@
                     }
                     @foreach (var item in Model.LimitListItems.Where(x => !x.IsDeleted))
                     {
-                        <div style="width: 100%; height: 40px; border: 1px lightgrey solid; background: lavender; padding-left: 10px; padding-right: 10px; position: relative">
+                        <div class="row_div">
                             <div style="float: left; position: absolute; top: 9px;">
                                 <label style="margin-right: 10px">@counter.</label>
                                 <label>@item.Name</label>
@@ -74,8 +74,3 @@
     </div>
 </body>
 </html>
-<script>
-    function GoBack() {
-        javascript: history.go(-1);
-    }
-</script>
