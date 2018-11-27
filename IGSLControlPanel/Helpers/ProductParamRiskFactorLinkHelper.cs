@@ -9,7 +9,7 @@ namespace IGSLControlPanel.Helpers
 {
     public class ProductParamRiskFactorLinkHelper
     {
-        private List<ParameterToFactorLink> ParameterToFactorList { get; set; } = new List<ParameterToFactorLink>();
+        private List<ParameterToFactorLink> ParameterToFactorList { get; } = new List<ParameterToFactorLink>();
 
         public void AddParamToFactorLink(Guid productId, Guid tariffId, Guid paramId, Guid factorId)
         {
@@ -32,6 +32,11 @@ namespace IGSLControlPanel.Helpers
             if(ParameterToFactorList.Count <= 0) return;
             await context.AddRangeAsync(ParameterToFactorList);
             await context.SaveChangesAsync();
+        }
+
+        public int GetParameterToFactorListCount()
+        {
+            return ParameterToFactorList.Count;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using DBModels.Models;
+using DBModels.Models.ManyToManyLinks;
 using IGSLControlPanel.Controllers;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
@@ -136,6 +137,7 @@ namespace IGSLPanelTests.UnitTests
 	    [Theory]
         [InlineData("save")]
         [InlineData("saveAndExit")]
+        [InlineData("")]
 	    public async Task ConfirmEditProduct(string saveMethod)
 	    {
 	        // arrange
@@ -158,16 +160,24 @@ namespace IGSLPanelTests.UnitTests
 
 	        product.Name = "Edited Product";
 
-	        if (saveMethod == "save")
-	            result = await controller.Edit(product, saveMethod, null) as RedirectToActionResult;
-	        else
-	            result = await controller.Edit(product, null, saveMethod) as RedirectToActionResult;
+	        switch (saveMethod)
+	        {
+	            case "save":
+	                result = await controller.Edit(product, saveMethod, null) as RedirectToActionResult;
+	                break;
+	            case "saveAndExit":
+	                result = await controller.Edit(product, null, saveMethod) as RedirectToActionResult;
+	                break;
+	            default:
+	                result = await controller.Edit(product, null, null) as RedirectToActionResult;
+	                break;
+	        }
 
-	        // assert
+            // assert
             Assert.NotNull(await _context.Products.FindAsync(product.Id));
             Assert.NotNull(result);
             Assert.Equal("Edited Product", _context.Products.Find(product.Id)?.Name);
-	        Assert.Equal(saveMethod == "save" ? "Edit" : "Index", result.ActionName);
+	        Assert.Equal(saveMethod == "save" || saveMethod == "" ? "Edit" : "Index", result.ActionName);
 	    }
 
 	    [Fact]
@@ -355,5 +365,106 @@ namespace IGSLPanelTests.UnitTests
             Assert.Equal(Guid.Empty, _context.Products.Find(product2.Id).FolderId);
             Assert.False(controller.GetFolderOrProductSelected());
         }
-	}
+
+        [Fact]
+	    public async Task GetLinkSettingsView()
+	    {
+            // arrange
+            var tariff = new Tariff
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tariff 1"
+            };
+	        _context.Tariffs.Add(tariff);
+	        await _context.SaveChangesAsync();
+
+	        var product = new Product
+	        {
+	            Id = Guid.NewGuid(),
+	            Name = "Product 1",
+                TariffId = tariff.Id
+	        };
+	        _context.Products.Add(product);
+	        _context.SaveChanges();
+
+
+            var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+	        {
+	            HttpContext = new DefaultHttpContext()
+	        }, new ProductParamRiskFactorLinkHelper());
+
+	        // act
+	        var result = await controller.LinkSettings(product.Id) as ViewResult;
+
+	        // assert
+	        Assert.NotNull(result);
+	        Assert.Equal(typeof(Product), result.Model.GetType());
+	        Assert.Equal(product.Id, (result.Model as Product)?.Id);
+        }
+
+        [Fact]
+	    public void AddParamToFactorLinkShouldAddLinkToParameterToFactorListInProductParamRiskFactorLinkHelper()
+	    {
+	        // arrange
+            var productId = Guid.NewGuid();
+	        var tariffId = Guid.NewGuid();
+	        var paramId = Guid.NewGuid();
+	        var factorId = Guid.NewGuid();
+	        var helper = new ProductParamRiskFactorLinkHelper();
+
+            var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+	        {
+	            HttpContext = new DefaultHttpContext()
+	        }, helper);
+
+	        // act
+            controller.AddLink(productId, tariffId, paramId, factorId);
+
+	        // assert
+	        Assert.Equal(1, helper.GetParameterToFactorListCount());
+	    }
+
+
+	    [Theory]
+	    [InlineData("save")]
+	    [InlineData("saveAndExit")]
+        public async Task SaveLinksShouldAddAddedLinksToContext(string saveMethod)
+        {
+            //arrange
+            RedirectToActionResult result;
+            var productId = Guid.NewGuid();
+            var tariffId = Guid.NewGuid();
+            var paramId = Guid.NewGuid();
+            var factorId = Guid.NewGuid();
+            var helper = new ProductParamRiskFactorLinkHelper();
+
+            var controller = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+            }, helper);
+
+            //act
+            controller.AddLink(productId, tariffId, paramId, factorId);
+            switch (saveMethod)
+            {
+                case "save":
+                    result = await controller.SaveLinks(productId, saveMethod, null) as RedirectToActionResult;
+                    break;
+                case "saveAndExit":
+                    result = await controller.SaveLinks(productId, null, saveMethod) as RedirectToActionResult;
+                    break;
+                default:
+                    result = await controller.SaveLinks(productId, null, null) as RedirectToActionResult;
+                    break;
+            }
+
+            //assert
+            Assert.NotNull(await _context.ParameterToFactorLinks.SingleOrDefaultAsync(x => x.ProductId == productId 
+                                                                                           && x.ProductParameterId == paramId
+                                                                                           && x.RiskFactorId == factorId
+                                                                                           && x.TariffId == tariffId));
+            Assert.NotNull(result);
+            Assert.Equal(saveMethod == "save" || saveMethod == "" ? "LinkSettings" : "Edit", result.ActionName);
+        }
+    }
 }

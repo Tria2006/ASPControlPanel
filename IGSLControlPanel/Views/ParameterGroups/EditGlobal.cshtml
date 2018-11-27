@@ -38,7 +38,7 @@
     @await Html.PartialAsync("_ProductParametersBlock", (ViewData["Parameters"] as List<ProductParameter>)?.OrderBy(x => x.Order).ToList() ?? new List<ProductParameter>(), ViewData)
 
     <div class="form-group">
-        <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+        <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left" />
         <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default save_and_exit_btn" />
         <a asp-action="GoBack">
             <input class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />

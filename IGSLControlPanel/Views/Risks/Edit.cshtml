@@ -2,7 +2,8 @@
 
 @{
     ViewData["Title"] = "Редактирование риска";
-    var requirement = Model.Requirements.SingleOrDefault(x => x.TariffId == (Guid)ViewData["TariffId"]);
+    var tariffId = (Guid) ViewData["TariffId"];
+    var requirement = Model.Requirements.SingleOrDefault(x => x.TariffId == tariffId);
 }
 
 <head>
@@ -10,7 +11,7 @@
     <link href="~/css/site.css" />
 </head>
 <h2>Риск</h2>
-<form asp-action="Edit" class="create_update_form">
+<form asp-action="Edit" asp-route-tariffId="@tariffId" class="create_update_form">
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
     <input type="hidden" asp-for="Id" />
     <div class="form-group">
@@ -35,7 +36,7 @@
         @await Html.PartialAsync("_RequirementBlock", requirement)
     }
     <div class="form-group" style="margin-top: 50px">
-        <input type="submit" value="Сохранить" name="save" class="btn btn-default" />
+        <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left" />
         <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default save_and_exit_btn" />
         <a asp-action="GoBack" asp-route-reqId="@requirement?.Id" asp-route-required="@requirement?.IsRequired">
             <input type="button" class="btn btn-default" style="width: 200px" value="Выйти без сохранения" />

@@ -1,14 +1,14 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using DBModels.Models;
+﻿using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -28,12 +28,12 @@ namespace IGSLControlPanel.Controllers
             _insRuleHelper = insRuleHelper;
             _risksHelper = risksHelper;
         }
-        
+
         public IActionResult Create(Guid tariffId, Guid insRuleId)
         {
             var tempRisk = new Risk
             {
-                ValidFrom = DateTime.Today, 
+                ValidFrom = DateTime.Today,
                 ValidTo = new DateTime(2100, 1, 1)
             };
             ViewData["InsRuleId"] = insRuleId;
@@ -48,33 +48,36 @@ namespace IGSLControlPanel.Controllers
         {
             if (!ModelState.IsValid) return View(risk);
 
-                _context.Add(risk);
-                await _context.SaveChangesAsync();
+            _context.Add(risk);
+            await _context.SaveChangesAsync();
 
-                _insRuleHelper.CurrentRule.LinksToRisks.Add(new RiskInsRuleLink
-                {
-                    InsRuleId = insRuleId,
-                    RiskId = risk.Id
-                });
+            _insRuleHelper.CurrentRule.LinksToRisks.Add(new RiskInsRuleLink
+            {
+                InsRuleId = insRuleId,
+                RiskId = risk.Id
+            });
 
-                risk.LinksToInsRules.Add(new RiskInsRuleLink
-                {
-                    InsRuleId = insRuleId,
-                    RiskId = risk.Id
-                });
+            risk.LinksToInsRules.Add(new RiskInsRuleLink
+            {
+                InsRuleId = insRuleId,
+                RiskId = risk.Id
+            });
 
-                risk.Requirements.Add(new RiskRequirement
-                {
-                    RiskId = risk.Id,
-                    TariffId = tariffId,
-                    IsRequired = risk.OnCreateRequired
-                });
+            var req = new RiskRequirement
+            {
+                RiskId = risk.Id,
+                TariffId = tariffId,
+                IsRequired = risk.OnCreateRequired
+            };
+            risk.Requirements.Add(req);
 
-                await _context.SaveChangesAsync();
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Risk (id={risk.Id})");
+            await _context.SaveChangesAsync();
+            _risksHelper.TempRequirement = req;
+
+            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created Risk (id={risk.Id})");
             if (!string.IsNullOrEmpty(createAndExit))
                 return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
-            return RedirectToAction("Edit", new { risk.Id });
+            return RedirectToAction("Edit", new { risk.Id, tariffId });
         }
 
         public IActionResult Edit(Guid id, Guid tariffId)
@@ -88,12 +91,14 @@ namespace IGSLControlPanel.Controllers
                 return NotFound();
             }
             _insRuleHelper.CurrentRisk = risk;
+            _risksHelper.TempRequirement =
+                risk.Requirements.SingleOrDefault(x => x.RiskId == id && x.TariffId == tariffId);
             return View(risk);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Risk risk, string save, string saveAndExit)
+        public async Task<IActionResult> Edit(Guid id, Risk risk, string save, string saveAndExit, Guid tariffId)
         {
             if (id != risk.Id)
             {
@@ -104,10 +109,13 @@ namespace IGSLControlPanel.Controllers
             try
             {
                 _context.Update(risk);
-                var requirement = await _context.RiskRequirements.FindAsync(_risksHelper.TempRequirement.Id);
-                if (requirement != null)
+                if (_risksHelper.TempRequirement != null)
                 {
-                    requirement.IsRequired = _risksHelper.TempRequirement.IsRequired;
+                    var requirement = await _context.RiskRequirements.FindAsync(_risksHelper.TempRequirement.Id);
+                    if (requirement != null)
+                    {
+                        requirement.IsRequired = _risksHelper.TempRequirement.IsRequired;
+                    }
                 }
                 await _context.SaveChangesAsync();
                 logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated Risk (id={risk.Id})");
@@ -122,7 +130,7 @@ namespace IGSLControlPanel.Controllers
             }
             if (!string.IsNullOrEmpty(saveAndExit))
                 return RedirectToAction("Edit", "InsuranceRules", _insRuleHelper.CurrentRule);
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new { id,  tariffId});
         }
 
         public async Task<IActionResult> Delete(Guid id)
@@ -164,7 +172,7 @@ namespace IGSLControlPanel.Controllers
         {
             var requirement = await _context.RiskRequirements.FindAsync(reqId);
 
-            if(requirement == null) return;
+            if (requirement == null) return;
             _risksHelper.TempRequirement = requirement;
             _risksHelper.TempRequirement.IsRequired = required ?? false;
         }
