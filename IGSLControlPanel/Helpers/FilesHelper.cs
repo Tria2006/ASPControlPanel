@@ -72,7 +72,7 @@ namespace IGSLControlPanel.Helpers
             var risks = new List<Risk>();
             foreach (var ruleLink in tariff.InsRuleTariffLink)
             {
-                foreach (var riskLink in ruleLink.InsRule.LinksToRisks)
+                foreach (var riskLink in ruleLink.InsRule.LinksToRisks.Where(x => !x.Risk.IsDeleted))
                 {
                     if (risks.TrueForAll(x => x.Id != riskLink.Risk.Id))
                         risks.Add(riskLink.Risk);

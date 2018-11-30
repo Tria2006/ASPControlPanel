@@ -1,0 +1,44 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<CodeSnippet Format="1.0.0" xmlns="http://schemas.microsoft.com/VisualStudio/2005/CodeSnippet">
+  <Header>
+    <Title>xUnit Theory</Title>
+    <Author>Anton Ageev</Author>
+    <Shortcut>xunittheory</Shortcut>
+    <Description>Theory xUnit test</Description>
+    <SnippetTypes>
+      <SnippetType>Expansion</SnippetType>
+    </SnippetTypes>
+  </Header>
+  <Snippet>
+    <Declarations>
+      <Literal>
+        <ID>name</ID>
+        <Default>TestMethod</Default>
+      </Literal>
+      <Literal>
+        <ID>type</ID>
+        <Default>void</Default>
+      </Literal>
+      <Literal>
+        <ID>paramName</ID>
+        <Default>parameter</Default>
+      </Literal>
+      <Literal>
+        <ID>paramType</ID>
+        <Default>string</Default>
+      </Literal>
+    </Declarations>
+    <Code Language="csharp">
+      <![CDATA[[Theory]
+		[InlineData("")]
+	    public $type$ $name$($paramType$ $paramName$)
+	    {
+            //arrange
+
+            //act
+
+            //assert
+	    }]]>
+    </Code>
+  </Snippet>
+</CodeSnippet>
