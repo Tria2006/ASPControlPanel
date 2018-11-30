@@ -4,14 +4,16 @@ using IGSLControlPanel.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace IGSLControlPanel.Migrations
 {
     [DbContext(typeof(IGSLContext))]
-    partial class IGSLContextModelSnapshot : ModelSnapshot
+    [Migration("20181130075840_BaseTariff return to Risk from Tariff")]
+    partial class BaseTariffreturntoRiskfromTariff
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -313,8 +315,6 @@ namespace IGSLControlPanel.Migrations
                     b.Property<bool>("IsConstant");
 
                     b.Property<bool>("IsDeleted");
-
-                    b.Property<bool>("IsParamTemplate");
 
                     b.Property<bool>("IsRequiredForCalc");
 

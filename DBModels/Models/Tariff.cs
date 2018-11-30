@@ -14,13 +14,5 @@ namespace DBModels.Models
         public List<RiskFactorTariffLink> RiskFactorsTariffLinks { get; set; } = new List<RiskFactorTariffLink>();
 
         public List<Product> LinkedProducts { get; set; } = new List<Product>();
-
-        [DisplayName("Значение базового тарифа")]
-        [DefaultValue(1)]
-        public double? BaseTariffValue { get; set; }
-
-        [DisplayName("Тип базового тарифа")]
-        [DefaultValue(1)]
-        public int BaseTariffType { get; set; }
     }
 }

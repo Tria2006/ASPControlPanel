@@ -35,7 +35,7 @@
         <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" />
     </a>
 
-    @await Html.PartialAsync("_ProductParametersBlock", (ViewData["Parameters"] as List<ProductParameter>)?.OrderBy(x => x.Order).ToList() ?? new List<ProductParameter>(), ViewData)
+    @await Html.PartialAsync("_ProductParametersBlock", (ViewData["Parameters"] as List<ProductParameter>)?.Where(x => x.IsParamTemplate).OrderBy(x => x.Order).ToList() ?? new List<ProductParameter>(), ViewData)
 
     <div class="form-group">
         <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left" />

@@ -100,7 +100,8 @@ namespace IGSLControlPanel.Controllers
             }
             else
             {
-                productParameter.LinkToProduct = new List<ProductLinkToProductParameter> ();
+                productParameter.LinkToProduct = new List<ProductLinkToProductParameter>();
+                productParameter.IsParamTemplate = true;
                 await _context.SaveChangesAsync();
             }
             _productsHelper.CurrentParameter = null;
@@ -233,21 +234,23 @@ namespace IGSLControlPanel.Controllers
                 return RedirectToAction("EditGlobal", "ParameterGroups", new { group.Id });
             }
             productParameter.IsDeleted = true;
+            var returnToGroupIndex = productParameter.IsParamTemplate;
 
-            if (!isGlobal)
+            var link = productParameter.LinkToProduct.SingleOrDefault(
+                p => p.ProductParameterId == id && p.ProductId == _productsHelper.CurrentProduct.Id);
+            if (link != null)
             {
-                var link = productParameter.LinkToProduct.SingleOrDefault(
-                    p => p.ProductParameterId == id && p.ProductId == _productsHelper.CurrentProduct.Id);
-                if (link != null)
-                {
-                    productParameter.LinkToProduct.Remove(link);
-                }
+                productParameter.LinkToProduct.Remove(link);
             }
+
             await _context.SaveChangesAsync();
             _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ProductParameter (id={id})");
 
-            if (!isGlobal) return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
-            return RedirectToAction("EditGlobal", "ParameterGroups", new {group.Id});
+            if (!returnToGroupIndex) return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
+
+            if(group != null) return RedirectToAction("EditGlobal", "ParameterGroups", new { group.Id });
+
+            return RedirectToAction("Index", "ParameterGroups");
         }
 
         private bool ProductParameterExists(Guid id)
@@ -287,9 +290,9 @@ namespace IGSLControlPanel.Controllers
             {
                 // предыдущий параметр по Order(выбираем ближайший order, который меньше, чем в текущем параметре)
                 var prevParam = _context.ProductParameters.Include(x => x.LinkToProduct)
-                    .Where(x => x.GroupId == groupId 
-                                && x.Order < contextParameter.Order 
-                                && !x.IsDeleted 
+                    .Where(x => x.GroupId == groupId
+                                && x.Order < contextParameter.Order
+                                && !x.IsDeleted
                                 && x.LinkToProduct.Any(s => s.ProductId == _productsHelper.CurrentProduct.Id))
                     .OrderByDescending(x => x.Order)
                     .FirstOrDefault();
@@ -311,7 +314,7 @@ namespace IGSLControlPanel.Controllers
                 var nextParam = _context.ProductParameters.Include(x => x.LinkToProduct)
                     .Where(x => x.GroupId == groupId
                                 && x.Order > contextParameter.Order
-                                && !x.IsDeleted 
+                                && !x.IsDeleted
                                 && x.LinkToProduct.Any(s => s.ProductId == _productsHelper.CurrentProduct.Id))
                     .OrderByDescending(x => x.Order)
                     .FirstOrDefault();
@@ -332,7 +335,7 @@ namespace IGSLControlPanel.Controllers
         private async Task CheckParameterOrders(ProductParameter parameter)
         {
             List<ProductLinkToProductParameter> resultList;
-            var paramsList = 
+            var paramsList =
                 _productsHelper.CurrentProduct.LinkToProductParameters.Where(
                     x => x.Parameter.GroupId == parameter.GroupId).OrderBy(x => x.Parameter.Order).ToList();
 
@@ -421,7 +424,7 @@ namespace IGSLControlPanel.Controllers
                 return RedirectToAction("Edit", "Products", _productsHelper.CurrentProduct);
             }
 
-            return RedirectToAction("EditGlobal", "ParameterGroups", new {id = group.Id});
+            return RedirectToAction("EditGlobal", "ParameterGroups", new { id = group.Id });
         }
 
         private async Task<ParameterGroup> GetGroupById(Guid? id)

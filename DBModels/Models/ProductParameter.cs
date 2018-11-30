@@ -8,6 +8,30 @@ namespace DBModels.Models
 {
     public class ProductParameter : BaseModel
     {
+        public ProductParameter()
+        {
+            
+        }
+
+        public ProductParameter(ProductParameter source)
+        {
+            DataType = source.DataType;
+            ConstantValueDate = source.ConstantValueDate;
+            ConstantValueInt = source.ConstantValueInt;
+            ConstantValueStr = source.ConstantValueStr;
+            DataType = source.DataType;
+            IsConstant = source.IsConstant;
+            GroupId = source.GroupId;
+            BoolValue = source.BoolValue;
+            IsRequiredForCalc = source.IsRequiredForCalc;
+            IsRequiredForSave = source.IsRequiredForSave;
+            Limit = source.Limit;
+            Order = source.Order;
+            Name = source.Name;
+            ValidFrom = DateTime.Now;
+            ValidTo = new DateTime(2100,1,1);
+        }
+
         [Range(1, int.MaxValue)]
         [DisplayName("Тип данных")]
         public int DataType { get; set; }
@@ -42,5 +66,7 @@ namespace DBModels.Models
 
         [DisplayName("Группа параметров")]
         public Guid? GroupId { get; set; }
+
+        public bool IsParamTemplate { get; set; }
     }
 }

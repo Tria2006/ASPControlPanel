@@ -173,7 +173,6 @@ namespace IGSLControlPanel.Controllers
 
         public IActionResult AttachGroup(Guid productId)
         {
-
             var product = _context.Products
                 .Include(x => x.LinkToProductParameters)
                 .ThenInclude(x => x.Parameter).SingleOrDefault(x => x.Id == productId);
@@ -181,15 +180,16 @@ namespace IGSLControlPanel.Controllers
 
             var globalParams = _groupHelper.GetSelectedGroupParameters(_context);
 
-            foreach (var globalParam in globalParams)
+            foreach (var globalParam in globalParams.Where(x => x.IsParamTemplate))
             {
-                // если вдруг связь с этим параметром уже есть, то идем дальше
-                if (product.LinkToProductParameters.Any(x => x.ProductId == productId && x.ProductParameterId == globalParam.Id)) continue;
+                var linkParam = new ProductParameter(globalParam);
+                _context.ProductParameters.Add(linkParam);
+                _context.SaveChanges();
 
                 product.LinkToProductParameters.Add(new ProductLinkToProductParameter
                 {
                     ProductId = productId,
-                    ProductParameterId = globalParam.Id
+                    ProductParameterId = linkParam.Id
                 });
                 _context.SaveChanges();
             }
