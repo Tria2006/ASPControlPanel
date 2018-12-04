@@ -212,7 +212,7 @@ namespace IGSLControlPanel.Controllers
             var param = _context.ProductParameters
                 .Include(x => x.Limit)
                 .ThenInclude(x => x.LimitListItems)
-                .SingleOrDefault(x => x.Id == parameterId);
+                .SingleOrDefault(x => x.Id == parameterId && !x.IsDeleted);
             if (param == null) return NotFound();
             var riskFactor = new RiskFactor
             {

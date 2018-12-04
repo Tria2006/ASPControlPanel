@@ -153,7 +153,7 @@ namespace IGSLControlPanel.Controllers
         {
             var parameterGroup = await _context.ParameterGroups.FindAsync(id);
             parameterGroup.IsDeleted = true;
-            var parameters = _context.ProductParameters.Where(x => x.GroupId == id);
+            var parameters = _context.ProductParameters.Where(x => x.GroupId == id && !x.IsDeleted);
             foreach (var parameter in parameters)
             {
                 parameter.GroupId = null;

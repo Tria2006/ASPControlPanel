@@ -123,7 +123,7 @@ namespace IGSLControlPanel.Controllers
         {
             ViewData["ReturnToGroupEdit"] = returnToGroupEdit;
             var productParameter =
-                await _context.ProductParameters.Include(x => x.Limit).ThenInclude(x => x.LimitListItems).SingleOrDefaultAsync(x => x.Id == id);
+                await _context.ProductParameters.Include(x => x.Limit).ThenInclude(x => x.LimitListItems).SingleOrDefaultAsync(x => x.Id == id && !x.IsDeleted);
             if (productParameter == null)
             {
                 return NotFound();
@@ -185,8 +185,7 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Delete(Guid id)
         {
-            var productParameter = await _context.ProductParameters
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var productParameter = await _context.ProductParameters.FirstOrDefaultAsync(m => m.Id == id && !m.IsDeleted);
             if (productParameter == null)
             {
                 return NotFound();
@@ -354,7 +353,7 @@ namespace IGSLControlPanel.Controllers
             var i = 1;
             foreach (var link in resultList)
             {
-                var contextParam = _context.ProductParameters.SingleOrDefault(x => x.Id == link.ProductParameterId);
+                var contextParam = _context.ProductParameters.SingleOrDefault(x => x.Id == link.ProductParameterId && !x.IsDeleted);
                 link.Parameter.Order = i;
                 if (contextParam != null) contextParam.Order = i;
                 i++;
