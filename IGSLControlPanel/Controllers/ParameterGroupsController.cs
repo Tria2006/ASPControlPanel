@@ -181,7 +181,7 @@ namespace IGSLControlPanel.Controllers
 
             var globalParams = _groupHelper.GetSelectedGroupParameters(_context);
 
-            foreach (var globalParam in globalParams.Where(x => x.IsParamTemplate))
+            foreach (var globalParam in globalParams.Where(x => x.IsParamTemplate && !x.IsDeleted))
             {
                 var linkParam = new ProductParameter(globalParam);
                 _context.ProductParameters.Add(linkParam);
