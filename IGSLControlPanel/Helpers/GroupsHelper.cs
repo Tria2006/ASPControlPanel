@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
 using IGSLControlPanel.Data;
+using Microsoft.EntityFrameworkCore;
 
 namespace IGSLControlPanel.Helpers
 {
@@ -19,7 +20,12 @@ namespace IGSLControlPanel.Helpers
         public List<ProductParameter> GetSelectedGroupParameters(IGSLContext context)
         {
             if(SelectedGroup == null) return  new List<ProductParameter>();
-            return context.ProductParameters.Where(x => x.GroupId == SelectedGroup.Id).ToList();
+            return context.ProductParameters
+                .Include(x => x.LinkToProduct)
+                .ThenInclude(x => x.Product)
+                .Include(x => x.Limit)
+                .ThenInclude(x => x.LimitListItems)
+                .Where(x => x.GroupId == SelectedGroup.Id).ToList();
         }
     }
 }

@@ -1,12 +1,12 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using DBModels.Models;
+﻿using DBModels.Models;
 using DBModels.Models.ManyToManyLinks;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -25,6 +25,7 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Index()
         {
+            _productsHelper.CurrentProduct = null;
             return View(await _context.ParameterGroups.Where(p => !p.IsDeleted).ToListAsync());
         }
 
@@ -185,6 +186,12 @@ namespace IGSLControlPanel.Controllers
                 var linkParam = new ProductParameter(globalParam);
                 _context.ProductParameters.Add(linkParam);
                 _context.SaveChanges();
+
+                if (linkParam.Limit != null)
+                {
+                    linkParam.Limit.ParameterId = linkParam.Id;
+                    _context.SaveChanges();
+                }
 
                 product.LinkToProductParameters.Add(new ProductLinkToProductParameter
                 {

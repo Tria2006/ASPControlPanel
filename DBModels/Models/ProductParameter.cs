@@ -25,7 +25,7 @@ namespace DBModels.Models
             BoolValue = source.BoolValue;
             IsRequiredForCalc = source.IsRequiredForCalc;
             IsRequiredForSave = source.IsRequiredForSave;
-            Limit = source.Limit;
+            if(source.Limit != null) Limit = new ValueLimit(source.Limit);
             Order = source.Order;
             Name = source.Name;
             ValidFrom = DateTime.Now;

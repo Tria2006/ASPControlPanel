@@ -17,7 +17,7 @@ namespace IGSLPanelTests.UnitTests
     {
         private readonly IGSLContext _context;
 
-        private HttpContextAccessor _httpAccessor = new HttpContextAccessor
+        private readonly HttpContextAccessor _httpAccessor = new HttpContextAccessor
         {
             HttpContext = new DefaultHttpContext()
         };

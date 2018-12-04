@@ -147,20 +147,7 @@ namespace IGSLControlPanel.Controllers
         {
             try
             {
-                var contextParam = await _context.ProductParameters.FindAsync(productParameter.Id);
-                contextParam.DataType = _productsHelper.CurrentParameter.DataType;
-                contextParam.Name = _productsHelper.CurrentParameter.Name;
-                contextParam.ValidFrom = _productsHelper.CurrentParameter.ValidFrom;
-                contextParam.ValidTo = _productsHelper.CurrentParameter.ValidTo;
-                contextParam.Order = _productsHelper.CurrentParameter.Order;
-                contextParam.GroupId = _productsHelper.CurrentParameter.GroupId;
-                contextParam.IsRequiredForCalc = _productsHelper.CurrentParameter.IsRequiredForCalc;
-                contextParam.IsRequiredForSave = _productsHelper.CurrentParameter.IsRequiredForSave;
-                contextParam.IsConstant = _productsHelper.CurrentParameter.IsConstant;
-                contextParam.ConstantValueDate = _productsHelper.CurrentParameter.ConstantValueDate;
-                contextParam.ConstantValueInt = _productsHelper.CurrentParameter.ConstantValueInt;
-                contextParam.ConstantValueStr = _productsHelper.CurrentParameter.ConstantValueStr;
-                contextParam.BoolValue = _productsHelper.CurrentParameter.BoolValue;
+                _context.Update(_productsHelper.CurrentParameter);
                 await _context.SaveChangesAsync();
                 _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ProductParameter (id={productParameter.Id})");
             }
@@ -187,7 +174,7 @@ namespace IGSLControlPanel.Controllers
             {
                 if (!string.IsNullOrEmpty(saveAndExit))
                     return RedirectToAction("EditGlobal", "ParameterGroups", new { id = group?.Id });
-                return RedirectToAction("Edit", new { productParameter.Id });
+                return RedirectToAction("Edit", new { productParameter.Id, returnToGroupEdit = true });
             }
 
             if (!string.IsNullOrEmpty(saveAndExit))

@@ -2,11 +2,49 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
+using System.Linq;
 
 namespace DBModels.Models
 {
     public class ValueLimit : BaseModel
     {
+        public ValueLimit()
+        {
+            
+        }
+
+        public ValueLimit(ValueLimit source)
+        {
+            DateValueFrom = source.DateValueFrom;
+            DateValueTo = source.DateValueTo;
+            IntValueFrom = source.IntValueFrom;
+            IntValueTo = source.IntValueTo;
+            Name = source.Name;
+            IsDeleted = source.IsDeleted;
+            ParameterDataType = source.ParameterDataType;
+            ParameterId = source.Id;
+            ProductId = source.ProductId;
+            StringValue = source.StringValue;
+            ValidFrom = source.ValidFrom;
+            ValidTo = source.ValidTo;
+
+            if (source.LimitListItems == null || !source.LimitListItems.Any()) return;
+
+            if(LimitListItems == null) LimitListItems = new List<LimitListItem>();
+            foreach (var sourceItem in source.LimitListItems)
+            {
+                var item = new LimitListItem
+                {
+                    Name = sourceItem.Name,
+                    Value = sourceItem.Value,
+                    ValidFrom = DateTime.Now,
+                    ValidTo = new DateTime(2100, 1, 1),
+                    ValueLimitId = Id
+                };
+                LimitListItems.Add(item);
+            }
+        }
+
         [DisplayName("Тип данных")]
         public int ParameterDataType { get; set; }
 

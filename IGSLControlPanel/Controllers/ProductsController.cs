@@ -47,7 +47,6 @@ namespace IGSLControlPanel.Controllers
         {
             var tempProduct = new Product {FolderId = folderId, ValidFrom = DateTime.Today, ValidTo = new DateTime(2100, 1, 1)};
                 _productsHelper.CurrentProduct = tempProduct;
-            //var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(GroupList, "Id", "Name");
             ViewData["ParentFolderId"] = folderId;
             return View(tempProduct);
@@ -66,7 +65,6 @@ namespace IGSLControlPanel.Controllers
 
         public async Task<IActionResult> Edit(Guid id)
         {
-            //var groups = _context.ParameterGroups.Where(x => !x.IsDeleted);
             ViewData["ParamGroups"] = new SelectList(GroupList, "Id", "Name");
             var product = await _context.Products.Include(x => x.LinkToProductParameters).ThenInclude(s => s.Parameter).SingleOrDefaultAsync(m => m.Id == id);
             if (product == null)

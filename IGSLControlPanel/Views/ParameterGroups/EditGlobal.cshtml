@@ -29,6 +29,7 @@
     <div class="form-group">
         <label asp-for="IsGlobal" class="control-label" style="width: 220px"></label>
         <input asp-for="IsGlobal" style="vertical-align: top" disabled="disabled" />
+        @Html.HiddenFor(x => x.IsGlobal)
     </div>
 
     <a asp-controller="ProductParameters" asp-action="Create" asp-route-groupId="@Model.Id" asp-route-isSelectGroupDisabled="true" style="font-size: 0">

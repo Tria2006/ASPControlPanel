@@ -77,7 +77,7 @@
                         <a style="font-size: 0">
                             <img src="~/images/Icons/add_gray.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
                         </a>
-                        <a asp-controller="ValueLimits" asp-action="Edit" asp-route-id="@Model.Limit.Id" style="font-size: 0">
+                        <a asp-controller="ValueLimits" asp-action="Edit" asp-route-id="@Model.Limit.Id" asp-route-returnToGroupEdit="@returnToGroupEdit" style="font-size: 0">
                             <img src="~/images/Icons/edit_param.png" class="small-button-img" style="margin: 2px" alt="" />
                         </a>
                         <a asp-controller="ValueLimits" asp-action="Delete"  asp-route-id="@Model.Limit.Id" style="font-size: 0">
@@ -86,7 +86,7 @@
                     }
                     else
                     {
-                        <a id="add-limit" asp-controller="ValueLimits" asp-action="Create" style="font-size: 0">
+                        <a id="add-limit" asp-controller="ValueLimits" asp-action="Create" asp-route-parameterId="@Model.Id" style="font-size: 0">
                             <img src="~/images/Icons/add_param.png" class="small-button-img" style="margin: 2px; margin-left: 28px" alt="" />
                         </a>
                         <a style="font-size: 0">

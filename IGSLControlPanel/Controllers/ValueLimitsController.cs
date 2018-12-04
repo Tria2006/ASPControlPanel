@@ -1,13 +1,13 @@
-﻿using System;
-using System.Linq;
-using System.Threading.Tasks;
-using DBModels.Models;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
+﻿using DBModels.Models;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
 using log4net;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace IGSLControlPanel.Controllers
 {
@@ -16,59 +16,72 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly ProductsHelper _productsHelper;
         private readonly IHttpContextAccessor _httpAccessor;
-        private readonly ILog logger;
+        private readonly ILog _logger;
 
         public ValueLimitsController(IGSLContext context, ProductsHelper productsHelper, IHttpContextAccessor accessor)
         {
             _context = context;
             _httpAccessor = accessor;
-            logger = LogManager.GetLogger(typeof(ValueLimitsController));
+            _logger = LogManager.GetLogger(typeof(ValueLimitsController));
             _productsHelper = productsHelper;
         }
 
-        public IActionResult Create()
+        public IActionResult Create(Guid parameterId, bool returnToGroupEdit = false)
         {
+            ViewData["ReturnToGroupEdit"] = returnToGroupEdit;
+            var param = _context.ProductParameters.Find(parameterId);
+            if (param == null) return NotFound();
+
             var limit = new ValueLimit
             {
-                ProductId = _productsHelper.CurrentProduct.Id,
-                ParameterId = _productsHelper.CurrentParameter.Id,
-                ParameterDataType = _productsHelper.CurrentParameter.DataType,
+                ParameterId = parameterId,
+                ParameterDataType = param.DataType,
                 ValidFrom = DateTime.Today,
                 ValidTo = new DateTime(2100, 1, 1)
             };
+            if (_productsHelper.CurrentProduct != null)
+            {
+                limit.ProductId = _productsHelper.CurrentProduct.Id;
+            }
+
+            if (_productsHelper.CurrentParameter != null)
+            {
                 _productsHelper.CurrentParameter.Limit = limit;
-                _productsHelper.LimitWOChanges = null;
+            }
+            _productsHelper.LimitWOChanges = null;
 
             return View(limit);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(ValueLimit valueLimit, string create, string createAndExit)
+        public async Task<IActionResult> Create(ValueLimit valueLimit, string create, string createAndExit, bool returnToGroupEdit)
         {
             if (!ModelState.IsValid) return View(valueLimit);
-            valueLimit.ParameterDataType = _productsHelper.CurrentParameter.DataType;
-            _productsHelper.CurrentParameter.Limit = valueLimit;
-            var contextParam = await _context.ProductParameters.FindAsync(_productsHelper.CurrentParameter.Id);
+            if (_productsHelper.CurrentParameter != null)
+                _productsHelper.CurrentParameter.Limit = valueLimit;
+            var contextParam = await _context.ProductParameters.FindAsync(valueLimit.ParameterId);
             contextParam.Limit = valueLimit;
-
             _context.Add(valueLimit);
             await _context.SaveChangesAsync();
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ValueLimit (id={valueLimit.Id})");
+
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} created ValueLimit (id={valueLimit.Id})");
+
             if (!string.IsNullOrEmpty(createAndExit))
-                return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
+                return RedirectToAction("Edit", "ProductParameters", new{id = valueLimit.ParameterId, returnToGroupEdit});
             return RedirectToAction("Edit", new { valueLimit.Id });
         }
 
-        public IActionResult Edit(Guid id)
+        public IActionResult Edit(Guid id, bool returnToGroupEdit = false)
         {
+            ViewData["ReturnToGroupEdit"] = returnToGroupEdit;
             var contextLimit = _context.ValueLimits.Include(x => x.LimitListItems).SingleOrDefault(x => x.Id == id);
             return View(contextLimit);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, ValueLimit valueLimit, string save, string saveAndExit)
+        public async Task<IActionResult> Edit(Guid id, ValueLimit valueLimit, string save, string saveAndExit, bool returnToGroupEdit)
         {
             if (!ModelState.IsValid) return View(valueLimit);
             try
@@ -78,7 +91,7 @@ namespace IGSLControlPanel.Controllers
                 _context.Update(valueLimit);
                 _productsHelper.CurrentParameter.Limit = valueLimit;
                 await _context.SaveChangesAsync();
-                logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ValueLimit (id={valueLimit.Id})");
+                _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} updated ValueLimit (id={valueLimit.Id})");
             }
             catch (DbUpdateConcurrencyException)
             {
@@ -92,8 +105,8 @@ namespace IGSLControlPanel.Controllers
                 }
             }
             if (!string.IsNullOrEmpty(saveAndExit))
-                return RedirectToAction("Edit", "ProductParameters", new{ _productsHelper.CurrentParameter.Id });
-            return RedirectToAction("Edit", new { id });
+                return RedirectToAction("Edit", "ProductParameters", new { id = _productsHelper.CurrentParameter.Id, returnToGroupEdit });
+            return RedirectToAction("Edit", new { id, returnToGroupEdit });
         }
 
         public IActionResult Delete(Guid id)
@@ -111,7 +124,7 @@ namespace IGSLControlPanel.Controllers
             var contextParam = await _context.ProductParameters.FindAsync(_productsHelper.CurrentParameter.Id);
             contextParam.Limit = null;
             await _context.SaveChangesAsync();
-            logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ValueLimit (id={id})");
+            _logger.Info($"{_httpAccessor.HttpContext.Connection.RemoteIpAddress} deleted(set IsDeleted=true) ValueLimit (id={id})");
             return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
         }
 
@@ -131,10 +144,9 @@ namespace IGSLControlPanel.Controllers
             _productsHelper.CurrentParameter.Limit.StringValue = strValue;
         }
 
-        public IActionResult GoBack()
+        public IActionResult GoBack(Guid parameterId, bool returnToGroupEdit)
         {
-            //_productsHelper.CurrentParameter.Limit = _productsHelper.LimitWOChanges;
-            return RedirectToAction("Edit", "ProductParameters", _productsHelper.CurrentParameter);
+            return RedirectToAction("Edit", "ProductParameters", new {id = parameterId, returnToGroupEdit});
         }
     }
 }

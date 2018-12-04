@@ -31,6 +31,8 @@ namespace IGSLControlPanel.Helpers
             Products.ForEach(p => LoadProductLimits(p, context));
 
             BuildProducts(rootFolder);
+
+            CurrentProduct = null;
         }
 
         private void BuildProducts(FolderTreeEntry parent)
