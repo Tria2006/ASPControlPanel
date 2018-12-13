@@ -130,13 +130,8 @@ namespace IGSLControlPanel.Controllers
             return RedirectToAction("Edit", new { id });
         }
 
-        public async Task<IActionResult> Delete(Guid? id)
+        public async Task<IActionResult> Delete(Guid id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var parameterGroup = await _context.ParameterGroups
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (parameterGroup == null)
