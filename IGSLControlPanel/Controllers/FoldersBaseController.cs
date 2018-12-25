@@ -16,6 +16,7 @@ namespace IGSLControlPanel.Controllers
         private readonly IGSLContext _context;
         private readonly FolderDataHelper _folderDataHelper;
         public bool HasSelectedFolders => _folderDataHelper.CheckedFolders.Any();
+        public List<FolderTreeEntry> SelectedFolders => _folderDataHelper.CheckedFolders;
 
         protected FoldersBaseController(IGSLContext context, FolderDataHelper helper)
         {
@@ -85,6 +86,11 @@ namespace IGSLControlPanel.Controllers
         public void BuildFolderTree(ModelTypes modelType)
         {
             _folderDataHelper.BuildFolderTree(modelType);
+        }
+
+        public List<Guid> GetSelectedFoldersIds()
+        {
+            return SelectedFolders.Select(x => x.Id).ToList();
         }
     }
 }

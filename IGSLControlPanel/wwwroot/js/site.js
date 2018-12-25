@@ -15,3 +15,19 @@
 function GoBack() {
     javascript: history.go(-1);
 }
+
+function hideSelectedFolders(div) {
+    var childrens = div.children();
+    for (var i = 0; i < childrens.length; i++) {
+        $("#" + childrens[i].id).show();
+    };
+
+    $.get("/Tariffs/GetSelectedFoldersIds", function (data) {
+        data.forEach(function (guid) {
+            var item = $("#" + guid);
+            if (item) {
+                item.hide();
+            }
+        });
+    });
+}

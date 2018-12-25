@@ -9,7 +9,7 @@
                 <img src="~/images/Icons/back.png" alt="Назад" style="margin-right: 10px; margin-bottom: 5px; width: 40px; height: 40px" />
             </a>
         </div>
-        <div style="width: 100%; float: left">
+        <div style="width: 100%; float: left" id="itemsDiv">
             @foreach (var child in Model.ChildFolders)
             {
                 // Папки
@@ -45,6 +45,7 @@
             type: "post",
             data: { id: child.id, controllerName: $("#controllerName").val()},
             success: function (result) {
+                hideSelectedFolders($("#itemsDiv"));
                 $("#partial").html(result);
             }
         });
@@ -55,6 +56,7 @@
             type: "post",
             data: { destFolderId: $("#parentId").val(), controllerName: $("#controllerName").val(), returnPartial: true },
             success: function (result) {
+                hideSelectedFolders($("#itemsDiv"));
                 $("#partial").html(result);
             }
         });
