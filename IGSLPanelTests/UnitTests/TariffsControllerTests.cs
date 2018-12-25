@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using DBModels.Models;
+using DBModels.Models.ManyToManyLinks;
 using IGSLControlPanel.Controllers;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Enums;
@@ -132,9 +134,9 @@ namespace IGSLPanelTests.UnitTests
             tariff.Name = "Edited Tariff";
 
             if (saveMethod == "save")
-                result = await controller.Edit(tariff.Id, tariff, saveMethod, null) as RedirectToActionResult;
+                result = await controller.Edit(tariff, saveMethod, null) as RedirectToActionResult;
             else
-                result = await controller.Edit(tariff.Id, tariff, null, saveMethod) as RedirectToActionResult;
+                result = await controller.Edit(tariff, null, saveMethod) as RedirectToActionResult;
 
             // assert
             Assert.NotNull(await _context.Tariffs.FindAsync(tariff.Id));
@@ -312,6 +314,146 @@ namespace IGSLPanelTests.UnitTests
             Assert.Equal(Guid.Empty, _context.Tariffs.Find(tariff1.Id).FolderId);
             Assert.Equal(Guid.Empty, _context.Tariffs.Find(tariff2.Id).FolderId);
             Assert.False(controller.GetFolderOrTariffSelected());
+        }
+
+
+        [Fact]
+        public async Task AttachTariffToProductShouldLinkTariffToProduct()
+        {
+            //arrange
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Product 1"
+            };
+            await _context.AddAsync(product);
+            await _context.SaveChangesAsync();
+
+            var tariff = new Tariff
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tariff1"
+            };
+            await _context.AddAsync(tariff);
+            await _context.SaveChangesAsync();
+
+            //act
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
+            await controller.SelectTariff(tariff.Id);
+            var result = await controller.AttachTariffToProduct(product.Id) as RedirectToActionResult;
+
+            //assert
+            Assert.NotNull(result);
+            var resultProduct = await _context.Products.FindAsync(product.Id);
+            Assert.NotNull(resultProduct);
+            Assert.NotNull(resultProduct.TariffId);
+        }
+
+        [Fact]
+        public async Task ReAttachTariffToProductShouldReLinkTariffToProduct()
+        {
+            //arrange
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Product 1"
+            };
+            await _context.AddAsync(product);
+            await _context.SaveChangesAsync();
+
+            var attachedTariff = new Tariff
+            {
+                Id = Guid.NewGuid(),
+                Name = "AttachedTariff"
+            };
+            await _context.AddAsync(attachedTariff);
+
+            attachedTariff.LinkedProducts.Add(product);
+            await _context.SaveChangesAsync();
+
+            var tariff = new Tariff
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tariff1"
+            };
+            await _context.AddAsync(tariff);
+            await _context.SaveChangesAsync();
+
+            //act
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
+            await controller.SelectTariff(tariff.Id);
+            var result = await controller.AttachTariffToProduct(product.Id) as RedirectToActionResult;
+
+            //assert
+            Assert.NotNull(result);
+            var resultProduct = await _context.Products.FindAsync(product.Id);
+            Assert.NotNull(resultProduct);
+            Assert.NotNull(resultProduct.TariffId);
+            Assert.Equal(tariff.Id, resultProduct.TariffId);
+        }
+
+
+        [Fact]
+        public async Task GetDetailsView()
+        {
+            //arrange
+            var tariff = new Tariff
+            {
+                Id = Guid.NewGuid(),
+                Name = "Tariff1"
+            };
+            await _context.AddAsync(tariff);
+
+            var insRule = new InsuranceRule
+            {
+                Id=Guid.NewGuid(),
+                Name = "Ins Rule 1"
+            };
+            await _context.AddAsync(insRule);
+
+            var risk = new Risk
+            {
+                Id=Guid.NewGuid(),
+                Name = "Risk 1"
+            };
+            await _context.AddAsync(risk);
+
+            var rf = new RiskFactor
+            {
+                Id = Guid.NewGuid(),
+                Name = "RF 1"
+            };
+            await _context.AddAsync(rf);
+
+            tariff.InsRuleTariffLink.Add(new InsRuleTariffLink
+            {
+                InsRuleId = insRule.Id,
+                TariffId = tariff.Id
+            });
+            tariff.RiskFactorsTariffLinks.Add(new RiskFactorTariffLink
+            {
+                TariffId = tariff.Id,
+                RiskFactorId = rf.Id
+            });
+            insRule.LinksToRisks.Add(new RiskInsRuleLink
+            {
+                RiskId = risk.Id,
+                InsRuleId = insRule.Id
+            });
+            await _context.SaveChangesAsync();
+
+            //act
+            var controller = new TariffsController(_context, new FolderDataHelper(), new TariffsHelper(), _httpAccessor, new FilesHelper(_httpAccessor));
+            var result = controller.Details(tariff.Id) as ViewResult;
+
+            //assert
+            Assert.NotNull(result);
+            var resultTariff = result.Model as Tariff;
+            Assert.NotNull(resultTariff);
+            Assert.NotNull(resultTariff.InsRuleTariffLink.SingleOrDefault(x => x.InsRuleId == insRule.Id));
+            Assert.NotNull(resultTariff.InsRuleTariffLink.SingleOrDefault(x => x.InsRuleId == insRule.Id)
+                ?.InsRule.LinksToRisks.SingleOrDefault(x => x.RiskId == risk.Id));
+            Assert.NotNull(resultTariff.RiskFactorsTariffLinks.SingleOrDefault(x => x.RiskFactorId == rf.Id));
         }
     }
 }

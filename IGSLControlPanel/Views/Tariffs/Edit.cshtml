@@ -69,34 +69,37 @@
 
 <div>
     <form asp-action="Edit" class="create_update_form">
+        @Html.HiddenFor(x => x.FolderId)
+        @Html.HiddenFor(x => x.InsRuleTariffLink)
+        @Html.HiddenFor(x => x.LinkedProducts)
         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="Id"/>
         <div class="form-group" style="width: 600px">
             <label asp-for="Name" class="control-label"></label>
-            <input asp-for="Name" class="form-control" />
+            <input asp-for="Name" class="form-control"/>
             <span asp-validation-for="Name" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="ValidFrom" class="control-label"></label>
-            <input asp-for="ValidFrom" class="form-control" style="width: 160px" />
+            <input asp-for="ValidFrom" class="form-control" style="width: 160px"/>
             <span asp-validation-for="ValidFrom" class="text-danger"></span>
         </div>
         <div class="form-group">
             <label asp-for="ValidTo" class="control-label"></label>
-            <input asp-for="ValidTo" class="form-control" style="width: 160px" />
+            <input asp-for="ValidTo" class="form-control" style="width: 160px"/>
             <span asp-validation-for="ValidTo" class="text-danger"></span>
         </div>
 
         <h3>Правила страхования</h3>
         <div style="float: left">
             <a asp-controller="InsuranceRules" asp-action="Create" style="font-size: 0">
-                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px" />
+                <img src="~/images/Icons/add_param.png" alt="Добавить параметр" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px"/>
             </a>
         </div>
         <div>
             <!-- кнопка выбора правила -->
             <a id="selectInsRuleBtn" href="#" style="font-size: 0">
-                <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px" />
+                <img src="~/images/Icons/folderadd.png" alt="Создать папку" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px"/>
             </a>
         </div>
         @await Html.PartialAsync("_InsuranceRulesBlock", Model.InsRuleTariffLink)
@@ -104,21 +107,21 @@
         <h3>Факторы риска</h3>
         <div style="float: left">
             <a asp-controller="RiskFactors" asp-action="Create" style="font-size: 0">
-                <img src="~/images/Icons/add_param.png" alt="Добавить новую запись" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px" />
+                <img src="~/images/Icons/add_param.png" alt="Добавить новую запись" class="small-button-img" style="margin-bottom: 5px; margin-top: 10px"/>
             </a>
         </div>
         <div>
             <!-- кнопка выбора фактора -->
             <a id="selectFactorBtn" style="font-size: 0">
-                <img src="~/images/Icons/folderadd.png" alt="Выбор существующей" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px" />
+                <img src="~/images/Icons/folderadd.png" alt="Выбор существующей" style="margin: 10px; margin-top: 5px; width: 40px; height: 40px"/>
             </a>
             <a asp-controller="Tariffs" asp-action="CreateFactorFromParameterView">Фактор риска из параметра</a>
         </div>
         @await Html.PartialAsync("_RiskFactorsBlock", Model.RiskFactorsTariffLinks)
 
         <div class="form-group" style="margin-top: 50px">
-            <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left" />
-            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default save_and_exit_btn" />
+            <input type="submit" value="Сохранить" name="save" class="btn btn-default" style="float: left"/>
+            <input type="submit" value="Сохранить и выйти" name="saveAndExit" class="btn btn-default save_and_exit_btn"/>
             <div>
                 <button class="btn btn-default" style="width: 200px" asp-controller="Tariffs" asp-action="Index" asp-route-parentid="@Model.FolderId">Выйти без сохранения</button>
             </div>

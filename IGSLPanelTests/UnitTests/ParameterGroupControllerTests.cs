@@ -1,14 +1,14 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using DBModels.Models;
+﻿using DBModels.Models;
 using IGSLControlPanel.Controllers;
 using IGSLControlPanel.Data;
 using IGSLControlPanel.Helpers;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Xunit;
 
 namespace IGSLPanelTests.UnitTests
@@ -112,7 +112,7 @@ namespace IGSLPanelTests.UnitTests
             switch (saveMethod)
             {
                 case "save":
-                    result = await controller.Edit(group.Id ,group, saveMethod, null) as RedirectToActionResult;
+                    result = await controller.Edit(group.Id, group, saveMethod, null) as RedirectToActionResult;
                     break;
                 case "saveAndExit":
                     result = await controller.Edit(group.Id, group, null, saveMethod) as RedirectToActionResult;
@@ -186,6 +186,7 @@ namespace IGSLPanelTests.UnitTests
             // arrange
             var group = new ParameterGroup
             {
+
                 Id = Guid.NewGuid(),
                 Name = "Group 1"
             };
@@ -217,6 +218,134 @@ namespace IGSLPanelTests.UnitTests
             Assert.NotNull(result);
             Assert.Equal("Edited Group", _context.ParameterGroups.Find(group.Id)?.Name);
             Assert.Equal(saveMethod == "save" || saveMethod == "" ? "EditGlobal" : "Index", result.ActionName);
+        }
+
+        [Fact]
+        public async Task GetDeleteView()
+        {
+            // arrange
+            var group = new ParameterGroup
+            {
+                Id = Guid.NewGuid(),
+                Name = "Group 1"
+            };
+            await _context.AddAsync(group);
+            await _context.SaveChangesAsync();
+
+            var controller = new ParameterGroupsController(_context, new GroupsHelper(), new ProductsHelper());
+
+            // act
+            var result = await controller.Delete(group.Id) as ViewResult;
+
+            // assert
+            Assert.NotNull(result);
+            Assert.Equal(typeof(ParameterGroup), result.Model.GetType());
+            Assert.Equal(group.Id, (result.Model as ParameterGroup)?.Id);
+        }
+
+        [Fact]
+        public async Task DeleteGroupMustSetIsDeletedTrueAndClearParamsGroupId()
+        {
+            //arrange
+            var group = new ParameterGroup
+            {
+                Id = Guid.NewGuid(),
+                Name = "Group 1"
+            };
+            await _context.AddAsync(group);
+            await _context.SaveChangesAsync();
+
+            var param = new ProductParameter
+            {
+                Id = Guid.NewGuid(),
+                GroupId = group.Id,
+                Name = "Param1"
+            };
+            await _context.AddAsync(param);
+            await _context.SaveChangesAsync();
+
+            var controller = new ParameterGroupsController(_context, new GroupsHelper(), new ProductsHelper());
+
+            //act
+            var result = await controller.DeleteConfirmed(group.Id);
+
+            //assert
+            Assert.NotNull(result);
+            Assert.True(_context.ParameterGroups.Find(group.Id).IsDeleted);
+            Assert.Null(_context.ProductParameters.Find(param.Id).GroupId);
+        }
+
+        [Fact]
+        public async Task AttachGroupShouldCreateParamsForProductFromTemplates()
+        {
+            //arrange
+            #region GlobalGroup with params
+            var globalGroup = new ParameterGroup
+            {
+                Id = Guid.NewGuid(),
+                Name = "Group 1",
+                IsGlobal = true
+            };
+            await _context.AddAsync(globalGroup);
+            await _context.SaveChangesAsync();
+
+            var template1 = new ProductParameter
+            {
+                Id = Guid.NewGuid(),
+                GroupId = globalGroup.Id,
+                Name = "Param1",
+                IsParamTemplate = true
+            };
+            var template2 = new ProductParameter
+            {
+                Id = Guid.NewGuid(),
+                GroupId = globalGroup.Id,
+                Name = "Param2",
+                IsParamTemplate = true
+            };
+            await _context.AddRangeAsync(new List<ProductParameter> { template1, template2 });
+            await _context.SaveChangesAsync();
+
+            var limit = new ValueLimit
+            {
+                Id = Guid.NewGuid(),
+                Name = "Limit 1",
+                ParameterDataType = 0,
+                ParameterId = template1.Id
+            };
+            await _context.AddAsync(limit);
+            await _context.SaveChangesAsync();
+
+            template1.Limit = limit;
+            #endregion
+
+            #region Product arrange
+            var product = new Product
+            {
+                Id = Guid.NewGuid(),
+                Name = "Product 1"
+            };
+            _context.Products.Add(product);
+            _context.SaveChanges();
+            #endregion
+
+            //act
+            var productsController = new ProductsController(_context, new FolderDataHelper(), new ProductsHelper(), new HttpContextAccessor
+            {
+                HttpContext = new DefaultHttpContext()
+            }, new ProductParamRiskFactorLinkHelper());
+            await productsController.Edit(product.Id);
+
+            var groupsController = new ParameterGroupsController(_context, new GroupsHelper(), new ProductsHelper());
+            await groupsController.SelectGroup(globalGroup.Id);
+            var result = groupsController.AttachGroup(product.Id) as PartialViewResult;
+
+            //assert
+            Assert.NotNull(result);
+            var resultProduct = result.Model as Product;
+            Assert.NotNull(resultProduct);
+            Assert.Equal(2, resultProduct.LinkToProductParameters.Count);
+            Assert.NotNull(resultProduct.LinkToProductParameters.SingleOrDefault(x => x.Parameter.Name == "Param1")?.Parameter.Limit);
         }
     }
 }

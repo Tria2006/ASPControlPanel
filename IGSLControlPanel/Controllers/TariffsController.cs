@@ -79,13 +79,8 @@ namespace IGSLControlPanel.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(Guid id, Tariff tariff, string save, string saveAndExit)
+        public async Task<IActionResult> Edit(Tariff tariff, string save, string saveAndExit)
         {
-            if (id != tariff.Id)
-            {
-                return NotFound();
-            }
-
             if (!ModelState.IsValid) return View(_tariffsHelper.CurrentTariff);
             try
             {
@@ -106,7 +101,7 @@ namespace IGSLControlPanel.Controllers
             }
             if (!string.IsNullOrEmpty(saveAndExit))
                 return RedirectToAction(nameof(Index), GetFolderById(tariff.FolderId));
-            return RedirectToAction("Edit", new { id });
+            return RedirectToAction("Edit", new { id = tariff.Id });
         }
 
         public async Task<IActionResult> Delete(Guid id)
@@ -209,12 +204,12 @@ namespace IGSLControlPanel.Controllers
             ViewData["TariffId"] = id;
         }
 
-        public IActionResult AttachTariffToProduct(Guid productId)
+        public async Task<IActionResult> AttachTariffToProduct(Guid productId)
         {
-            var product = _context.Products.Find(productId);
+            var product = await _context.Products.FindAsync(productId);
             if (product == null) return NotFound();
 
-            var attachedTariff = _context.Tariffs.Include(x => x.LinkedProducts).SingleOrDefault(x => x.Id == product.TariffId);
+            var attachedTariff = await _context.Tariffs.Include(x => x.LinkedProducts).SingleOrDefaultAsync(x => x.Id == product.TariffId);
 
             if (attachedTariff != null)
             {
@@ -227,8 +222,8 @@ namespace IGSLControlPanel.Controllers
                 _tariffsHelper.SelectedTariffForProduct.LinkedProducts.Add(product);
                 product.TariffId = _tariffsHelper.SelectedTariffForProduct.Id;
             }
-            _context.SaveChanges();
-            return RedirectToAction("Edit", "Products", product);
+            await _context.SaveChangesAsync();
+            return RedirectToAction("Edit", "Products", new { id = product.Id });
         }
 
         public async Task<IActionResult> DetachTariff(Guid productId)
@@ -242,7 +237,7 @@ namespace IGSLControlPanel.Controllers
             product.TariffId = null;
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Edit", "Products", product);
+            return RedirectToAction("Edit", "Products", new { id = product.Id });
         }
 
         public IActionResult CreateFactorFromParameterView()
